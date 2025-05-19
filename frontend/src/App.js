@@ -1,8 +1,11 @@
-import React from "react";
-import Login from "./components/Login";
+
+import './App.css';
+import Cadastro from './components/Cadastro';
 
 function App() {
-  return <Login />;
+  return (
+    <Cadastro />
+  );
 }
 
 export default App;

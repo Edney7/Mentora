@@ -1,0 +1,99 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body, html {
+    height: 100%;
+    font-family: Arial, sans-serif;
+  }
+
+  .container{
+    display: grid;
+    grid-template-columns: auto;
+  }
+  
+  .cadastro-container {
+    display: flex;
+    height: 100vh;
+   
+  }
+  
+  .cadastro-left {
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30%;
+  }
+  
+  .cadastro-image {
+    width: 80%;
+    max-width: 500px;
+    height: auto;
+  }
+  
+  .cadastro-right {
+    width: 75%;
+    display: flex;
+    background-color: #0A9FAA;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .cadastro-form {
+    width: 80%;
+    max-width: 400px;
+  }
+  
+  .cadastro-title {
+    font-size: 32px;
+    color: #FFFFFF;
+    font-weight: bold;
+    margin-bottom: 60px;
+    text-align: center;
+  }
+  
+  .cadastro-form input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 20px;
+    background-color: #fff;
+    
+    font-size: 16px;
+    outline: none;
+  }
+
+  .cadastro-form input::placeholder {
+    color: #cec3c3;
+  }
+  
+  .cadastro-actions {
+    text-align: right;
+    margin-bottom: 30px;
+  }
+  
+  .cadastro-actions a {
+    color: #000000;
+    font-size: 14px;
+    text-decoration: underline;
+  }
+  
+  .cadastro-form button {
+    width: 100%;
+    padding: 12px;
+    color: black;
+    font-weight: bold;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .animacaoLogin{
+    width: 70%;
+  }
