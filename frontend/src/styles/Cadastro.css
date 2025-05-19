@@ -7,45 +7,82 @@
   body, html {
     height: 100%;
     font-family: Arial, sans-serif;
+    align-items: center;
   }
 
-  .container{
+  .form-grid{
     display: grid;
-    grid-template-columns: auto;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap:16px;
+    margin-bottom: 5px;
+  }
+  
+  .form-grid select{
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 20px;
+    background-color: #fff;
+    font-size: 14px;
+    outline: none;
+  }
+   .grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr ;
+    gap:16px;
+    margin-bottom: 16px;
+  }
+  .grid select{
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 20px;
+    background-color: #fff;
+    font-size: 14px;
+    outline: none;
   }
   
   .cadastro-container {
-    display: flex;
-    height: 100vh;
-   
-  }
-  
-  .cadastro-left {
-    background-color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 30%;
-  }
-  
-  .cadastro-image {
-    width: 80%;
-    max-width: 500px;
-    height: auto;
-  }
-  
-  .cadastro-right {
-    width: 75%;
-    display: flex;
-    background-color: #0A9FAA;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
+  display: flex;
+  position: relative;
+  height: 100vh;
+}
+
+.cadastro-left {
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30%;
+  z-index: 1;
+}
+
+.cadastro-right {
+  width: 70%;
+  display: flex;
+  background-color: #0A9FAA;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.animacaoCadastro {
+  position: absolute;
+  top: 50%;
+  left: 30%;
+  transform: translate(-66%, -50%);
+  width: auto;
+  height: 50em;
+  z-index: 2;
+  pointer-events: none;
+}
+
   .cadastro-form {
     width: 80%;
-    max-width: 400px;
+    max-width: 600px;
+    
   }
   
   .cadastro-title {
@@ -63,7 +100,6 @@
     border: none;
     border-radius: 20px;
     background-color: #fff;
-    
     font-size: 16px;
     outline: none;
   }
@@ -84,15 +120,19 @@
   }
   
   .cadastro-form button {
-    width: 100%;
+    width: 40%;
     padding: 12px;
     color: black;
     font-weight: bold;
     border: none;
-    background-color: transparent;
+    background-color: #fff;
+    border-radius: 20px;
     cursor: pointer;
     font-size: 16px;
+    text-align: center;
+    margin-top:10px ;
   }
+  
   
   .animacaoLogin{
     width: 70%;

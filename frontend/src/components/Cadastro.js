@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../styles/Cadastro.css";
 import animacaoCadastro from "../assets/animacaoCadastro.png"; 
-import logo from "../assets/logo.png"; // Substitua pela imagem correta
+
 
 export default function Cadastro() {
   const [nome, setNome] = useState("");
@@ -12,79 +12,72 @@ export default function Cadastro() {
   const [tipo, setTipo] = useState("");
   const [senha, setSenha] = useState("");
 
-
- /* const handleSubmit = (e) => {
-    e.preventDefault();
-    alert(`CPF: ${cpf}\nSenha: ${senha}`);
-  };
-*/
   return (
     <div className="cadastro-container">
-    
-      <div className="cadastro-left">
-        {/* Substitua pela imagem real ou SVG correspondente */}
-        <img src={animacaoCadastro} alt="Estudante com livros" className="animacaoCadastro" />
-      </div>
+      <img src={animacaoCadastro} alt="Estudante com livros" className="animacaoCadastro" />
+
+      <div className="cadastro-left"></div>
 
       <div className="cadastro-right">
         <div className="cadastro-form">
-          <h1 className="cadastro-title">Cadastro de Usuario</h1>
-          <form >
+          <h1 className="cadastro-title">Cadastro de Usuário</h1>
+          <form>
             <input
               type="text"
               placeholder="Nome"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
             />
-            <div className="container" >
-            <input
-              type="text"
-              placeholder="CPF"
-              value={cpf}
-              onChange={(e) => setCpf(e.target.value)}
-            />
-            <input
-              type="date"
-              placeholder="Data tNascimento"
-              value={dtNascimento}
-              onChange={(e) => setDtNascimento(e.target.value)}
-            />
-            </div>
-            <select
-              type="text"
-              placeholder="Sexo"
-              value={sexo}
-              onChange={(e) => setSexo(e.target.value)}>
-                <option value="">Selecione o sexo</option>
+
+            <div className="form-grid">
+              <input
+                type="text"
+                placeholder="CPF"
+                value={cpf}
+                onChange={(e) => setCpf(e.target.value)}
+              />
+              <input
+                type="date"
+                placeholder="Data de Nascimento"
+                value={dtNascimento}
+                onChange={(e) => setDtNascimento(e.target.value)}
+              />
+              <select
+                value={sexo}
+                onChange={(e) => setSexo(e.target.value)}
+              >
+                <option value="">Sexo</option>
                 <option value="feminino">Feminino</option>
                 <option value="masculino">Masculino</option>
               </select>
-            
+            </div>
+
             <input
-              type="text"
+              type="email"
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <select
-              placeholder="Tipo"
-              value={tipo}
-              onChange={(e) => setTipo(e.target.value)}>
-              <otion>Femino</otion>
-              <otion>Masculino</otion>
-            </select >
-            <input
-              type="password"
-              placeholder="Senha"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-            />
 
-            <div className="login-actions">
-              <a href="#">Redefinir senha</a>
+            <div className="grid">
+              <select
+                value={tipo}
+                onChange={(e) => setTipo(e.target.value)}
+              >
+                <option value="">Tipo de Usuário</option>
+                <option value="secretaria">Secretaria</option>
+                <option value="professor">Professor</option>
+                <option value="aluno">Aluno</option>
+              </select>
+              <input
+                type="password"
+                placeholder="Senha"
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+              />
             </div>
 
-            <button type="submit">ENTRAR</button>
+            <button type="submit">Cadastrar</button>
           </form>
         </div>
       </div>

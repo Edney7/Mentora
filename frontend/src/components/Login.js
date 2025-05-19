@@ -14,11 +14,9 @@ export default function Login() {
 
   return (
     <div className="login-container">
-    
-      <div className="login-left">
-        {/* Substitua pela imagem real ou SVG correspondente */}
-        <img src={animacaoLogin} alt="Estudante com livros" className="animacaoLogin" />
-      </div>
+            <img src={animacaoLogin} alt="Estudante com livros" className="animacaoLogin" />
+
+      <div className="login-left"></div>
 
       <div className="login-right">
         <div className="login-form">
