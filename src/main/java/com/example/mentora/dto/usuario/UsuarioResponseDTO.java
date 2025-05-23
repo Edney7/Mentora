@@ -1,4 +1,4 @@
-package com.example.mentora.dto;
+package com.example.mentora.dto.usuario;
 
 import lombok.Builder;
 import lombok.Getter;

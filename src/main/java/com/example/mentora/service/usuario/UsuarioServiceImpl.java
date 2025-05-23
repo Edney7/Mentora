@@ -1,11 +1,10 @@
-package com.example.mentora.service.impl;
+package com.example.mentora.service.usuario;
 
-import com.example.mentora.dto.LoginRequestDTO;
-import com.example.mentora.dto.UsuarioCreateDTO;
-import com.example.mentora.dto.UsuarioResponseDTO;
+import com.example.mentora.dto.usuario.LoginRequestDTO;
+import com.example.mentora.dto.usuario.UsuarioCreateDTO;
+import com.example.mentora.dto.usuario.UsuarioResponseDTO;
 import com.example.mentora.model.Usuario;
 import com.example.mentora.repository.UsuarioRepository;
-import com.example.mentora.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

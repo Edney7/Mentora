@@ -25,4 +25,7 @@ public class Turma {
 
     @Column(name = "ano_letivo")
     private Integer anoLetivo;
+
+    @Column(nullable = false)
+    private Boolean ativo = true;
 }

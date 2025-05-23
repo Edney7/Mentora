@@ -1,8 +1,9 @@
 package com.example.mentora.controller;
 
-import com.example.mentora.dto.TurmaCreateDTO;
-import com.example.mentora.dto.TurmaResponseDTO;
-import com.example.mentora.service.TurmaService;
+import com.example.mentora.dto.turma.TurmaCreateDTO;
+import com.example.mentora.dto.turma.TurmaResponseDTO;
+import com.example.mentora.dto.turma.TurmaUpdateDTO;
+import com.example.mentora.service.turma.TurmaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -33,4 +34,14 @@ public class TurmaController {
     public ResponseEntity<List<TurmaResponseDTO>> listar() {
         return ResponseEntity.ok(turmaService.listar());
     }
+
+    @Operation(summary = "Atualizar uma turma")
+    @PutMapping("/{id}")
+    public ResponseEntity<TurmaResponseDTO> atualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody TurmaUpdateDTO dto) {
+
+        return ResponseEntity.ok(turmaService.atualizar(id, dto));
+    }
+
 }

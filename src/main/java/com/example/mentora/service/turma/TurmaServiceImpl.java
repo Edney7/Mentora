@@ -1,10 +1,10 @@
-package com.example.mentora.service.impl;
+package com.example.mentora.service.turma;
 
-import com.example.mentora.dto.TurmaCreateDTO;
-import com.example.mentora.dto.TurmaResponseDTO;
+import com.example.mentora.dto.turma.TurmaCreateDTO;
+import com.example.mentora.dto.turma.TurmaResponseDTO;
+import com.example.mentora.dto.turma.TurmaUpdateDTO;
 import com.example.mentora.model.Turma;
 import com.example.mentora.repository.TurmaRepository;
-import com.example.mentora.service.TurmaService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,5 +47,19 @@ public class TurmaServiceImpl implements TurmaService {
                 .serieAno(turma.getSerieAno())
                 .anoLetivo(turma.getAnoLetivo())
                 .build();
+    }
+
+    @Override
+    public TurmaResponseDTO atualizar(Long id, TurmaUpdateDTO dto) {
+        Turma turma = turmaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Turma não encontrada"));
+
+        turma.setNome(dto.getNome());
+        turma.setTurno(dto.getTurno());
+        turma.setSerieAno(dto.getSerieAno());
+        turma.setAnoLetivo(dto.getAnoLetivo());
+
+        Turma atualizada = turmaRepository.save(turma);
+        return toResponseDTO(atualizada);
     }
 }

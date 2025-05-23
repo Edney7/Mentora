@@ -1,5 +1,5 @@
 // LoginRequestDTO.java
-package com.example.mentora.dto;
+package com.example.mentora.dto.usuario;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

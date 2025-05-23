@@ -1,11 +1,9 @@
-package com.example.mentora.dto;
+package com.example.mentora.dto.turma;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
 @Builder
 public class TurmaResponseDTO {
     private Long id;

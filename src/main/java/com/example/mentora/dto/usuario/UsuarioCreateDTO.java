@@ -1,9 +1,7 @@
-package com.example.mentora.dto;
+package com.example.mentora.dto.usuario;
 
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;

@@ -39,4 +39,7 @@ public class Usuario {
     @JsonIgnore 
     @Column(nullable = false)
     private String senha;
+
+    @Column(nullable = false)
+    private Boolean ativo = true;
 }

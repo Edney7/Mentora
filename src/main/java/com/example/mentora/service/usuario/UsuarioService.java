@@ -1,8 +1,8 @@
-package com.example.mentora.service;
+package com.example.mentora.service.usuario;
 
-import com.example.mentora.dto.LoginRequestDTO;
-import com.example.mentora.dto.UsuarioCreateDTO;
-import com.example.mentora.dto.UsuarioResponseDTO;
+import com.example.mentora.dto.usuario.LoginRequestDTO;
+import com.example.mentora.dto.usuario.UsuarioCreateDTO;
+import com.example.mentora.dto.usuario.UsuarioResponseDTO;
 
 import java.util.List;
 

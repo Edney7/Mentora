@@ -1,11 +1,9 @@
 package com.example.mentora.controller;
 
-import com.example.mentora.dto.LoginRequestDTO;
-import com.example.mentora.dto.UsuarioCreateDTO;
-import com.example.mentora.dto.UsuarioResponseDTO;
-import com.example.mentora.service.UsuarioService;
-import com.example.mentora.repository.UsuarioRepository;
-import io.swagger.v3.oas.annotations.Operation;
+import com.example.mentora.dto.usuario.LoginRequestDTO;
+import com.example.mentora.dto.usuario.UsuarioCreateDTO;
+import com.example.mentora.dto.usuario.UsuarioResponseDTO;
+import com.example.mentora.service.usuario.UsuarioService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -13,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/usuarios")

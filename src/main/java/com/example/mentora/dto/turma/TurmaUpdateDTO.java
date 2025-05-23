@@ -1,4 +1,4 @@
-package com.example.mentora.dto;
+package com.example.mentora.dto.turma;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -7,9 +7,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class TurmaCreateDTO {
+public class TurmaUpdateDTO {
 
-    @NotBlank(message = "Nome da turma é obrigatório")
+    @NotBlank(message = "Nome é obrigatório")
     private String nome;
 
     @NotBlank(message = "Turno é obrigatório")
