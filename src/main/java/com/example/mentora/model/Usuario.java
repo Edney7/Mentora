@@ -1,5 +1,6 @@
 package com.example.mentora.model;
 
+import com.example.mentora.enums.TipoUsuario;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -33,8 +34,10 @@ public class Usuario {
     @Column(nullable = false)
     private LocalDate dtNascimento;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false)
-    private String tipoUsuario;
+    private TipoUsuario tipoUsuario;
+
 
     @JsonIgnore 
     @Column(nullable = false)

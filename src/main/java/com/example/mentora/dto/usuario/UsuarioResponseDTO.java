@@ -1,5 +1,6 @@
 package com.example.mentora.dto.usuario;
 
+import com.example.mentora.enums.TipoUsuario;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,5 +17,5 @@ public class UsuarioResponseDTO {
     private String email;
     private String sexo;
     private LocalDate dtNascimento;
-    private String tipoUsuario;
+    private TipoUsuario tipoUsuario;
 }

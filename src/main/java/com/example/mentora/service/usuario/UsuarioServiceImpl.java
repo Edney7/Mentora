@@ -3,6 +3,7 @@ package com.example.mentora.service.usuario;
 import com.example.mentora.dto.usuario.LoginRequestDTO;
 import com.example.mentora.dto.usuario.UsuarioCreateDTO;
 import com.example.mentora.dto.usuario.UsuarioResponseDTO;
+import com.example.mentora.enums.TipoUsuario;
 import com.example.mentora.model.Usuario;
 import com.example.mentora.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,12 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setEmail(dto.getEmail());
         usuario.setSexo(dto.getSexo());
         usuario.setDtNascimento(dto.getDtNascimento());
-        usuario.setTipoUsuario(dto.getTipoUsuario());
+
+        try {
+            usuario.setTipoUsuario(TipoUsuario.valueOf(dto.getTipoUsuario().toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Tipo de usuário inválido. Use: ALUNO, PROFESSOR ou SECRETARIA.");
+        }
 
         String senhaHash = passwordEncoder.encode(dto.getSenha());
         usuario.setSenha(senhaHash);
@@ -73,5 +79,4 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         return toResponseDTO(usuario);
     }
-
 }
