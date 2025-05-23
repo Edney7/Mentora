@@ -20,25 +20,16 @@ import java.util.stream.Collectors;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
-    private final UsuarioRepository repository;
 
-    public UsuarioController(UsuarioService usuarioService, UsuarioRepository repository) {
+    public UsuarioController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
-        this.repository = repository;
     }
 
-    @Operation(summary = "Listar todos os usuários")
     @GetMapping
     public ResponseEntity<List<UsuarioResponseDTO>> listar() {
-        var usuarios = repository.findAll()
-                .stream()
-                .map(usuarioService::toResponseDTO)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(usuarios);
+        return ResponseEntity.ok(usuarioService.listarTodos());
     }
 
-    @Operation(summary = "Criar um novo usuário")
     @PostMapping
     public ResponseEntity<UsuarioResponseDTO> criar(@Valid @RequestBody UsuarioCreateDTO dto) {
         UsuarioResponseDTO response = usuarioService.cadastrar(dto);
