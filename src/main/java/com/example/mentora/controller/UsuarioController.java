@@ -1,5 +1,6 @@
 package com.example.mentora.controller;
 
+import com.example.mentora.dto.LoginRequestDTO;
 import com.example.mentora.dto.UsuarioCreateDTO;
 import com.example.mentora.dto.UsuarioResponseDTO;
 import com.example.mentora.service.UsuarioService;
@@ -35,4 +36,15 @@ public class UsuarioController {
         UsuarioResponseDTO response = usuarioService.cadastrar(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO loginDTO) {
+        try {
+            UsuarioResponseDTO response = usuarioService.autenticar(loginDTO);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+    }
+
 }

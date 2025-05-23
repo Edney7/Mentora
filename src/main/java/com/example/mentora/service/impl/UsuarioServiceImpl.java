@@ -1,5 +1,6 @@
 package com.example.mentora.service.impl;
 
+import com.example.mentora.dto.LoginRequestDTO;
 import com.example.mentora.dto.UsuarioCreateDTO;
 import com.example.mentora.dto.UsuarioResponseDTO;
 import com.example.mentora.model.Usuario;
@@ -61,4 +62,17 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .tipoUsuario(usuario.getTipoUsuario())
                 .build();
     }
+
+    @Override
+    public UsuarioResponseDTO autenticar(LoginRequestDTO loginDTO) {
+        Usuario usuario = usuarioRepository.findByEmail(loginDTO.getEmail())
+                .orElseThrow(() -> new RuntimeException("Email ou Senha inválida"));
+
+        if (!passwordEncoder.matches(loginDTO.getSenha(), usuario.getSenha())) {
+            throw new RuntimeException("Email ou Senha inválida");
+        }
+
+        return toResponseDTO(usuario);
+    }
+
 }
