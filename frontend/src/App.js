@@ -1,10 +1,12 @@
-
-import './App.css';
-import Login from './components/Login';
+import React from 'react';
+import { BrowserRouter } from "react-router-dom";
+import AppRoutes from './AppRoutes';
 
 function App() {
   return (
-    <Login />
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   );
 }
 

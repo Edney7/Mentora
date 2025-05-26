@@ -27,13 +27,15 @@
     font-size: 14px;
     outline: none;
   }
-   .grid{
+
+ 
+  .form-senha-grid{
     display: grid;
-    grid-template-columns: 1fr 1fr ;
+    grid-template-columns: 1fr 1fr  ;
     gap:16px;
     margin-bottom: 16px;
   }
-  .grid select{
+  .form-senha-grid input{
     width: 100%;
     padding: 12px;
     margin-bottom: 15px;
@@ -120,6 +122,8 @@
   }
   
   .cadastro-form button {
+    display: block;
+    margin: 20px auto 0;
     width: 40%;
     padding: 12px;
     color: black;
@@ -133,7 +137,12 @@
     margin-top:10px ;
   }
   
-  
+   button:hover{
+    background-color: #bee7ec;
+    color: white;
+  }
   .animacaoLogin{
     width: 70%;
   }
+  
+ 

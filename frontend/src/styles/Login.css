@@ -45,21 +45,23 @@
   }
 
   .animacaoLogin {
-  position: absolute;
-  top: 50%;
-  left: 30%;
-  transform: translate(-66%, -50%);
-  width: 50em;
-  height: 50em;
-  z-index: 2;
-  pointer-events: none;
-}
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-86%, -50%);
+    max-width: 80vw;
+    max-height: 80vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;/* evita esticar a imagem ou cortar*/
+    z-index: 2;
+    pointer-events: none; 
+  }
+
   .login-form {
     width: 80%;
     max-width: 600px;
   }
-  
-  
   
   .login-form input {
     width: 100%;
@@ -82,14 +84,29 @@
     font-size: 14px;
     text-decoration: underline;
   }
+  .login-actions a:hover {
+    color: #00838f;
+  }
   
   .login-form button {
-    width: 100%;
+     display: block;
+    margin: 20px auto 0;
+    width: 40%;
     padding: 12px;
     color: black;
     font-weight: bold;
     border: none;
     background-color: #fff;
+    border-radius: 20px;
+    cursor: pointer;
     font-size: 16px;
+    text-align: center;
+    margin-top:10px ;
+  }
+
+  .login-form button:hover {
+    background-color: #00838f;
+    color: white;
+    border-radius: 20px;
   }
   
