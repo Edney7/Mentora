@@ -27,6 +27,12 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public UsuarioResponseDTO cadastrar(UsuarioCreateDTO dto) {
+        if (UsuarioRepository.existsByEmail(dto.getEmail())){
+            throw new RuntimeException("Email já cadastrado.");
+        }
+        if (usuarioRepository.existsByCpf(dto.getCpf())){
+            throw new RuntimeException("CPF já cadastrado.");
+        }
         Usuario usuario = new Usuario();
         usuario.setNome(dto.getNome());
         usuario.setCpf(dto.getCpf());
@@ -39,6 +45,8 @@ public class UsuarioServiceImpl implements UsuarioService {
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Tipo de usuário inválido. Use: ALUNO, PROFESSOR ou SECRETARIA.");
         }
+
+        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
 
         String senhaHash = passwordEncoder.encode(dto.getSenha());
         usuario.setSenha(senhaHash);
