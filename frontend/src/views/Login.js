@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import "../styles/Login.css";
 import animacaoLogin from "../assets/animacaoLogin.png"; 
-import logo from "../assets/logo.png"; // Substitua pela imagem correta
+import logo from "../assets/logo.png"; 
+// Substitua pela imagem correta
 
 export default function Login() {
-  const [cpf, setCpf] = useState("");
+  const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert(`CPF: ${cpf}\nSenha: ${senha}`);
+    alert(`email: ${email}\nSenha: ${senha}`);
   };
 
   return (
@@ -25,9 +26,9 @@ export default function Login() {
           <form onSubmit={handleSubmit}>
             <input
               type="text"
-              placeholder="CPF"
-              value={cpf}
-              onChange={(e) => setCpf(e.target.value)}
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
             <input
               type="password"

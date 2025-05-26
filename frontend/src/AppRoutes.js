@@ -6,7 +6,7 @@ import Cadastro from './views/Cadastro';
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
+      <Route path="/login" element={<Login />} />
       <Route path="/cadastro" element={<Cadastro />} />
     </Routes>
   );

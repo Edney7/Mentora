@@ -1,4 +1,4 @@
-import { Toast, ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export const showSuccess = (mensagem) => {
@@ -18,7 +18,7 @@ export const showWarn = (mensagem) => {
 };
 
 // Componente que precisa ser exibido em pelo menos uma página
-export const Toast = () => (
+export  const Toast = () => (
   <ToastContainer
     position="top-right"
     autoClose={3000}

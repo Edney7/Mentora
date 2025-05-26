@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import "../styles/Cadastro.css";
 import animacaoCadastro from "../assets/animacaoCadastro.png"; 
 import { buscarTurmas, buscarDisciplinas } from "../services/ApiService";
-
+import { showSuccess, showError, Toast } from "../components/Toast"; // se estiver usando react-toastify encapsulado
+import { cadastrarUsuario } from "../services/ApiService"; // função para cadastrar usuário
 
 export default function Cadastro() {
   const [nome, setNome] = useState("");
@@ -13,7 +14,7 @@ export default function Cadastro() {
   const [senha, setSenha] = useState("");
   const [senhaRepetida, setSenhaRepetida] = useState("");
 
-  const [tipo, setTipo] = useState("");
+  const [tipoUsuario, setTipoUsuario] = useState("");
   const [turmas, setTurmas] = useState([]);
   const [disciplinas, setDisciplinas] = useState([]);
 
@@ -21,13 +22,48 @@ export default function Cadastro() {
   const [disciplina1, setDisciplina1] = useState("");
   const [disciplina2, setDisciplina2] = useState("");
 
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!nome || !cpf || !dtNascimento || !sexo || !email || !senha || !senhaRepetida) {
+      showError("Todos os campos são obrigatórios.");
+      return;
+    }
+
+    if (senha !== senhaRepetida) {
+      showError("As senhas não coincidem.");
+      return;
+    }
+
+    const dadosUsuario = {
+      nome,
+      cpf,
+      dtNascimento,
+      sexo,
+      email,
+      senha,
+      tipoUsuario,
+      turmaId: turmaSelecionada || null, // se for aluno
+      disciplina1Id: disciplina1 || null, // se for professor
+      disciplina2Id: disciplina2 || null, // se for professor
+    };
+
+    try {
+      await cadastrarUsuario(dadosUsuario);
+      showSuccess("Usuário cadastrado com sucesso!");
+    } catch (error) {
+      showError("Erro ao cadastrar usuário. Tente novamente.");
+    }
+  }
+  
   useEffect(() => {
-    if (tipo === "aluno") {
+    if (tipoUsuario === "aluno") {
       buscarTurmas().then(setTurmas).catch(console.error);
-    } else if (tipo === "professor") {
+    } else if (tipoUsuario === "professor") {
       buscarDisciplinas().then(setDisciplinas).catch(console.error);
     }
-  }, [tipo]);
+  }, [tipoUsuario]);
 
   return (
     <div className="cadastro-container">
@@ -38,7 +74,7 @@ export default function Cadastro() {
       <div className="cadastro-right">
         <div className="cadastro-form">
           <h1 className="cadastro-title">Cadastro de Usuário</h1>
-          <form>
+          <form onSubmit={handleSubmit}>
             <input
               type="text"
               placeholder="Nome"
@@ -64,8 +100,8 @@ export default function Cadastro() {
                 onChange={(e) => setSexo(e.target.value)}
               >
                 <option value="">Sexo</option>
-                <option value="feminino">Feminino</option>
-                <option value="masculino">Masculino</option>
+                <option value="F">Feminino</option>
+                <option value="M">Masculino</option>
               </select>
             </div>
 
@@ -78,16 +114,16 @@ export default function Cadastro() {
 
             <div className="form-grid">
               <select
-                value={tipo}
-                onChange={(e) => setTipo(e.target.value)}
+                value={tipoUsuario}
+                onChange={(e) => setTipoUsuario(e.target.value)}
               >
                 <option value="">Tipo de Usuário</option>
-                <option value="secretaria">Secretaria</option>
-                <option value="professor">Professor</option>
-                <option value="aluno">Aluno</option>
+                <option value="SECREATARIA">Secretaria</option>
+                <option value="PROFESSOR">Professor</option>
+                <option value="ALUNO">Aluno</option>
               </select>
               {/* se for aluno → mostrar select com turmas */}
-              {tipo === "aluno" && (
+              {tipoUsuario === "aluno" && (
                 <select
                   value={turmaSelecionada}
                   onChange={(e) => setTurmaSelecionada(e.target.value)}
@@ -102,7 +138,7 @@ export default function Cadastro() {
               )}
 
               {/* se for professor → mostrar dois selects com disciplinas */}
-              {tipo === "professor" && (
+              {tipoUsuario === "professor" && (
                 <>
                   <select
                     value={disciplina1}
@@ -144,7 +180,7 @@ export default function Cadastro() {
                 onChange={(e) => setSenhaRepetida(e.target.value)}
               />
               </div>
-            <button type="submit">Cadastrar</button>
+            <button type="submit" >Cadastrar</button>
           </form>
         </div>
       </div>

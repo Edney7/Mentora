@@ -1,8 +1,22 @@
-import axios from 'axios';
+import axios from "axios";
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: "http://localhost:8080", // ajuste sua URL
 });
+
+// Cadastro de usuário
+export const cadastrarUsuario = async (usuarioDados) => {
+  const response = await api.post("/usuarios", usuarioDados);
+  return response.data;
+};
+
+// Login 
+export const loginUsuario = async (email, senha) => {
+  const response = await api.post("/login", { email, senha });
+  return response.data;
+};
+
+
 //vai pegas as turmas  dinamicamente no back para o cadastro do aluno
 export const buscarTurmas = async () => {
   const response = await api.get('/turmas');
