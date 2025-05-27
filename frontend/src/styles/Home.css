@@ -1,0 +1,112 @@
+.container {
+  display: flex;
+  width: 700px;
+  height: 300px;
+  background-color: #cbe8eb;
+  border-radius: 10px;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  box-sizing: border-box;
+}
+
+.leftSide {
+  flex: 1;
+  padding-right: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.headerCard {
+  background-color: #b7d8f7;
+  border-radius: 15px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.userIcon {
+  background-color: #a3a3a3;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+}
+
+.headerCard h2 {
+  margin: 0;
+  color: #5ea9f5;
+  font-weight: 700;
+  font-size: 24px;
+}
+
+.btnGroup {
+  display: flex;
+  gap: 15px;
+}
+
+.btn {
+  flex: 1;
+  border: none;
+  padding: 20px 30px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 18px;
+  cursor: pointer;
+  color: white;
+}
+
+.tealBtn {
+  background-color: #0297a0;
+}
+
+.rightSide {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 15px;
+}
+
+.whiteBox {
+  background-color: white;
+  border-radius: 15px;
+  height: 130px;
+  margin-bottom: 10px;
+}
+
+.eventToday {
+  background-color: #e2a336;
+  border-radius: 20px;
+  padding: 10px 20px;
+  color: white;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: fit-content;
+}
+
+.absenceProf {
+  background-color: #f1f7fb;
+  border-radius: 20px;
+  padding: 10px 20px;
+  color: #3a81b6;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: fit-content;
+}
+
+.nextHoliday {
+  background-color: #11c089;
+  border-radius: 20px;
+  padding: 10px 20px;
+  color: white;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: fit-content;
+}
