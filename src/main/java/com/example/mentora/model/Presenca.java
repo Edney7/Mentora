@@ -22,17 +22,20 @@ public class Presenca {
     @Column(name = "id_presenca")
     private Long id;
 
-    @Column(name = "presente")
+    @Column(name = "data_aula", nullable = false)
+    private LocalDate dataAula;
+
+    @Column(name = "presente", nullable = false)
     private Boolean presente;
 
     @Column(name = "dt_lancamento", nullable = false)
     private LocalDate dtLancamento;
 
     @ManyToOne
-    @JoinColumn(name = "idAluno", nullable = false)
+    @JoinColumn(name = "aluno_id", referencedColumnName = "id_presenca", nullable = false)
     private Aluno aluno;
 
     @ManyToOne
-    @JoinColumn(name = "idDisciplina", nullable = false)
+    @JoinColumn(name = "disciplina_id", referencedColumnName = "id_disciplina", nullable = false)
     private Disciplina disciplina;
 }
