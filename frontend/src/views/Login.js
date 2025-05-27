@@ -4,7 +4,7 @@ import animacaoLogin from "../assets/animacaoLogin.png";
 import logo from "../assets/logo.png"; 
 import { loginUsuario } from "../services/ApiService";
 import { useNavigate } from "react-router-dom";
-
+//implementar o toast e verificar o regex
 export default function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
