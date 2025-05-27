@@ -1,13 +1,16 @@
 package com.example.mentora.service.secretaria;
 
-import com.example.mentora.dto.secretaria.SecretariaCreateDTO;
 import com.example.mentora.dto.secretaria.SecretariaResponseDTO;
 import com.example.mentora.model.Secretaria;
-import com.example.mentora.model.Usuario;
 import com.example.mentora.repository.SecretariaRepository;
-import com.example.mentora.repository.UsuarioRepository;
-import com.example.mentora.service.secretaria.SecretariaService;
+// UsuarioRepository não é mais necessário aqui se o cadastro foi removido
+// e o toResponseDTO já acessa o usuário através da entidade Secretaria.
+// import com.example.mentora.repository.UsuarioRepository;
+
+// Considere criar exceções customizadas, ex:
+// import com.example.mentora.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,34 +19,37 @@ import java.util.stream.Collectors;
 public class SecretariaServiceImpl implements SecretariaService {
 
     private final SecretariaRepository secretariaRepository;
-    private final UsuarioRepository usuarioRepository;
+    // private final UsuarioRepository usuarioRepository; // Removido se não usado diretamente
 
-    public SecretariaServiceImpl(SecretariaRepository secretariaRepository, UsuarioRepository usuarioRepository) {
+    public SecretariaServiceImpl(SecretariaRepository secretariaRepository
+            /*, UsuarioRepository usuarioRepository */) {
         this.secretariaRepository = secretariaRepository;
-        this.usuarioRepository = usuarioRepository;
+        // this.usuarioRepository = usuarioRepository;
     }
 
-    @Override
-    public SecretariaResponseDTO cadastrar(SecretariaCreateDTO dto) {
-        Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-
-        Secretaria secretaria = new Secretaria();
-        secretaria.setUsuario(usuario);
-
-        Secretaria salva = secretariaRepository.save(secretaria);
-        return toResponseDTO(salva);
-    }
+    // O método cadastrar(SecretariaCreateDTO dto) foi removido.
 
     @Override
+    @Transactional(readOnly = true)
     public List<SecretariaResponseDTO> listarTodos() {
-        return secretariaRepository.findAll()
-                .stream()
+        return secretariaRepository.findAll().stream()
                 .map(this::toResponseDTO)
                 .collect(Collectors.toList());
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public SecretariaResponseDTO buscarPorId(Long id) {
+        Secretaria secretaria = secretariaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Perfil de Secretaria com ID " + id + " não encontrado.")); // Usar ResourceNotFoundException
+        return toResponseDTO(secretaria);
+    }
+
     private SecretariaResponseDTO toResponseDTO(Secretaria secretaria) {
+        if (secretaria == null) {
+            return null;
+        }
+        // O getUsuario() não deve ser nulo devido à restrição na entidade Secretaria
         return SecretariaResponseDTO.builder()
                 .id(secretaria.getId())
                 .idUsuario(secretaria.getUsuario().getId())
@@ -51,4 +57,6 @@ public class SecretariaServiceImpl implements SecretariaService {
                 .emailUsuario(secretaria.getUsuario().getEmail())
                 .build();
     }
+
+    // Implementar outros métodos da interface SecretariaService se adicionados (atualizar, deletar)
 }

@@ -1,19 +1,19 @@
 package com.example.mentora.controller;
 
-import com.example.mentora.dto.secretaria.SecretariaCreateDTO;
+// Removido SecretariaCreateDTO se não for mais usado
 import com.example.mentora.dto.secretaria.SecretariaResponseDTO;
 import com.example.mentora.service.secretaria.SecretariaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
+// Removido @Valid para o POST, pois o POST foi removido
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.*; // @RequestBody removido do import se não houver mais POSTs/PUTs com body aqui
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/secretarias")
-@Tag(name = "Secretarias", description = "Gerenciamento de secretarias")
+@RequestMapping("/secretarias") // Este endpoint agora serve para gerenciar perfis de Secretaria existentes
+@Tag(name = "Perfis de Secretarias", description = "Visualização e gerenciamento de perfis de secretarias")
 public class SecretariaController {
 
     private final SecretariaService secretariaService;
@@ -22,15 +22,17 @@ public class SecretariaController {
         this.secretariaService = secretariaService;
     }
 
-    @Operation(summary = "Cadastrar uma nova secretaria")
-    @PostMapping
-    public ResponseEntity<SecretariaResponseDTO> cadastrar(@Valid @RequestBody SecretariaCreateDTO dto) {
-        return ResponseEntity.ok(secretariaService.cadastrar(dto));
-    }
-
-    @Operation(summary = "Listar todas as secretarias")
+    @Operation(summary = "Listar todos os perfis de secretarias")
     @GetMapping
     public ResponseEntity<List<SecretariaResponseDTO>> listarTodos() {
-        return ResponseEntity.ok(secretariaService.listarTodos());
+        List<SecretariaResponseDTO> secretarias = secretariaService.listarTodos();
+        return ResponseEntity.ok(secretarias);
+    }
+
+    @Operation(summary = "Buscar perfil de secretaria por ID")
+    @GetMapping("/{id}")
+    public ResponseEntity<SecretariaResponseDTO> buscarPorId(@PathVariable Long id) {
+        SecretariaResponseDTO secretaria = secretariaService.buscarPorId(id);
+        return ResponseEntity.ok(secretaria);
     }
 }

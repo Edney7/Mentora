@@ -1,11 +1,9 @@
 package com.example.mentora.controller;
 
-import com.example.mentora.dto.aluno.AlunoCreateDTO;
 import com.example.mentora.dto.aluno.AlunoResponseDTO;
 import com.example.mentora.service.aluno.AlunoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/alunos")
-@Tag(name = "Alunos", description = "Gerenciamento de Alunos")
+@Tag(name = "Perfis de Alunos", description = "Visualização e gerenciamento de perfis de alunos")
 public class AlunoController {
 
     private final AlunoService alunoService;
@@ -22,15 +20,18 @@ public class AlunoController {
         this.alunoService = alunoService;
     }
 
-    @Operation(summary = "Cadastrar aluno")
-    @PostMapping
-    public ResponseEntity<AlunoResponseDTO> cadastrar(@Valid @RequestBody AlunoCreateDTO dto) {
-        return ResponseEntity.ok(alunoService.cadastrar(dto));
-    }
-
-    @Operation(summary = "Listar alunos")
+    @Operation(summary = "Listar todos os perfis de alunos")
     @GetMapping
     public ResponseEntity<List<AlunoResponseDTO>> listar() {
-        return ResponseEntity.ok(alunoService.listar());
+        List<AlunoResponseDTO> alunos = alunoService.listar();
+        return ResponseEntity.ok(alunos);
     }
+
+    @Operation(summary = "Buscar perfil de aluno por ID")
+    @GetMapping("/{id}")
+    public ResponseEntity<AlunoResponseDTO> buscarPorId(@PathVariable Long id) {
+        AlunoResponseDTO aluno = alunoService.buscarPorId(id);
+        return ResponseEntity.ok(aluno);
+    }
+
 }
