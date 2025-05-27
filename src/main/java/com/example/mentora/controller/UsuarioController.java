@@ -1,9 +1,10 @@
 package com.example.mentora.controller;
 
+import com.example.mentora.dto.usuario.LoginRequestDTO;
+import com.example.mentora.dto.usuario.UsuarioCreateDTO;
+import com.example.mentora.dto.usuario.UsuarioResponseDTO;
+import com.example.mentora.service.usuario.UsuarioService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Operation;
-import com.example.mentora.model.Usuario;
-import com.example.mentora.repository.UsuarioRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,23 +16,32 @@ import java.util.List;
 @RequestMapping("/usuarios")
 @Tag(name = "Usuários", description = "Operações relacionadas aos usuários")
 public class UsuarioController {
-    private final UsuarioRepository repository;
 
-    public UsuarioController(UsuarioRepository repository) {
-        this.repository = repository;
+    private final UsuarioService usuarioService;
+
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
     }
 
-    @Operation(summary = "Listar todos os usuários")
     @GetMapping
-    public List<Usuario> listar() {
-        return repository.findAll();
+    public ResponseEntity<List<UsuarioResponseDTO>> listar() {
+        return ResponseEntity.ok(usuarioService.listarTodos());
     }
 
-    @Operation(summary = "Criar um novo usuário")
     @PostMapping
-    public ResponseEntity<Usuario> criar(@Valid @RequestBody Usuario usuario) {
-        Usuario salvo = repository.save(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
+    public ResponseEntity<UsuarioResponseDTO> criar(@Valid @RequestBody UsuarioCreateDTO dto) {
+        UsuarioResponseDTO response = usuarioService.cadastrar(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-}
 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO loginDTO) {
+        try {
+            UsuarioResponseDTO response = usuarioService.autenticar(loginDTO);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+    }
+
+}
