@@ -12,12 +12,12 @@ import lombok.Setter;
 public class ProfessorDisciplina {
 
     @Id
-    @ManyToOne
-    @JoinColumn(name = "idProfessor", nullable = false)
-    private Professor professor;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "professor_id", referencedColumnName = "id") // Was: idProfessor
+    private Professor professor; // Field name 'professor' is used in ProfessorDisciplinaId
 
     @Id
-    @ManyToOne
-    @JoinColumn(name = "idDisciplina", nullable = false)
-    private Disciplina disciplina;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "disciplina_id", referencedColumnName = "id") // Was: idDisciplina
+    private Disciplina disciplina; // Field name 'disciplina' is used in ProfessorDisciplinaId
 }

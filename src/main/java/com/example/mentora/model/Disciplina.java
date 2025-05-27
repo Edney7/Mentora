@@ -12,10 +12,10 @@ public class Disciplina {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_disciplina")
+    @Column(name = "id") // Was: id_disciplina
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 100, unique = true) // Added unique = true
     private String nome;
 
     @Column(columnDefinition = "TEXT")

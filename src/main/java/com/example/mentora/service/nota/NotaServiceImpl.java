@@ -36,7 +36,7 @@ public class NotaServiceImpl implements NotaService {
 
         Nota nota = new Nota();
         nota.setValor(dto.getValor());
-        nota.setDtLancamento(dto.getDtLancamento());
+        nota.setDataLancamento(dto.getDtLancamento());
         nota.setAluno(aluno);
         nota.setDisciplina(disciplina);
 
@@ -45,7 +45,7 @@ public class NotaServiceImpl implements NotaService {
         return NotaResponseDTO.builder()
                 .id(salva.getId())
                 .valor(salva.getValor())
-                .dtLancamento(salva.getDtLancamento())
+                .dtLancamento(salva.getDataLancamento())
                 .idAluno(salva.getAluno().getId())
                 .idDisciplina(salva.getDisciplina().getId())
                 .build();
@@ -57,7 +57,7 @@ public class NotaServiceImpl implements NotaService {
                 NotaResponseDTO.builder()
                         .id(nota.getId())
                         .valor(nota.getValor())
-                        .dtLancamento(nota.getDtLancamento())
+                        .dtLancamento(nota.getDataLancamento())
                         .idAluno(nota.getAluno().getId())
                         .idDisciplina(nota.getDisciplina().getId())
                         .build()

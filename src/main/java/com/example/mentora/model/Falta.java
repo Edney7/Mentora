@@ -3,6 +3,7 @@ package com.example.mentora.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -11,17 +12,25 @@ import lombok.Setter;
 public class Falta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_falta")
+    @Column(name = "id") // Was: id_falta
     private Long id;
+
+    @Column(name = "data_falta", nullable = false) // Added field
+    private LocalDate dataFalta;
 
     @Column(nullable = false)
     private Boolean justificada = false;
 
-    @ManyToOne
-    @JoinColumn(name = "idAluno, nullable = false")
+    @Column(name = "descricao_justificativa", columnDefinition = "TEXT") // Added field
+    private String descricaoJustificativa;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "aluno_id", referencedColumnName = "id", nullable = false) // Was: idAluno, syntax error
     private Aluno aluno;
 
-    @ManyToOne
-    @JoinColumn(name = "idDisciplina", nullable = false)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "disciplina_id", referencedColumnName = "id", nullable = false) // Was: idDisciplina
     private Disciplina disciplina;
+
+    // Consider adding UNIQUE constraint for (aluno_id, disciplina_id, data_falta) using @Table(uniqueConstraints=...)
 }

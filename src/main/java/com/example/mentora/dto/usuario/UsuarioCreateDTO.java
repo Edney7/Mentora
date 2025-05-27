@@ -28,10 +28,12 @@ public class UsuarioCreateDTO {
     private LocalDate dtNascimento;
 
     @NotBlank(message = "Tipo de usuário é obrigatório")
-    private String tipoUsuario;
+    private String tipoUsuario; // Mantenha como String para validação inicial
 
     @NotBlank(message = "Senha é obrigatória")
     @Size(min = 6, message = "Senha deve ter no mínimo 6 caracteres")
     private String senha;
-}
 
+    // Novo campo para o ID da turma, opcional
+    private Long turmaId;
+}

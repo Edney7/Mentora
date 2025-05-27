@@ -5,10 +5,9 @@ import java.util.Objects;
 
 public class ProfessorDisciplinaId implements Serializable {
 
-    private Long professor;
-    private Long disciplina;
+    private Long professor; // Corresponds to Professor.id (via ProfessorDisciplina.professor field)
+    private Long disciplina; // Corresponds to Disciplina.id (via ProfessorDisciplina.disciplina field)
 
-    // Construtores, equals e hashCode
     public ProfessorDisciplinaId() {}
 
     public ProfessorDisciplinaId(Long professor, Long disciplina) {

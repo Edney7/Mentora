@@ -6,12 +6,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+
+    // Método de instância: Spring Data JPA fornecerá a implementação
     boolean existsByCpf(String cpf);
 
-    static boolean existsByEmail(String email) {
-        return false;
-    }
+    // Método de instância CORRIGIDO: Removido 'static' e a implementação manual
+    boolean existsByEmail(String email);
 
+    // Método de instância: Spring Data JPA fornecerá a implementação
     Optional<Usuario> findByEmail(String email);
 
 }
