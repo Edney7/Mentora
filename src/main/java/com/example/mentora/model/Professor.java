@@ -7,14 +7,15 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "Professor")
+@Table(name = "professor") // Was: Professor
 public class Professor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id") // Explicitly set for clarity, was defaulting to 'id'
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "id_usuario", nullable = false)
+    @OneToOne(optional = false) // Assuming Professor must have a Usuario profile
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id", nullable = false, unique = true) // Was: id_usuario, referenced id_usuario
     private Usuario usuario;
 }

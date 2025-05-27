@@ -12,10 +12,10 @@ public class Secretaria {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_secretaria")
+    @Column(name = "id") // Was: id_secretaria
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "id_usuario", nullable = false)
+    @OneToOne(optional = false) // Assuming Secretaria staff must have a Usuario profile
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id", nullable = false, unique = true) // Was: id_usuario, referenced id_usuario
     private Usuario usuario;
 }

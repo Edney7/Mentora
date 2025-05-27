@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List; // Importar List
 
 @Getter
 @Setter
@@ -25,7 +26,7 @@ public class UsuarioCreateDTO {
 
     @NotNull(message = "Data de nascimento é obrigatória")
     @PastOrPresent(message = "Data de nascimento deve ser no passado ou presente")
-    private LocalDate dtNascimento;
+    private LocalDate dtNascimento; // Manter como dtNascimento se o DTO for usado externamente assim
 
     @NotBlank(message = "Tipo de usuário é obrigatório")
     private String tipoUsuario;
@@ -33,5 +34,10 @@ public class UsuarioCreateDTO {
     @NotBlank(message = "Senha é obrigatória")
     @Size(min = 6, message = "Senha deve ter no mínimo 6 caracteres")
     private String senha;
-}
 
+    // Usado para Aluno
+    private Long turmaId;
+
+    // Novo campo para IDs das Disciplinas, usado para Professor
+    private List<Long> disciplinaIds;
+}

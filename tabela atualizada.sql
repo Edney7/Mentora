@@ -1,123 +1,135 @@
-CREATE TABLE Usuario (
-    id_usuario SERIAL PRIMARY KEY,
+CREATE TABLE usuario (
+    id SERIAL PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     cpf VARCHAR(14) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
-    sexo CHAR(1),
-    dt_nascimento DATE,
-    tipo VARCHAR(20),
-    senha VARCHAR(255) NOT NULL
+    sexo VARCHAR(15),
+    data_nascimento DATE,
+    tipo_usuario VARCHAR(20) NOT NULL,
+    senha_hash VARCHAR(255) NOT NULL,
+    ativo BOOLEAN DEFAULT TRUE NOT NULL
 );
 
-CREATE TABLE Turma (
-    id_turma SERIAL PRIMARY KEY,
+CREATE TABLE turma (
+    id SERIAL PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     turno VARCHAR(20),
     serie_ano VARCHAR(20),
-    ano_letivo INT
+    ano_letivo INT,
+    ativa BOOLEAN DEFAULT TRUE NOT NULL
 );
 
-CREATE TABLE Aluno (
-    id_aluno SERIAL PRIMARY KEY,
-    idUsuario INT NOT NULL,
-    idTurma INT NOT NULL,
-    FOREIGN KEY (idUsuario) REFERENCES Usuario(id_usuario),
-    FOREIGN KEY (idTurma) REFERENCES Turma(id_turma)
+CREATE TABLE aluno (
+    id SERIAL PRIMARY KEY,
+    usuario_id INT NOT NULL UNIQUE,
+    turma_id INT NOT NULL,
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE,
+    FOREIGN KEY (turma_id) REFERENCES turma(id) ON DELETE RESTRICT
 );
 
-CREATE TABLE Professor (
-    id_professor SERIAL PRIMARY KEY,
-    idUsuario INT NOT NULL,
-    FOREIGN KEY (idUsuario) REFERENCES Usuario(id_usuario)
+CREATE TABLE professor (
+    id SERIAL PRIMARY KEY,
+    usuario_id INT NOT NULL UNIQUE,
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
 );
 
-CREATE TABLE Secretaria (
-    id_secretaria SERIAL PRIMARY KEY,
-    idUsuario INT NOT NULL,
-    FOREIGN KEY (idUsuario) REFERENCES Usuario(id_usuario)
+CREATE TABLE secretaria (
+    id SERIAL PRIMARY KEY,
+    usuario_id INT NOT NULL UNIQUE,
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
 );
 
-CREATE TABLE Disciplina (
-    id_disciplina SERIAL PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
+CREATE TABLE disciplina (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL UNIQUE,
     descricao TEXT
 );
 
-CREATE TABLE Turma_disciplina (
-    idTurma INT NOT NULL,
-    idDisciplina INT NOT NULL,
-    PRIMARY KEY (idTurma, idDisciplina),
-    FOREIGN KEY (idTurma) REFERENCES Turma(id_turma),
-    FOREIGN KEY (idDisciplina) REFERENCES Disciplina(id_disciplina)
+
+CREATE TABLE turma_disciplina (
+    turma_id INT NOT NULL,
+    disciplina_id INT NOT NULL,
+    PRIMARY KEY (turma_id, disciplina_id),
+    FOREIGN KEY (turma_id) REFERENCES turma(id) ON DELETE CASCADE,
+    FOREIGN KEY (disciplina_id) REFERENCES disciplina(id) ON DELETE CASCADE
 );
 
-CREATE TABLE Professor_disciplina (
-    idProfessor INT NOT NULL,
-    idDisciplina INT NOT NULL,
-    PRIMARY KEY (idProfessor, idDisciplina),
-    FOREIGN KEY (idProfessor) REFERENCES Professor(id_professor),
-    FOREIGN KEY (idDisciplina) REFERENCES Disciplina(id_disciplina)
+
+CREATE TABLE professor_disciplina (
+    professor_id INT NOT NULL,
+    disciplina_id INT NOT NULL,
+    PRIMARY KEY (professor_id, disciplina_id),
+    FOREIGN KEY (professor_id) REFERENCES professor(id) ON DELETE CASCADE,
+    FOREIGN KEY (disciplina_id) REFERENCES disciplina(id) ON DELETE CASCADE
 );
 
-CREATE TABLE Turma_professor (
-    id_professor INT NOT NULL,
-    idTurma INT NOT NULL,
-    PRIMARY KEY (id_professor, idTurma),
-    FOREIGN KEY (id_professor) REFERENCES Professor(id_professor),
-    FOREIGN KEY (idTurma) REFERENCES Turma(id_turma)
+CREATE TABLE turma_professor (
+    professor_id INT NOT NULL,
+    turma_id INT NOT NULL,
+    PRIMARY KEY (professor_id, turma_id),
+    FOREIGN KEY (professor_id) REFERENCES professor(id) ON DELETE CASCADE,
+    FOREIGN KEY (turma_id) REFERENCES turma(id) ON DELETE CASCADE
 );
 
-CREATE TABLE Nota (
-    id_nota SERIAL PRIMARY KEY,
-    valor DECIMAL(5,2),
-    dt_lancamento DATE,
-    idAluno INT NOT NULL,
-    idDisciplina INT NOT NULL,
-    FOREIGN KEY (idAluno) REFERENCES Aluno(id_aluno),
-    FOREIGN KEY (idDisciplina) REFERENCES Disciplina(id_disciplina)
+CREATE TABLE nota (
+    id SERIAL PRIMARY KEY,
+    valor DECIMAL(5,2) CHECK (valor >= 0 AND valor <= 100),
+    data_lancamento DATE DEFAULT CURRENT_DATE,
+    aluno_id INT NOT NULL,
+    disciplina_id INT NOT NULL,
+    FOREIGN KEY (aluno_id) REFERENCES aluno(id) ON DELETE CASCADE,
+    FOREIGN KEY (disciplina_id) REFERENCES disciplina(id) ON DELETE RESTRICT
 );
 
-CREATE TABLE Falta (
-    id_falta SERIAL PRIMARY KEY,
-    justificada BOOLEAN,
-    idAluno INT NOT NULL,
-    idDisciplina INT NOT NULL,
-    FOREIGN KEY (idAluno) REFERENCES Aluno(id_aluno),
-    FOREIGN KEY (idDisciplina) REFERENCES Disciplina(id_disciplina)
+CREATE TABLE falta (
+    id SERIAL PRIMARY KEY,
+    data_falta DATE NOT NULL,
+    justificada BOOLEAN DEFAULT FALSE,
+    descricao_justificativa TEXT,
+    aluno_id INT NOT NULL,
+    disciplina_id INT NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE (aluno_id, disciplina_id, data_falta),
+    FOREIGN KEY (aluno_id) REFERENCES aluno(id) ON DELETE CASCADE,
+    FOREIGN KEY (disciplina_id) REFERENCES disciplina(id) ON DELETE RESTRICT
 );
 
-CREATE TABLE Presenca (
-    id_presenca SERIAL PRIMARY KEY,
-    presente BOOLEAN,
-    idAluno INT NOT NULL,
-    idDisciplina INT NOT NULL,
-    FOREIGN KEY (idAluno) REFERENCES Aluno(id_aluno),
-    FOREIGN KEY (idDisciplina) REFERENCES Disciplina(id_disciplina)
+CREATE TABLE presenca (
+    id SERIAL PRIMARY KEY,
+    data_aula DATE NOT NULL,
+    presente BOOLEAN NOT NULL,
+    aluno_id INT NOT NULL,
+    disciplina_id INT NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE (aluno_id, disciplina_id, data_aula),
+    FOREIGN KEY (aluno_id) REFERENCES aluno(id) ON DELETE CASCADE,
+    FOREIGN KEY (disciplina_id) REFERENCES disciplina(id) ON DELETE RESTRICT
 );
 
-CREATE TABLE Ausencia (
-    id_ausencia SERIAL PRIMARY KEY,
-    data DATE,
+CREATE TABLE ausencia_professor (
+    id SERIAL PRIMARY KEY,
+    data_ausencia DATE NOT NULL,
     motivo TEXT,
-    idProfessor INT NOT NULL,
-    FOREIGN KEY (idProfessor) REFERENCES Professor(id_professor)
+    professor_id INT NOT NULL,
+    FOREIGN KEY (professor_id) REFERENCES professor(id) ON DELETE CASCADE
 );
 
-CREATE TABLE Calendario (
-    id_calendario SERIAL PRIMARY KEY
+CREATE TABLE calendario (
+    id SERIAL PRIMARY KEY,
+    ano_letivo INT NOT NULL,
+    descricao VARCHAR(255),
+    data_inicio DATE,
+    data_fim DATE
 );
 
-CREATE TABLE Evento (
-    id_evento SERIAL PRIMARY KEY,
-    titulo VARCHAR(100),
+CREATE TABLE evento (
+    id SERIAL PRIMARY KEY,
+    titulo VARCHAR(100) NOT NULL,
     descricao TEXT,
-    data DATE,
-    tipo VARCHAR(50),
-    idSecretaria INT NOT NULL,
-    idCalendario INT NOT NULL,
-    FOREIGN KEY (idSecretaria) REFERENCES Secretaria(id_secretaria),
-    FOREIGN KEY (idCalendario) REFERENCES Calendario(id_calendario)
+    data_evento TIMESTAMP NOT NULL,
+    tipo_evento VARCHAR(50),
+    secretaria_id INT,
+    calendario_id INT NOT NULL,
+    FOREIGN KEY (secretaria_id) REFERENCES secretaria(id) ON DELETE SET NULL,
+    FOREIGN KEY (calendario_id) REFERENCES calendario(id) ON DELETE CASCADE
 );
-
-ALTER TABLE Usuario ADD COLUMN ativo BOOLEAN DEFAULT TRUE;
-ALTER TABLE Turma ADD COLUMN ativo BOOLEAN DEFAULT TRUE;
