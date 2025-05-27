@@ -1,34 +1,38 @@
 package com.example.mentora.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import java.time.LocalDate;
 
+
+
+@Entity
+@Table(name = "presencas")
 @Getter
 @Setter
-@Entity // Added
-@Table(name = "presenca") // Added
+@NoArgsConstructor
+@AllArgsConstructor
 public class Presenca {
-
-    @Id // Added new PK field
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id_presenca")
     private Long id;
 
-    @Column(name = "data_aula", nullable = false) // Was: dt_lancamento, renamed to data_aula for clarity
-    private LocalDate dataAula; // Field name updated
-
-    @Column(name = "presente", nullable = false) // This field indicates presence status
+    @Column(name = "presente")
     private Boolean presente;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "aluno_id", referencedColumnName = "id", nullable = false) // Was: idAluno
+    @Column(name = "dt_lancamento", nullable = false)
+    private LocalDate dtLancamento;
+
+    @ManyToOne
+    @JoinColumn(name = "idAluno", nullable = false)
     private Aluno aluno;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "disciplina_id", referencedColumnName = "id", nullable = false) // Was: idDisciplina
+    @ManyToOne
+    @JoinColumn(name = "idDisciplina", nullable = false)
     private Disciplina disciplina;
-
-    // Consider adding UNIQUE constraint for (aluno_id, disciplina_id, data_aula) using @Table(uniqueConstraints=...)
 }
