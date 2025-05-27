@@ -1,8 +1,8 @@
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect} from "react";
 import "../styles/Cadastro.css";
 import animacaoCadastro from "../assets/animacaoCadastro.png"; 
 import { buscarTurmas, buscarDisciplinas } from "../services/ApiService";
-import { showSuccess, showError, Toast } from "../components/Toast"; // se estiver usando react-toastify encapsulado
+//import { showSuccess, showError, Toast } from "../components/Toast"; // se estiver usando react-toastify encapsulado
 import { cadastrarUsuario } from "../services/ApiService"; // função para cadastrar usuário
 
 //add toast e colocar o regex de permitir somente caractere em nome
@@ -26,7 +26,6 @@ export default function Cadastro() {
   const formatarCPF = (value) => {
   // Remove tudo que não for número
   value = value.replace(/\D/g, "");
-  // Aplica máscara
   value = value.replace(/(\d{3})(\d)/, "$1.$2");
   value = value.replace(/(\d{3})(\d)/, "$1.$2");
   value = value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
@@ -82,9 +81,9 @@ export default function Cadastro() {
   }
   
   useEffect(() => {
-    if (tipoUsuario === "aluno") {
+    if (tipoUsuario === "ALUNO") {
       buscarTurmas().then(setTurmas).catch(console.error);
-    } else if (tipoUsuario === "professor") {
+    } else if (tipoUsuario === "PROFESSOR") {
       buscarDisciplinas().then(setDisciplinas).catch(console.error);
     }
   }, [tipoUsuario]);
@@ -153,7 +152,7 @@ export default function Cadastro() {
                 <option value="ALUNO">Aluno</option>
               </select>
               {/* se for aluno → mostrar select com turmas */}
-              {tipoUsuario === "aluno" && (
+              {tipoUsuario === "ALUNO" && (
                 <select
                   value={turmaSelecionada}
                   onChange={(e) => setTurmaSelecionada(e.target.value)}
@@ -168,7 +167,7 @@ export default function Cadastro() {
               )}
 
               {/* se for professor → mostrar dois selects com disciplinas */}
-              {tipoUsuario === "professor" && (
+              {tipoUsuario === "PROFESSOR" && (
                 <>
                   <select
                     value={disciplina1}
