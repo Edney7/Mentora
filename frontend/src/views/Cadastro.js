@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import "../styles/Cadastro.css";
 import animacaoCadastro from "../assets/animacaoCadastro.png"; 
 import { buscarTurmas, buscarDisciplinas } from "../services/ApiService";
 import { showSuccess, showError, Toast } from "../components/Toast"; // se estiver usando react-toastify encapsulado
 import { cadastrarUsuario } from "../services/ApiService"; // função para cadastrar usuário
 
+//add toast e colocar o regex de permitir somente caractere em nome
 export default function Cadastro() {
   const [nome, setNome] = useState("");
   const [cpf, setCpf] = useState("");
@@ -22,17 +23,26 @@ export default function Cadastro() {
   const [disciplina1, setDisciplina1] = useState("");
   const [disciplina2, setDisciplina2] = useState("");
 
+  const formatarCPF = (value) => {
+  // Remove tudo que não for número
+  value = value.replace(/\D/g, "");
+  // Aplica máscara
+  value = value.replace(/(\d{3})(\d)/, "$1.$2");
+  value = value.replace(/(\d{3})(\d)/, "$1.$2");
+  value = value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+  return value;
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!nome || !cpf || !dtNascimento || !sexo || !email || !senha || !senhaRepetida) {
-      showError("Todos os campos são obrigatórios.");
+      alert("Todos os campos são obrigatórios.");
       return;
     }
 
     if (senha !== senhaRepetida) {
-      showError("As senhas não coincidem.");
+      alert("As senhas não coincidem.");
       return;
     }
 
@@ -51,9 +61,23 @@ export default function Cadastro() {
 
     try {
       await cadastrarUsuario(dadosUsuario);
-      showSuccess("Usuário cadastrado com sucesso!");
+      alert("Usuário cadastrado com sucesso!");
+      
+      //limpa os campos
+        setNome("");
+        setCpf("");
+        setDtNascimento("");
+        setSexo("");
+        setEmail("");
+        setSenha("");
+        setSenhaRepetida("");
+        setTipoUsuario("");
+        setTurmaSelecionada("");
+        setDisciplina1("");
+        setDisciplina2("");
+
     } catch (error) {
-      showError("Erro ao cadastrar usuário. Tente novamente.");
+      alert("Erro ao cadastrar usuário. Tente novamente.");
     }
   }
   
@@ -80,6 +104,7 @@ export default function Cadastro() {
               placeholder="Nome"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
+              required minLength={3} maxLength={100}
             />
 
             <div className="form-grid">
@@ -87,17 +112,20 @@ export default function Cadastro() {
                 type="text"
                 placeholder="CPF"
                 value={cpf}
-                onChange={(e) => setCpf(e.target.value)}
+                onChange={(e) => setCpf(formatarCPF(e.target.value))}
+                required 
               />
               <input
                 type="date"
                 placeholder="Data de Nascimento"
                 value={dtNascimento}
                 onChange={(e) => setDtNascimento(e.target.value)}
+                required
               />
               <select
                 value={sexo}
                 onChange={(e) => setSexo(e.target.value)}
+                required
               >
                 <option value="">Sexo</option>
                 <option value="F">Feminino</option>
@@ -110,15 +138,17 @@ export default function Cadastro() {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required minLength={10} maxLength={100}
             />
 
             <div className="form-grid">
               <select
                 value={tipoUsuario}
                 onChange={(e) => setTipoUsuario(e.target.value)}
+                required
               >
                 <option value="">Tipo de Usuário</option>
-                <option value="SECREATARIA">Secretaria</option>
+                <option value="SECRETARIA">Secretaria</option>
                 <option value="PROFESSOR">Professor</option>
                 <option value="ALUNO">Aluno</option>
               </select>
@@ -172,12 +202,14 @@ export default function Cadastro() {
                 placeholder="Senha"
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
+                required minLength={6} maxLength={20}
               />
               <input
                 type="password"
                 placeholder="Repetir senha"
                 value={senhaRepetida}
                 onChange={(e) => setSenhaRepetida(e.target.value)}
+                required minLength={6} maxLength={20}
               />
               </div>
             <button type="submit" >Cadastrar</button>
