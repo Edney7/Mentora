@@ -5,15 +5,17 @@ import com.example.mentora.dto.usuario.UsuarioCreateDTO;
 import com.example.mentora.dto.usuario.UsuarioResponseDTO;
 import com.example.mentora.enums.TipoUsuario;
 import com.example.mentora.model.Aluno;
-import com.example.mentora.model.Disciplina; // Importar Disciplina
-import com.example.mentora.model.Professor; // Importar Professor
-import com.example.mentora.model.ProfessorDisciplina; // Importar ProfessorDisciplina
+import com.example.mentora.model.Disciplina;
+import com.example.mentora.model.Professor;
+import com.example.mentora.model.ProfessorDisciplina;
+import com.example.mentora.model.Secretaria; // Importar Secretaria
 import com.example.mentora.model.Turma;
 import com.example.mentora.model.Usuario;
 import com.example.mentora.repository.AlunoRepository;
-import com.example.mentora.repository.DisciplinaRepository; // Importar DisciplinaRepository
-import com.example.mentora.repository.ProfessorDisciplinaRepository; // Importar ProfessorDisciplinaRepository
-import com.example.mentora.repository.ProfessorRepository; // Importar ProfessorRepository
+import com.example.mentora.repository.DisciplinaRepository;
+import com.example.mentora.repository.ProfessorDisciplinaRepository;
+import com.example.mentora.repository.ProfessorRepository;
+import com.example.mentora.repository.SecretariaRepository; // Importar SecretariaRepository
 import com.example.mentora.repository.TurmaRepository;
 import com.example.mentora.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +33,10 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final PasswordEncoder passwordEncoder;
     private final AlunoRepository alunoRepository;
     private final TurmaRepository turmaRepository;
-    private final ProfessorRepository professorRepository; // Injetar ProfessorRepository
-    private final DisciplinaRepository disciplinaRepository; // Injetar DisciplinaRepository
-    private final ProfessorDisciplinaRepository professorDisciplinaRepository; // Injetar ProfessorDisciplinaRepository
+    private final ProfessorRepository professorRepository;
+    private final DisciplinaRepository disciplinaRepository;
+    private final ProfessorDisciplinaRepository professorDisciplinaRepository;
+    private final SecretariaRepository secretariaRepository; // Injetar SecretariaRepository
 
 
     @Autowired
@@ -41,16 +44,18 @@ public class UsuarioServiceImpl implements UsuarioService {
                               PasswordEncoder passwordEncoder,
                               AlunoRepository alunoRepository,
                               TurmaRepository turmaRepository,
-                              ProfessorRepository professorRepository, // Adicionar ao construtor
-                              DisciplinaRepository disciplinaRepository, // Adicionar ao construtor
-                              ProfessorDisciplinaRepository professorDisciplinaRepository) { // Adicionar ao construtor
+                              ProfessorRepository professorRepository,
+                              DisciplinaRepository disciplinaRepository,
+                              ProfessorDisciplinaRepository professorDisciplinaRepository,
+                              SecretariaRepository secretariaRepository) { // Adicionar ao construtor
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.alunoRepository = alunoRepository;
         this.turmaRepository = turmaRepository;
-        this.professorRepository = professorRepository; // Atribuir
-        this.disciplinaRepository = disciplinaRepository; // Atribuir
-        this.professorDisciplinaRepository = professorDisciplinaRepository; // Atribuir
+        this.professorRepository = professorRepository;
+        this.disciplinaRepository = disciplinaRepository;
+        this.professorDisciplinaRepository = professorDisciplinaRepository;
+        this.secretariaRepository = secretariaRepository; // Atribuir
     }
 
     @Override
@@ -69,7 +74,6 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setEmail(dto.getEmail());
         usuario.setSexo(dto.getSexo());
         // Assumindo que Usuario.java tem o campo dataNascimento e setter correspondente
-        // Se o campo na entidade Usuario ainda for dtNascimento, use setDtNascimento
         usuario.setDataNascimento(dto.getDtNascimento());
 
 
@@ -81,14 +85,12 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new RuntimeException("Tipo de usuário inválido. Use: ALUNO, PROFESSOR ou SECRETARIA.");
         }
 
-        // Assumindo que Usuario.java tem o campo senha e setter correspondente
         usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
         usuario.setAtivo(true);
 
         Usuario usuarioSalvo = usuarioRepository.save(usuario);
         System.out.println("DEBUG: ID do Usuario salvo: " + (usuarioSalvo != null ? usuarioSalvo.getId() : "usuarioSalvo é null ou ID é null"));
 
-        // Lógica para Aluno
         if (tipo == TipoUsuario.ALUNO) {
             if (dto.getTurmaId() == null) {
                 throw new RuntimeException("turmaId é obrigatório para cadastrar um ALUNO.");
@@ -100,14 +102,13 @@ public class UsuarioServiceImpl implements UsuarioService {
             aluno.setUsuario(usuarioSalvo);
             aluno.setTurma(turma);
             alunoRepository.save(aluno);
-        }
-        // Lógica para Professor
-        else if (tipo == TipoUsuario.PROFESSOR) {
+            System.out.println("DEBUG: Aluno criado e vinculado ao usuário ID " + usuarioSalvo.getId());
+
+        } else if (tipo == TipoUsuario.PROFESSOR) {
             Professor professor = new Professor();
             professor.setUsuario(usuarioSalvo);
             Professor professorSalvo = professorRepository.save(professor);
-            System.out.println("DEBUG: ID do Professor salvo: " + (professorSalvo != null ? professorSalvo.getId() : "professorSalvo é null ou ID é null"));
-
+            System.out.println("DEBUG: Professor criado com ID " + professorSalvo.getId() + " vinculado ao usuário ID " + usuarioSalvo.getId());
 
             if (dto.getDisciplinaIds() != null && !dto.getDisciplinaIds().isEmpty()) {
                 for (Long disciplinaId : dto.getDisciplinaIds()) {
@@ -122,13 +123,13 @@ public class UsuarioServiceImpl implements UsuarioService {
                 }
             } else {
                 System.out.println("WARN: Nenhum disciplinaIds fornecido para o Professor ID " + professorSalvo.getId());
-                // Você pode decidir se quer lançar uma exceção aqui caso seja obrigatório
-                // ou apenas logar um aviso como feito acima.
             }
+        } else if (tipo == TipoUsuario.SECRETARIA) {
+            Secretaria secretaria = new Secretaria();
+            secretaria.setUsuario(usuarioSalvo);
+            Secretaria secretariaSalva = secretariaRepository.save(secretaria);
+            System.out.println("DEBUG: Secretaria criada com ID " + secretariaSalva.getId() + " vinculada ao usuário ID " + usuarioSalvo.getId());
         }
-        // Adicionar lógica para SECRETARIA se necessário
-        // else if (tipo == TipoUsuario.SECRETARIA) { ... }
-
 
         return toResponseDTO(usuarioSalvo);
     }
@@ -143,8 +144,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public UsuarioResponseDTO toResponseDTO(Usuario usuario) {
-        // Assumindo que Usuario.java tem getDataNascimento() e getSenha()
-        // Se os campos na entidade Usuario ainda forem dtNascimento e senha, use os getters correspondentes
+        // Assumindo que Usuario.java tem getDataNascimento()
         return UsuarioResponseDTO.builder()
                 .id(usuario.getId())
                 .nome(usuario.getNome())
@@ -161,11 +161,9 @@ public class UsuarioServiceImpl implements UsuarioService {
         Usuario usuario = usuarioRepository.findByEmail(loginDTO.getEmail())
                 .orElseThrow(() -> new RuntimeException("Email ou Senha inválida"));
 
-        // Assumindo que Usuario.java tem getSenha()
         if (!passwordEncoder.matches(loginDTO.getSenha(), usuario.getSenha())) {
             throw new RuntimeException("Email ou Senha inválida");
         }
-
         return toResponseDTO(usuario);
     }
 }
