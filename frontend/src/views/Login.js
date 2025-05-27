@@ -19,47 +19,65 @@ export default function Login() {
     return regex.test(email);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setErroEmail(null);
+  setErroSenha(null);
+  setErroLogin(null);
 
-    setErroEmail(null);
-    setErroSenha(null);
-    setErroLogin(null);
+  let validar = true;
 
-    
-    let validar = true;
+  if (!validarEmail(email)) {
+    setErroEmail("Email inválido");
+    validar = false;
+  }
+  if (senha.length < 6) {
+    setErroSenha("Senha deve ter no mínimo 6 caracteres");
+    validar = false;
+  }
 
-    if (!validarEmail(email)) {
-      setErroEmail("Email inválido");
-      validar = false;
+  if (!validar) return;
+
+  try {// vai pegar op id e confirmar o tipo
+    const data = await loginUsuario(email, senha);
+
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("userId", data.id);
+    localStorage.setItem("tipoUsuario", data.tipoUsuario);
+
+    alert("Login efetuado com sucesso!");
+
+    // Redireciona conforme o tipo do usuário
+    switch (data.tipoUsuario.toUpperCase()) {
+      case "SECRETARIA":
+        navigate("/homeSecretaria");
+        break;
+      case "ALUNO":
+        navigate("/homeAluno");
+        break;
+      case "PROFESSOR":
+        navigate("/homeProfessor");
+        break;
+      default:
+        alert("Tipo de usuário inválido.");
+        break;
     }
-    if (senha.length < 6) {
-      setErroSenha("Senha deve ter no mínimo 6 caracteres");
-      validar = false;
-    }
 
-    if (!validar) return;
+  } catch (error) {
+    const mensagemErro =
+      error.response?.data?.mensagem ||
+      error.response?.data ||
+      "Erro no login";
+    setErroLogin(mensagemErro);
+  }
+};
 
-    try {
-      const data = await loginUsuario(email, senha);
-      localStorage.setItem("token", data.token);
-      alert("Login efetuado com sucesso!");
-      navigate("/homeSecretaria");
-    } catch (error) {
-      const mensagemErro =
-        error.response?.data?.mensagem ||
-        error.response?.data ||
-        "Erro no login";
-      setErroLogin(mensagemErro);
-    }
-  };
 
   return (
     <div className="login-container">
       <img src={animacaoLogin} alt="Estudante com livros" className="animacaoLogin" />
 
       <div className="login-left"></div>
-
       <div className="login-right">
         <div className="login-form">
           <img src={logo} alt="logo mentora" className="login-image" />

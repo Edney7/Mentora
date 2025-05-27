@@ -2,7 +2,6 @@ import React, { useState, useEffect} from "react";
 import "../styles/Cadastro.css";
 import animacaoCadastro from "../assets/animacaoCadastro.png"; 
 import { buscarTurmas, buscarDisciplinas } from "../services/ApiService";
-//import { showSuccess, showError, Toast } from "../components/Toast"; // se estiver usando react-toastify encapsulado
 import { cadastrarUsuario } from "../services/ApiService"; // função para cadastrar usuário
 
 //add toast e colocar o regex de permitir somente caractere em nome
@@ -22,15 +21,15 @@ export default function Cadastro() {
   const [turmaSelecionada, setTurmaSelecionada] = useState("");
   const [disciplina1, setDisciplina1] = useState("");
   const [disciplina2, setDisciplina2] = useState("");
+  
 
   const formatarCPF = (value) => {
-  // Remove tudo que não for número
   value = value.replace(/\D/g, "");
   value = value.replace(/(\d{3})(\d)/, "$1.$2");
   value = value.replace(/(\d{3})(\d)/, "$1.$2");
   value = value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
   return value;
-};
+ };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,12 +54,12 @@ export default function Cadastro() {
       tipoUsuario,
       turmaId: turmaSelecionada || null, // se for aluno
       disciplina1Id: disciplina1 || null, // se for professor
-      disciplina2Id: disciplina2 || null, // se for professor
+      disciplina2Id: disciplina2 || null, // modificar para aceitar no minimo uma disciplina por professor
     };
 
     try {
       await cadastrarUsuario(dadosUsuario);
-      alert("Usuário cadastrado com sucesso!");
+      alert("Cadastro de usuário realizado com sucesso!");
       
       //limpa os campos
         setNome("");
@@ -91,11 +90,10 @@ export default function Cadastro() {
   return (
     <div className="cadastro-container">
       <img src={animacaoCadastro} alt="Estudante com livros" className="animacaoCadastro" />
-
       <div className="cadastro-left"></div>
 
       <div className="cadastro-right">
-        <div className="cadastro-form">
+        <div className="cadastro-form">//talvez colocar  a logo aqui
           <h1 className="cadastro-title">Cadastro de Usuário</h1>
           <form onSubmit={handleSubmit}>
             <input
@@ -112,7 +110,7 @@ export default function Cadastro() {
                 placeholder="CPF"
                 value={cpf}
                 onChange={(e) => setCpf(formatarCPF(e.target.value))}
-                required 
+                required minLength={14} maxLength={14}
               />
               <input
                 type="date"
