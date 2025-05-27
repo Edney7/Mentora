@@ -21,7 +21,7 @@ public class FaltaService {
     @Autowired
     private DisciplinaRepository disciplinaRepository;
 
-    public Falta registraFalta(FaltaCreateDTO dto){
+    public Falta registraFalta(FaltaCreateDTO dto) {
         Aluno aluno = alunoRepository.findById(dto.getIdAluno())
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado!"));
 
@@ -32,6 +32,11 @@ public class FaltaService {
         falta.setAluno(aluno);
         falta.setDisciplina(disciplina);
         falta.setJustificada(dto.getJustificada());
+        falta.setDataFalta(dto.getDataFalta());
+
+        if (dto.getDescricaoJustificativa() != null) {
+            falta.setDescricaoJustificativa(dto.getDescricaoJustificativa());
+        }
 
         return faltaRepository.save(falta);
     }

@@ -16,8 +16,8 @@ public class Presenca {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "data_aula", nullable = false) // Was: dt_lancamento, renamed to data_aula for clarity
-    private LocalDate dataAula; // Field name updated
+    @Column(name = "dt_lancamento", nullable = false) // Was: dt_lancamento, renamed to data_aula for clarity
+    private LocalDate dtLancamento; // Field name updated
 
     @Column(name = "presente", nullable = false) // This field indicates presence status
     private Boolean presente;
@@ -29,6 +29,9 @@ public class Presenca {
     @ManyToOne(optional = false)
     @JoinColumn(name = "disciplina_id", referencedColumnName = "id", nullable = false) // Was: idDisciplina
     private Disciplina disciplina;
+
+    @Column(name = "data_aula", nullable = false)
+    private LocalDate dataAula;
 
     // Consider adding UNIQUE constraint for (aluno_id, disciplina_id, data_aula) using @Table(uniqueConstraints=...)
 }

@@ -20,4 +20,7 @@ public class PresencaCreateDTO {
 
     @NotNull
     private LocalDate dtLancamento;
+
+    @NotNull(message = "A data da aula é obrigatória.")
+    private LocalDate dataAula;
 }
