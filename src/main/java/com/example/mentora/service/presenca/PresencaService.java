@@ -32,7 +32,7 @@ public class PresencaService {
         presenca.setAluno(aluno);
         presenca.setDisciplina(disciplina);
         presenca.setPresente(dto.getPresente());
-        presenca.setDtLancamento(dto.getDtLancamento());
+        presenca.setDataAula(dto.getDtLancamento());
 
         return presencaRepository.save(presenca);
 
