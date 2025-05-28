@@ -13,24 +13,16 @@ import java.util.List;
 @Repository
 public interface TurmaDisciplinaRepository extends JpaRepository<TurmaDisciplina, TurmaDisciplinaId> {
 
-    // Método para encontrar todas as associações por ID da Turma.
-    // O nome do método segue a convenção do Spring Data JPA para gerar a query.
-    // 'Turma' é a propriedade na entidade TurmaDisciplina, e 'Id' é a propriedade id dentro de Turma.
+    // Encontra todas as associações TurmaDisciplina para um determinado turmaId.
+    // O Spring Data JPA infere a query pelo nome do método.
     List<TurmaDisciplina> findByTurmaId(Long turmaId);
 
-    // Método para encontrar todas as associações por ID da Disciplina.
+    // Encontra todas as associações TurmaDisciplina para um determinado disciplinaId.
     List<TurmaDisciplina> findByDisciplinaId(Long disciplinaId);
 
-    // Método customizado para deletar todas as associações por ID da Turma.
-    // Útil para o método atualizarDisciplinasDaTurma no serviço.
-    // @Modifying indica que esta query altera dados.
-    // @Query permite escrever uma JPQL ou SQL nativa.
-    @Modifying
+    // Método customizado para deletar todas as associações por turmaId.
+    // Necessário para a operação de "atualizarDisciplinasDaTurma" de forma eficiente.
+    @Modifying // Indica que esta query modifica dados (DELETE, UPDATE, INSERT)
     @Query("DELETE FROM TurmaDisciplina td WHERE td.turma.id = :turmaId")
     void deleteByTurmaId(@Param("turmaId") Long turmaId);
-
-    // Opcional: Método para deletar por ID da Disciplina, se necessário.
-    // @Modifying
-    // @Query("DELETE FROM TurmaDisciplina td WHERE td.disciplina.id = :disciplinaId")
-    // void deleteByDisciplinaId(@Param("disciplinaId") Long disciplinaId);
 }

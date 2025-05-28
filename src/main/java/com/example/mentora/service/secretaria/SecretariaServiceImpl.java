@@ -2,12 +2,9 @@ package com.example.mentora.service.secretaria;
 
 import com.example.mentora.dto.secretaria.SecretariaResponseDTO;
 import com.example.mentora.model.Secretaria;
+import com.example.mentora.model.Usuario; // Importar Usuario para aceder ao nome e email
 import com.example.mentora.repository.SecretariaRepository;
-// UsuarioRepository não é mais necessário aqui se o cadastro foi removido
-// e o toResponseDTO já acessa o usuário através da entidade Secretaria.
-// import com.example.mentora.repository.UsuarioRepository;
-
-// Considere criar exceções customizadas, ex:
+// Considere criar exceções personalizadas, ex:
 // import com.example.mentora.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,44 +16,47 @@ import java.util.stream.Collectors;
 public class SecretariaServiceImpl implements SecretariaService {
 
     private final SecretariaRepository secretariaRepository;
-    // private final UsuarioRepository usuarioRepository; // Removido se não usado diretamente
 
-    public SecretariaServiceImpl(SecretariaRepository secretariaRepository
-            /*, UsuarioRepository usuarioRepository */) {
+    public SecretariaServiceImpl(SecretariaRepository secretariaRepository) {
         this.secretariaRepository = secretariaRepository;
-        // this.usuarioRepository = usuarioRepository;
     }
 
-    // O método cadastrar(SecretariaCreateDTO dto) foi removido.
+    // Método auxiliar para mapear Secretaria para SecretariaResponseDTO
+    private SecretariaResponseDTO toSecretariaResponseDTO(Secretaria secretaria) {
+        if (secretaria == null) {
+            return null;
+        }
+        Usuario usuario = secretaria.getUsuario(); // Obter o utilizador associado
+
+        return SecretariaResponseDTO.builder()
+                .id(secretaria.getId())
+                .idUsuario(usuario != null ? usuario.getId() : null)
+                .nomeUsuario(usuario != null ? usuario.getNome() : "N/A")
+                .emailUsuario(usuario != null ? usuario.getEmail() : "N/A")
+                // Adicionar outros campos relevantes, como estado ativo do utilizador, se necessário no DTO
+                // .ativo(usuario != null ? usuario.getAtivo() : false)
+                .build();
+    }
 
     @Override
     @Transactional(readOnly = true)
-    public List<SecretariaResponseDTO> listarTodos() {
-        return secretariaRepository.findAll().stream()
-                .map(this::toResponseDTO)
+    public List<SecretariaResponseDTO> listarSecretariasAtivas() {
+        // Utiliza o novo método do repositório que já filtra por utilizador ativo
+        return secretariaRepository.findAllWhereUsuarioAtivoTrue()
+                .stream()
+                .map(this::toSecretariaResponseDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public SecretariaResponseDTO buscarPorId(Long id) {
-        Secretaria secretaria = secretariaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Perfil de Secretaria com ID " + id + " não encontrado.")); // Usar ResourceNotFoundException
-        return toResponseDTO(secretaria);
+    public SecretariaResponseDTO buscarSecretariaAtivaPorId(Long id) {
+        // Utiliza o novo método do repositório que busca por ID de Secretaria e verifica se o utilizador está ativo
+        Secretaria secretaria = secretariaRepository.findByIdAndUsuarioAtivoTrue(id)
+                .orElseThrow(() -> new RuntimeException("Perfil de Secretaria ativo com ID " + id + " não encontrado, ou o utilizador associado está inativo."));
+        // Considere usar uma exceção mais específica, como ResourceNotFoundException
+        return toSecretariaResponseDTO(secretaria);
     }
 
-    private SecretariaResponseDTO toResponseDTO(Secretaria secretaria) {
-        if (secretaria == null) {
-            return null;
-        }
-        // O getUsuario() não deve ser nulo devido à restrição na entidade Secretaria
-        return SecretariaResponseDTO.builder()
-                .id(secretaria.getId())
-                .idUsuario(secretaria.getUsuario().getId())
-                .nomeUsuario(secretaria.getUsuario().getNome())
-                .emailUsuario(secretaria.getUsuario().getEmail())
-                .build();
-    }
-
-    // Implementar outros métodos da interface SecretariaService se adicionados (atualizar, deletar)
+    // Implementar outros métodos da interface SecretariaService se adicionados
 }

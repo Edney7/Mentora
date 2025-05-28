@@ -8,7 +8,6 @@ import lombok.Setter;
 @Setter
 @Builder
 public class DisciplinaResponseDTO {
-
     private Long id;
     private String nome;
     private String descricao;
