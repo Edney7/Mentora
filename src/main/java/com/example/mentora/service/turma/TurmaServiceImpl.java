@@ -24,8 +24,8 @@ public class TurmaServiceImpl implements TurmaService {
     private static final Logger log = LoggerFactory.getLogger(TurmaServiceImpl.class);
 
     private final TurmaRepository turmaRepository;
-    // private final AlunoRepository alunoRepository; // Descomente se necessário
-    // private final TurmaDisciplinaRepository turmaDisciplinaRepository; // Descomente se necessário
+    // private final AlunoRepository alunoRepository;
+    // private final TurmaDisciplinaRepository turmaDisciplinaRepository;
 
     @Autowired
     public TurmaServiceImpl(TurmaRepository turmaRepository
@@ -58,7 +58,6 @@ public class TurmaServiceImpl implements TurmaService {
         turma.setTurno(dto.getTurno());
         turma.setSerieAno(dto.getSerieAno());
         turma.setAnoLetivo(dto.getAnoLetivo());
-        // Novas turmas são ativas por padrão (definido na entidade ou aqui se o DTO permitir)
         turma.setAtiva(dto.getAtiva() != null ? dto.getAtiva() : true);
 
         Turma turmaSalva = turmaRepository.save(turma);
@@ -82,6 +81,7 @@ public class TurmaServiceImpl implements TurmaService {
         Turma turma = turmaRepository.findByIdAndAtivaTrue(id)
                 .orElseThrow(() -> {
                     log.warn("Turma ativa com ID: {} não encontrada.", id);
+                    // Considere usar uma exceção customizada como ResourceNotFoundException
                     return new RuntimeException("Turma ativa com ID " + id + " não encontrada.");
                 });
         return toTurmaResponseDTO(turma);
@@ -91,38 +91,54 @@ public class TurmaServiceImpl implements TurmaService {
     @Transactional
     public TurmaResponseDTO atualizar(Long id, TurmaUpdateDTO dto) {
         log.info("Atualizando turma com ID: {}", id);
-        Turma turmaExistente = turmaRepository.findById(id) // Busca mesmo que inativa para permitir atualização do status 'ativa'
+        // Busca a turma pelo ID, independentemente do status 'ativa',
+        // pois podemos querer atualizar uma turma inativa (ex: reativá-la ou corrigir dados).
+        Turma turmaExistente = turmaRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Turma com ID: {} não encontrada para atualização.", id);
+                    // Considere usar uma exceção customizada como ResourceNotFoundException
                     return new RuntimeException("Turma com ID " + id + " não encontrada para atualização.");
                 });
 
-        if (dto.getNome() != null && !dto.getNome().isBlank()) {
+        boolean modificado = false;
+
+        // Atualiza apenas os campos que foram fornecidos no DTO (não são nulos)
+        if (dto.getNome() != null && !dto.getNome().isBlank() && !dto.getNome().equals(turmaExistente.getNome())) {
             turmaExistente.setNome(dto.getNome());
+            modificado = true;
         }
-        if (dto.getTurno() != null) {
+        if (dto.getTurno() != null && !dto.getTurno().equals(turmaExistente.getTurno())) {
             turmaExistente.setTurno(dto.getTurno());
+            modificado = true;
         }
-        if (dto.getSerieAno() != null) {
+        if (dto.getSerieAno() != null && !dto.getSerieAno().equals(turmaExistente.getSerieAno())) {
             turmaExistente.setSerieAno(dto.getSerieAno());
+            modificado = true;
         }
-        if (dto.getAnoLetivo() != null) {
+        if (dto.getAnoLetivo() != null && !dto.getAnoLetivo().equals(turmaExistente.getAnoLetivo())) {
             turmaExistente.setAnoLetivo(dto.getAnoLetivo());
+            modificado = true;
         }
-        if (dto.getAtiva() != null) { // Permite atualizar o status 'ativa'
+        if (dto.getAtiva() != null && !dto.getAtiva().equals(turmaExistente.getAtiva())) {
             turmaExistente.setAtiva(dto.getAtiva());
+            modificado = true;
         }
 
-        Turma turmaAtualizada = turmaRepository.save(turmaExistente);
-        log.info("Turma com ID: {} atualizada com sucesso.", turmaAtualizada.getId());
-        return toTurmaResponseDTO(turmaAtualizada);
+        if (modificado) {
+            Turma turmaAtualizada = turmaRepository.save(turmaExistente);
+            log.info("Turma com ID: {} atualizada com sucesso.", turmaAtualizada.getId());
+            return toTurmaResponseDTO(turmaAtualizada);
+        } else {
+            log.info("Nenhuma alteração detectada para a turma com ID: {}. Retornando dados existentes.", id);
+            return toTurmaResponseDTO(turmaExistente); // Retorna os dados existentes se nada mudou
+        }
     }
 
     @Override
     @Transactional
     public void desativarTurma(Long id) {
         log.info("Tentando desativar turma com ID: {}", id);
-        Turma turma = turmaRepository.findById(id) // Busca mesmo que já inativa
+        Turma turma = turmaRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Turma com ID: {} não encontrada para desativação.", id);
                     return new RuntimeException("Turma com ID " + id + " não encontrada para desativação.");
@@ -130,20 +146,8 @@ public class TurmaServiceImpl implements TurmaService {
 
         if (!turma.getAtiva()) {
             log.warn("Tentativa de desativar Turma ID {}, que já está inativa.", id);
-            // throw new BusinessRuleException("Turma com ID " + id + " já está inativa.");
-            return; // Ou não fazer nada
+            return;
         }
-
-        // Lógica de Negócio Adicional antes de desativar:
-        // 1. Verificar se há alunos ativos vinculados a esta turma.
-        //    Se sim, impedir a desativação ou mover os alunos para outra turma.
-        //    Ex: if (alunoRepository.countByTurmaIdAndAtivoTrue(id) > 0) { // Requer método customizado
-        //            throw new RuntimeException("Não é possível desativar turma com alunos ativos vinculados.");
-        //        }
-        // 2. Desvincular disciplinas (TurmaDisciplina)? Ou isso acontece automaticamente
-        //    se a turma for considerada "inutilizável"?
-        //    Ex: turmaDisciplinaRepository.deleteByTurmaId(id);
-
         turma.setAtiva(false);
         turmaRepository.save(turma);
         log.info("Turma ID {} marcada como inativa.", id);
@@ -161,8 +165,7 @@ public class TurmaServiceImpl implements TurmaService {
 
         if (turma.getAtiva()) {
             log.warn("Tentativa de reativar Turma ID {}, que já está ativa.", id);
-            // throw new BusinessRuleException("Turma com ID " + id + " já está ativa.");
-            return; // Ou não fazer nada
+            return;
         }
         turma.setAtiva(true);
         turmaRepository.save(turma);

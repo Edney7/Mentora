@@ -8,17 +8,17 @@ import java.util.List;
 
 public interface TurmaService {
 
-    TurmaResponseDTO cadastrar(TurmaCreateDTO dto); // Cria uma turma ativa por padrão
+    TurmaResponseDTO cadastrar(TurmaCreateDTO dto);
 
-    List<TurmaResponseDTO> listarTurmasAtivas(); // Anteriormente listar()
-    TurmaResponseDTO buscarTurmaAtivaPorId(Long id); // Anteriormente buscarPorId()
+    List<TurmaResponseDTO> listarTurmasAtivas();
+    TurmaResponseDTO buscarTurmaAtivaPorId(Long id);
 
-    TurmaResponseDTO atualizar(Long id, TurmaUpdateDTO dto); // Pode atualizar o status 'ativa'
+    TurmaResponseDTO atualizar(Long id, TurmaUpdateDTO dto); // MÉTODO QUE VAMOS IMPLEMENTAR/REVISAR
 
-    void desativarTurma(Long id); // Novo método para soft delete (substitui excluir)
-    void reativarTurma(Long id);  // Novo método para reativar
+    void desativarTurma(Long id);
+    void reativarTurma(Long id);
 
-    // Se precisar de métodos para buscar todas as turmas (incluindo inativas) para admin:
+    // Métodos para buscar todas as turmas (incluindo inativas) podem ser adicionados aqui para admin
     // List<TurmaResponseDTO> listarTodasAsTurmas();
     // TurmaResponseDTO buscarTurmaPorIdIncluindoInativas(Long id);
 }

@@ -15,12 +15,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/turmas")
-@Tag(name = "Turmas", description = "Operações CRUD para Turmas") // Descrição atualizada
+@Tag(name = "Turmas", description = "Operações CRUD para Turmas")
 public class TurmaController {
 
     private final TurmaService turmaService;
 
-    // TurmaDisciplinaService foi removido daqui
+    // O TurmaDisciplinaService não é mais injetado aqui, pois os endpoints
+    // relacionados foram movidos para TurmaDisciplinaController.
     public TurmaController(TurmaService turmaService) {
         this.turmaService = turmaService;
     }
@@ -32,17 +33,17 @@ public class TurmaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(turmaCriada);
     }
 
-    @Operation(summary = "Listar todas as turmas ativas") // Assumindo que seu TurmaService.listar() agora é listarTurmasAtivas()
+    @Operation(summary = "Listar todas as turmas ativas")
     @GetMapping
     public ResponseEntity<List<TurmaResponseDTO>> listarTurmasAtivas() {
-        List<TurmaResponseDTO> turmas = turmaService.listarTurmasAtivas(); // Ajustado para listar apenas ativas
+        List<TurmaResponseDTO> turmas = turmaService.listarTurmasAtivas();
         return ResponseEntity.ok(turmas);
     }
 
-    @Operation(summary = "Buscar uma turma ativa por ID") // Assumindo que seu TurmaService.buscarPorId() agora é buscarTurmaAtivaPorId()
+    @Operation(summary = "Buscar uma turma ativa por ID")
     @GetMapping("/{id}")
     public ResponseEntity<TurmaResponseDTO> buscarTurmaAtivaPorId(@PathVariable Long id) {
-        TurmaResponseDTO turma = turmaService.buscarTurmaAtivaPorId(id); // Ajustado para buscar apenas ativa
+        TurmaResponseDTO turma = turmaService.buscarTurmaAtivaPorId(id);
         return ResponseEntity.ok(turma);
     }
 
@@ -57,8 +58,8 @@ public class TurmaController {
 
     @Operation(summary = "Desativar uma turma (soft delete)")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> desativarTurma(@PathVariable Long id){ // Nome do método reflete a ação
-        turmaService.desativarTurma(id); // Ajustado para desativar em vez de excluir
+    public ResponseEntity<Void> desativarTurma(@PathVariable Long id){
+        turmaService.desativarTurma(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -69,5 +70,6 @@ public class TurmaController {
         return ResponseEntity.ok().build();
     }
 
-    // Os endpoints relacionados a Turma-Disciplina foram movidos para TurmaDisciplinaController
+    // O método listarDisciplinasDaTurma e outros relacionados à associação
+    // Turma-Disciplina foram movidos para TurmaDisciplinaController.
 }
