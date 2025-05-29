@@ -8,7 +8,7 @@ import { cadastrarUsuario } from "../services/ApiService"; // função para cada
 export default function Cadastro() {
   const [nome, setNome] = useState("");
   const [cpf, setCpf] = useState("");
-  const [dtNascimento, setDtNascimento] = useState("");
+  const [data_nascimento, setData_nascimento] = useState("");
   const [sexo, setSexo] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -34,7 +34,7 @@ export default function Cadastro() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!nome || !cpf || !dtNascimento || !sexo || !email || !senha || !senhaRepetida) {
+    if (!nome || !cpf || !data_nascimento || !sexo || !email || !senha || !senhaRepetida) {
       alert("Todos os campos são obrigatórios.");
       return;
     }
@@ -47,7 +47,7 @@ export default function Cadastro() {
     const dadosUsuario = {
       nome,
       cpf,
-      dtNascimento,
+      data_nascimento,
       sexo,
       email,
       senha,
@@ -64,7 +64,7 @@ export default function Cadastro() {
       //limpa os campos
         setNome("");
         setCpf("");
-        setDtNascimento("");
+        setData_nascimento("");
         setSexo("");
         setEmail("");
         setSenha("");
@@ -93,7 +93,7 @@ export default function Cadastro() {
       <div className="cadastro-left"></div>
 
       <div className="cadastro-right">
-        <div className="cadastro-form">//talvez colocar  a logo aqui
+        <div className="cadastro-form">
           <h1 className="cadastro-title">Cadastro de Usuário</h1>
           <form onSubmit={handleSubmit}>
             <input
@@ -115,8 +115,8 @@ export default function Cadastro() {
               <input
                 type="date"
                 placeholder="Data de Nascimento"
-                value={dtNascimento}
-                onChange={(e) => setDtNascimento(e.target.value)}
+                value={data_nascimento}
+                onChange={(e) => setData_nascimento(e.target.value)}
                 required
               />
               <select

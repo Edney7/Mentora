@@ -41,22 +41,18 @@ export default function Login() {
   try {// vai pegar op id e confirmar o tipo
     const data = await loginUsuario(email, senha);
 
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("userId", data.id);
-    localStorage.setItem("tipoUsuario", data.tipoUsuario);
-
     alert("Login efetuado com sucesso!");
 
     // Redireciona conforme o tipo do usuário
     switch (data.tipoUsuario.toUpperCase()) {
       case "SECRETARIA":
-        navigate("/homeSecretaria");
+        navigate("/homeSecretaria/{id}");
         break;
       case "ALUNO":
-        navigate("/homeAluno");
+        navigate("/homeAluno/{id}");
         break;
       case "PROFESSOR":
-        navigate("/homeProfessor");
+        navigate("/homeProfessor/{id}");
         break;
       default:
         alert("Tipo de usuário inválido.");
@@ -102,7 +98,7 @@ export default function Login() {
             {erroSenha && <p style={{ color: "red" }}>{erroSenha}</p>}
 
             <div className="login-actions">
-              <a href="#">Redefinir senha</a>
+              <a href="/">Redefinir senha</a>
             </div>
 
             <button type="submit">ENTRAR</button>

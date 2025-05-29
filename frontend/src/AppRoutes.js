@@ -10,7 +10,7 @@ import HomeProfessor from './views/Professor/HomeProfessor';
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
+      <Route path="/" element={<Login />} />
       <Route path="/cadastro" element={<Cadastro />} />
       <Route path="/homeSecretaria" element={<HomeSecretaria/>} />
       <Route path="/homeProfessor" element={<HomeProfessor/>} />

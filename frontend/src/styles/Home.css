@@ -33,6 +33,7 @@
   color: #4a90e2;
   font-size: 50px;
   font-weight: bold;
+  text-decoration: none;
 
 }
 
@@ -76,8 +77,6 @@
 }
 
 .event-card {/* card geral dos eventos*/
-  padding: 30px;
-  
   display: flex;
   justify-content: space-between;
   align-items: center;
