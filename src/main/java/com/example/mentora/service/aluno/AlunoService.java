@@ -6,5 +6,6 @@ import java.util.List;
 public interface AlunoService {
     List<AlunoResponseDTO> listarAtivos();
     AlunoResponseDTO buscarAtivoPorId(Long id);
-    // Outros métodos se houver...
+    List<AlunoResponseDTO> listarAlunosPorTurma(Long turmaId); // NOVO MÉTODO
+    // Outros métodos...
 }

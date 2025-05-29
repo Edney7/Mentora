@@ -1,10 +1,13 @@
 package com.example.mentora.controller;
 
+import com.example.mentora.dto.aluno.AlunoResponseDTO; // 1. Importar AlunoResponseDTO
 import com.example.mentora.dto.turma.TurmaCreateDTO;
 import com.example.mentora.dto.turma.TurmaResponseDTO;
 import com.example.mentora.dto.turma.TurmaUpdateDTO;
+import com.example.mentora.service.aluno.AlunoService; // 2. Importar AlunoService
 import com.example.mentora.service.turma.TurmaService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter; // Importar @Parameter
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -15,15 +18,16 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/turmas")
-@Tag(name = "Turmas", description = "Operações CRUD para Turmas")
+@Tag(name = "Turmas", description = "Operações CRUD para Turmas e visualização de seus alunos") // Tag description atualizada
 public class TurmaController {
 
     private final TurmaService turmaService;
+    private final AlunoService alunoService; // 3. Declarar AlunoService
 
-    // O TurmaDisciplinaService não é mais injetado aqui, pois os endpoints
-    // relacionados foram movidos para TurmaDisciplinaController.
-    public TurmaController(TurmaService turmaService) {
+    // 4. Adicionar AlunoService ao construtor para injeção de dependência
+    public TurmaController(TurmaService turmaService, AlunoService alunoService) {
         this.turmaService = turmaService;
+        this.alunoService = alunoService; // 5. Atribuir AlunoService
     }
 
     @Operation(summary = "Cadastrar uma nova turma")
@@ -70,6 +74,15 @@ public class TurmaController {
         return ResponseEntity.ok().build();
     }
 
-    // O método listarDisciplinasDaTurma e outros relacionados à associação
-    // Turma-Disciplina foram movidos para TurmaDisciplinaController.
+    // --- NOVO ENDPOINT PARA LISTAR ALUNOS DA TURMA ---
+    @Operation(summary = "Listar todos os alunos ativos de uma turma específica")
+    @GetMapping("/{turmaId}/alunos")
+    public ResponseEntity<List<AlunoResponseDTO>> listarAlunosDaTurma(
+            @Parameter(description = "ID da turma para buscar os alunos") @PathVariable Long turmaId) {
+        List<AlunoResponseDTO> alunos = alunoService.listarAlunosPorTurma(turmaId);
+        return ResponseEntity.ok(alunos);
+    }
+
+    // Os métodos que gerenciavam a associação Turma-Disciplina
+    // devem estar APENAS no TurmaDisciplinaController.
 }
