@@ -12,10 +12,11 @@ public class Secretaria {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_secretaria")
+    @Column(name = "id")
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "id_usuario", nullable = false)
+    @OneToOne(optional = false)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id", nullable = false, unique = true)
     private Usuario usuario;
+
 }

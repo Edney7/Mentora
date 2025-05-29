@@ -7,19 +7,20 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "Aluno")
+@Table(name = "aluno") // Certifique-se de que o nome da tabela no BD é "aluno"
 public class Aluno {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_aluno")
+    @Column(name = "id")
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "idUsuario", nullable = false)
-    private Usuario usuario;
+    @OneToOne(optional = false)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id", nullable = false, unique = true)
+    private Usuario usuario; // O status 'ativo' deste aluno será determinado pelo usuario.getAtivo()
 
-    @ManyToOne
-    @JoinColumn(name = "idTurma", nullable = false)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "turma_id", referencedColumnName = "id", nullable = false)
     private Turma turma;
+
 }
