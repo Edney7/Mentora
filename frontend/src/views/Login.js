@@ -46,13 +46,13 @@ export default function Login() {
     // Redireciona conforme o tipo do usuário
     switch (data.tipoUsuario.toUpperCase()) {
       case "SECRETARIA":
-        navigate("/homeSecretaria/{id}");
+        navigate("/homeSecretaria");
         break;
       case "ALUNO":
-        navigate("/homeAluno/{id}");
+        navigate("/homeAluno");
         break;
       case "PROFESSOR":
-        navigate("/homeProfessor/{id}");
+        navigate("/homeProfessor");
         break;
       default:
         alert("Tipo de usuário inválido.");

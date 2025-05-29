@@ -2,9 +2,10 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Login from './views/Login';
 import Cadastro from './views/Cadastro';
-import HomeSecretaria from './views/Secretaria/HomeSecreataria';
+import HomeSecretaria from './views/Secretaria/HomeSecretaria';
 import HomeAluno from './views/Aluno/HomeAluno';
 import HomeProfessor from './views/Professor/HomeProfessor';
+import ListaUsuario from './views/Secretaria/ListaUsuario';
 
 
 export default function AppRoutes() {
@@ -15,6 +16,7 @@ export default function AppRoutes() {
       <Route path="/homeSecretaria" element={<HomeSecretaria/>} />
       <Route path="/homeProfessor" element={<HomeProfessor/>} />
       <Route path="/homeAluno" element={<HomeAluno/>} />
+      <Route path="/listaUsuario" element={<ListaUsuario/>} />
     </Routes>
   );
 }
