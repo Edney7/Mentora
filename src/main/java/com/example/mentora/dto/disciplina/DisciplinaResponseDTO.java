@@ -6,10 +6,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
+@Builder // Facilita a construção do DTO no serviço
 public class DisciplinaResponseDTO {
-
     private Long id;
     private String nome;
     private String descricao;
+    // Se disciplinas tivessem um status 'ativa':
+    // private Boolean ativa;
 }

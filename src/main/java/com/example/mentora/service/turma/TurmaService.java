@@ -7,7 +7,18 @@ import com.example.mentora.dto.turma.TurmaUpdateDTO;
 import java.util.List;
 
 public interface TurmaService {
+
     TurmaResponseDTO cadastrar(TurmaCreateDTO dto);
-    TurmaResponseDTO atualizar(Long id, TurmaUpdateDTO dto);
-    List<TurmaResponseDTO> listar();
+
+    List<TurmaResponseDTO> listarTurmasAtivas();
+    TurmaResponseDTO buscarTurmaAtivaPorId(Long id);
+
+    TurmaResponseDTO atualizar(Long id, TurmaUpdateDTO dto); // MÉTODO QUE VAMOS IMPLEMENTAR/REVISAR
+
+    void desativarTurma(Long id);
+    void reativarTurma(Long id);
+
+    // Métodos para buscar todas as turmas (incluindo inativas) podem ser adicionados aqui para admin
+    // List<TurmaResponseDTO> listarTodasAsTurmas();
+    // TurmaResponseDTO buscarTurmaPorIdIncluindoInativas(Long id);
 }

@@ -1,15 +1,12 @@
 package com.example.mentora.service.aluno;
 
-import com.example.mentora.dto.aluno.AlunoCreateDTO;
 import com.example.mentora.dto.aluno.AlunoResponseDTO;
 import com.example.mentora.model.Aluno;
-import com.example.mentora.model.Turma;
-import com.example.mentora.model.Usuario;
 import com.example.mentora.repository.AlunoRepository;
-import com.example.mentora.repository.TurmaRepository;
-import com.example.mentora.repository.UsuarioRepository;
-import com.example.mentora.service.aluno.AlunoService;
+// Considere criar exceções customizadas, ex:
+// import com.example.mentora.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,44 +15,45 @@ import java.util.stream.Collectors;
 public class AlunoServiceImpl implements AlunoService {
 
     private final AlunoRepository alunoRepository;
-    private final UsuarioRepository usuarioRepository;
-    private final TurmaRepository turmaRepository;
 
-    public AlunoServiceImpl(AlunoRepository alunoRepository, UsuarioRepository usuarioRepository, TurmaRepository turmaRepository) {
+    public AlunoServiceImpl(AlunoRepository alunoRepository) {
         this.alunoRepository = alunoRepository;
-        this.usuarioRepository = usuarioRepository;
-        this.turmaRepository = turmaRepository;
     }
 
-    @Override
-    public AlunoResponseDTO cadastrar(AlunoCreateDTO dto) {
-        Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-        Turma turma = turmaRepository.findById(dto.getIdTurma())
-                .orElseThrow(() -> new RuntimeException("Turma não encontrada"));
-
-        Aluno aluno = new Aluno();
-        aluno.setUsuario(usuario);
-        aluno.setTurma(turma);
-
-        Aluno salvo = alunoRepository.save(aluno);
-
+    // Método auxiliar para mapear Aluno para AlunoResponseDTO
+    private AlunoResponseDTO toAlunoResponseDTO(Aluno aluno) {
+        if (aluno == null) {
+            return null;
+        }
         return AlunoResponseDTO.builder()
-                .id(salvo.getId())
-                .idUsuario(usuario.getId())
-                .idTurma(turma.getId())
+                .id(aluno.getId())
+                .usuarioId(aluno.getUsuario() != null ? aluno.getUsuario().getId() : null)
+                .nomeUsuario(aluno.getUsuario() != null ? aluno.getUsuario().getNome() : "N/A")
+                .emailUsuario(aluno.getUsuario() != null ? aluno.getUsuario().getEmail() : "N/A")
+                .turmaId(aluno.getTurma() != null ? aluno.getTurma().getId() : null)
+                .nomeTurma(aluno.getTurma() != null ? aluno.getTurma().getNome() : "N/A")
+                // Você pode adicionar o status 'ativo' do usuário ao DTO do Aluno se for útil
+                // .ativo(aluno.getUsuario() != null ? aluno.getUsuario().getAtivo() : false)
                 .build();
     }
 
     @Override
-    public List<AlunoResponseDTO> listar() {
-        return alunoRepository.findAll()
+    @Transactional(readOnly = true)
+    public List<AlunoResponseDTO> listarAtivos() {
+        // Utiliza o novo método do repositório que já filtra por usuário ativo
+        return alunoRepository.findAllWhereUsuarioAtivoTrue()
                 .stream()
-                .map(a -> AlunoResponseDTO.builder()
-                        .id(a.getId())
-                        .idUsuario(a.getUsuario().getId())
-                        .idTurma(a.getTurma().getId())
-                        .build())
+                .map(this::toAlunoResponseDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AlunoResponseDTO buscarAtivoPorId(Long id) {
+        // Utiliza o novo método do repositório que busca por ID do Aluno e verifica se o usuário está ativo
+        Aluno aluno = alunoRepository.findByIdAndUsuarioAtivoTrue(id)
+                .orElseThrow(() -> new RuntimeException("Perfil de Aluno ativo com ID " + id + " não encontrado, ou o usuário associado está inativo."));
+        // Considere usar uma exceção mais específica, como ResourceNotFoundException
+        return toAlunoResponseDTO(aluno);
     }
 }

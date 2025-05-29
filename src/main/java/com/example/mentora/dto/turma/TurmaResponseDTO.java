@@ -1,9 +1,11 @@
-package com.example.mentora.dto.turma;
+package com.example.mentora.dto.turma; // Certifique-se que este é o seu pacote correto
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Builder
 public class TurmaResponseDTO {
     private Long id;
@@ -11,4 +13,5 @@ public class TurmaResponseDTO {
     private String turno;
     private String serieAno;
     private Integer anoLetivo;
+    private Boolean ativa; // Campo adicionado para ser incluído na resposta
 }
