@@ -1,23 +1,25 @@
 package com.example.mentora.dto.turma;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+// Importe anotações de validação se quiser adicionar restrições específicas para atualização
+// Ex: @Size, @Min, etc. Não use @NotBlank/@NotNull aqui se os campos forem opcionais.
 
 @Getter
 @Setter
 public class TurmaUpdateDTO {
 
-    @NotBlank(message = "Nome é obrigatório")
+    // Campos que podem ser atualizados.
+    // Se um campo não for fornecido no JSON, seu valor será null aqui.
     private String nome;
-
-    @NotBlank(message = "Turno é obrigatório")
     private String turno;
-
-    @NotBlank(message = "Série/Ano é obrigatório")
     private String serieAno;
-
-    @NotNull(message = "Ano letivo é obrigatório")
     private Integer anoLetivo;
+    private Boolean ativa; // Permite ativar ou desativar a turma via atualização
+
+    // Construtor padrão
+    public TurmaUpdateDTO() {
+    }
+
+    // Getters e Setters são gerados pelo Lombok
 }

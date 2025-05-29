@@ -8,16 +8,12 @@ import com.example.mentora.model.Aluno;
 import com.example.mentora.model.Disciplina;
 import com.example.mentora.model.Professor;
 import com.example.mentora.model.ProfessorDisciplina;
-import com.example.mentora.model.Secretaria; // Importar Secretaria
+import com.example.mentora.model.Secretaria;
 import com.example.mentora.model.Turma;
 import com.example.mentora.model.Usuario;
-import com.example.mentora.repository.AlunoRepository;
-import com.example.mentora.repository.DisciplinaRepository;
-import com.example.mentora.repository.ProfessorDisciplinaRepository;
-import com.example.mentora.repository.ProfessorRepository;
-import com.example.mentora.repository.SecretariaRepository; // Importar SecretariaRepository
-import com.example.mentora.repository.TurmaRepository;
-import com.example.mentora.repository.UsuarioRepository;
+import com.example.mentora.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +25,8 @@ import java.util.stream.Collectors;
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
 
+    private static final Logger log = LoggerFactory.getLogger(UsuarioServiceImpl.class);
+
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final AlunoRepository alunoRepository;
@@ -36,8 +34,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final ProfessorRepository professorRepository;
     private final DisciplinaRepository disciplinaRepository;
     private final ProfessorDisciplinaRepository professorDisciplinaRepository;
-    private final SecretariaRepository secretariaRepository; // Injetar SecretariaRepository
-
+    private final SecretariaRepository secretariaRepository;
 
     @Autowired
     public UsuarioServiceImpl(UsuarioRepository usuarioRepository,
@@ -47,7 +44,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                               ProfessorRepository professorRepository,
                               DisciplinaRepository disciplinaRepository,
                               ProfessorDisciplinaRepository professorDisciplinaRepository,
-                              SecretariaRepository secretariaRepository) { // Adicionar ao construtor
+                              SecretariaRepository secretariaRepository) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.alunoRepository = alunoRepository;
@@ -55,9 +52,108 @@ public class UsuarioServiceImpl implements UsuarioService {
         this.professorRepository = professorRepository;
         this.disciplinaRepository = disciplinaRepository;
         this.professorDisciplinaRepository = professorDisciplinaRepository;
-        this.secretariaRepository = secretariaRepository; // Atribuir
+        this.secretariaRepository = secretariaRepository;
     }
 
+    // ... (método cadastrar e outros existentes)
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UsuarioResponseDTO> listarUsuariosAtivos() {
+        return usuarioRepository.findAllByAtivoTrue().stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UsuarioResponseDTO buscarUsuarioAtivoPorId(Long id) {
+        Usuario usuario = usuarioRepository.findByIdAndAtivoTrue(id)
+                .orElseThrow(() -> new RuntimeException("Usuário ativo com ID " + id + " não encontrado."));
+        return toResponseDTO(usuario);
+    }
+
+    // --- NOVAS IMPLEMENTAÇÕES ---
+    @Override
+    @Transactional(readOnly = true)
+    public List<UsuarioResponseDTO> listarTodosOsUsuarios() {
+        // O método findAll() do JpaRepository já busca todos (ativos e inativos)
+        return usuarioRepository.findAll().stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UsuarioResponseDTO buscarUsuarioPorIdIncluindoInativos(Long id) {
+        // O método findById() do JpaRepository já busca independentemente do status 'ativo'
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário com ID " + id + " não encontrado."));
+        return toResponseDTO(usuario);
+    }
+    // --- FIM DAS NOVAS IMPLEMENTAÇÕES ---
+
+
+    @Override
+    @Transactional
+    public void desativarUsuario(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário com ID " + id + " não encontrado para desativação."));
+
+        if (!usuario.getAtivo()) {
+            log.warn("Tentativa de desativar Usuário ID {}, que já está inativo.", id);
+            return;
+        }
+        usuario.setAtivo(false);
+        usuarioRepository.save(usuario);
+        log.info("Usuário ID {} marcado como inativo.", id);
+    }
+
+    @Override
+    @Transactional
+    public void reativarUsuario(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário com ID " + id + " não encontrado para reativação."));
+
+        if (usuario.getAtivo()) {
+            log.warn("Tentativa de reativar Usuário ID {}, que já está ativo.", id);
+            return;
+        }
+        usuario.setAtivo(true);
+        usuarioRepository.save(usuario);
+        log.info("Usuário ID {} reativado.", id);
+    }
+
+    @Override
+    public UsuarioResponseDTO autenticar(LoginRequestDTO loginDTO) {
+        Usuario usuario = usuarioRepository.findByEmail(loginDTO.getEmail())
+                .orElseThrow(() -> new RuntimeException("Email ou Senha inválida"));
+
+        if (!usuario.getAtivo()) {
+            throw new RuntimeException("Usuário está inativo. Contate o administrador.");
+        }
+
+        if (!passwordEncoder.matches(loginDTO.getSenha(), usuario.getSenha())) {
+            throw new RuntimeException("Email ou Senha inválida");
+        }
+        return toResponseDTO(usuario);
+    }
+
+    @Override
+    public UsuarioResponseDTO toResponseDTO(Usuario usuario) {
+        return UsuarioResponseDTO.builder()
+                .id(usuario.getId())
+                .nome(usuario.getNome())
+                .cpf(usuario.getCpf())
+                .email(usuario.getEmail())
+                .sexo(usuario.getSexo())
+                .dtNascimento(usuario.getDataNascimento())
+                .tipoUsuario(usuario.getTipoUsuario())
+                .ativo(usuario.getAtivo())
+                .build();
+    }
+
+    // Implementação do método cadastrar como estava antes
     @Override
     @Transactional
     public UsuarioResponseDTO cadastrar(UsuarioCreateDTO dto) {
@@ -73,9 +169,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setCpf(dto.getCpf());
         usuario.setEmail(dto.getEmail());
         usuario.setSexo(dto.getSexo());
-        // Assumindo que Usuario.java tem o campo dataNascimento e setter correspondente
         usuario.setDataNascimento(dto.getDtNascimento());
-
 
         TipoUsuario tipo;
         try {
@@ -89,7 +183,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setAtivo(true);
 
         Usuario usuarioSalvo = usuarioRepository.save(usuario);
-        System.out.println("DEBUG: ID do Usuario salvo: " + (usuarioSalvo != null ? usuarioSalvo.getId() : "usuarioSalvo é null ou ID é null"));
+        log.info("Usuário salvo com ID: {}", usuarioSalvo.getId());
 
         if (tipo == TipoUsuario.ALUNO) {
             if (dto.getTurmaId() == null) {
@@ -102,68 +196,33 @@ public class UsuarioServiceImpl implements UsuarioService {
             aluno.setUsuario(usuarioSalvo);
             aluno.setTurma(turma);
             alunoRepository.save(aluno);
-            System.out.println("DEBUG: Aluno criado e vinculado ao usuário ID " + usuarioSalvo.getId());
+            log.info("Perfil Aluno criado para Usuário ID: {}", usuarioSalvo.getId());
 
         } else if (tipo == TipoUsuario.PROFESSOR) {
             Professor professor = new Professor();
             professor.setUsuario(usuarioSalvo);
             Professor professorSalvo = professorRepository.save(professor);
-            System.out.println("DEBUG: Professor criado com ID " + professorSalvo.getId() + " vinculado ao usuário ID " + usuarioSalvo.getId());
+            log.info("Perfil Professor criado para Usuário ID: {}", usuarioSalvo.getId());
 
             if (dto.getDisciplinaIds() != null && !dto.getDisciplinaIds().isEmpty()) {
                 for (Long disciplinaId : dto.getDisciplinaIds()) {
                     Disciplina disciplina = disciplinaRepository.findById(disciplinaId)
                             .orElseThrow(() -> new RuntimeException("Disciplina com ID " + disciplinaId + " não encontrada."));
-
                     ProfessorDisciplina professorDisciplina = new ProfessorDisciplina();
                     professorDisciplina.setProfessor(professorSalvo);
                     professorDisciplina.setDisciplina(disciplina);
                     professorDisciplinaRepository.save(professorDisciplina);
-                    System.out.println("DEBUG: Vinculado Professor ID " + professorSalvo.getId() + " com Disciplina ID " + disciplina.getId());
+                    log.info("Vinculado Professor ID {} com Disciplina ID {}", professorSalvo.getId(), disciplina.getId());
                 }
             } else {
-                System.out.println("WARN: Nenhum disciplinaIds fornecido para o Professor ID " + professorSalvo.getId());
+                log.warn("Nenhum disciplinaIds fornecido para o Professor com Usuário ID {}", usuarioSalvo.getId());
             }
         } else if (tipo == TipoUsuario.SECRETARIA) {
             Secretaria secretaria = new Secretaria();
             secretaria.setUsuario(usuarioSalvo);
-            Secretaria secretariaSalva = secretariaRepository.save(secretaria);
-            System.out.println("DEBUG: Secretaria criada com ID " + secretariaSalva.getId() + " vinculada ao usuário ID " + usuarioSalvo.getId());
+            secretariaRepository.save(secretaria);
+            log.info("Perfil Secretaria criado para Usuário ID: {}", usuarioSalvo.getId());
         }
-
         return toResponseDTO(usuarioSalvo);
-    }
-
-    @Override
-    public List<UsuarioResponseDTO> listarTodos() {
-        return usuarioRepository.findAll()
-                .stream()
-                .map(this::toResponseDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public UsuarioResponseDTO toResponseDTO(Usuario usuario) {
-        // Assumindo que Usuario.java tem getDataNascimento()
-        return UsuarioResponseDTO.builder()
-                .id(usuario.getId())
-                .nome(usuario.getNome())
-                .cpf(usuario.getCpf())
-                .email(usuario.getEmail())
-                .sexo(usuario.getSexo())
-                .dtNascimento(usuario.getDataNascimento())
-                .tipoUsuario(usuario.getTipoUsuario())
-                .build();
-    }
-
-    @Override
-    public UsuarioResponseDTO autenticar(LoginRequestDTO loginDTO) {
-        Usuario usuario = usuarioRepository.findByEmail(loginDTO.getEmail())
-                .orElseThrow(() -> new RuntimeException("Email ou Senha inválida"));
-
-        if (!passwordEncoder.matches(loginDTO.getSenha(), usuario.getSenha())) {
-            throw new RuntimeException("Email ou Senha inválida");
-        }
-        return toResponseDTO(usuario);
     }
 }
