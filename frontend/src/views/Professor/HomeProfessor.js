@@ -1,47 +1,113 @@
-import React from "react";
+import React, { useState } from "react";
+import "../../styles/HomeProfessor.css";
+import Calendar from "../../components/Calendar";
+import { useNavigate } from "react-router-dom";
 import "../../styles/Home.css";
-import Navbar from "../../components/Navbar"; // Certifique-se de que o caminho está correto
+import Navbar from "../../components/Navbar"; 
+
 
 export default function HomeProfessor() {
+  const navigate = useNavigate();
+
+  const turmas = [
+    { id: 1, nome: "Turma 1", turno: "MANHÃ", serie: "3° SÉRIE" },
+    { id: 2, nome: "Turma 1", turno: "MANHÃ", serie: "3° SÉRIE" },
+    { id: 3, nome: "Turma 1", turno: "MANHÃ", serie: "3° SÉRIE" },
+    { id: 4, nome: "Turma 1", turno: "MANHÃ", serie: "3° SÉRIE" },
+  ];
+
+  const [modalAberto, setModalAberto] = useState(false);
+  const [descricao, setDescricao] = useState("");
+  const [data, setData] = useState("");
+
+  const abrirModal = () => {
+    setDescricao("");
+    setData("");
+    setModalAberto(true);
+  };
+
+  const enviarAusencia = () => {
+    if (!descricao || !data) return alert("Preencha todos os campos!");
+    console.log("Ausência planejada:", { descricao, data });
+    setModalAberto(false);
+  };
+
   return (
     <>
-    <Navbar onLogout={() => console.log("Logout clicado")} />
-    <div className="home-secretaria-container">
-      
-<h1>Professor</h1>
-      <main className="main-content">
-        <div className="top-card">
-         
-          <h2>Gerenciar Usuarios</h2>
-        </div>
+      <Navbar onLogout={() => console.log("Logout clicado")} />
+      <div className="home-secretaria-container">
+        <main className="main-content-turmas">
+          <div className="turmas-grid">
+            {turmas.map((turma) => (
+              <div
+                key={turma.id}
+                className="card-turma-box"
+                onClick={() => navigate(`/turmaDetalhe/${turma.id}`)}
+                style={{ cursor: "pointer" }}
+              >
+                <h2>{turma.nome}</h2>
+                <div className="turma-info">
+                  <div>
+                    <p className="label">TURNO</p>
+                    <p>{turma.turno}</p>
+                  </div>
+                  <div>
+                    <p className="label">SÉRIE</p>
+                    <p>{turma.serie}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
 
-        <div className="button-grid">
-          <button className="btn">Gerenciar Turmas</button>
-          <button className="btn">Gerenciar Disciplinas</button>
-        </div>
-      </main>
+          <div className="ausencia-card" onClick={abrirModal} style={{ cursor: "pointer" }}>
+            <h2>Ausência Planejada</h2>
+          </div>
+        </main>
 
-      <section className="event-panel">
-        <div className="event-card branco"></div>
+        <section className="event-panel">
+          <div className="event-card branco">
+            <div className="calendar-container">
+              <Calendar />
+            </div>
+          </div>
+          <div className="event-group">
+            <button className="event-card laranja">
+              <h2>Evento Hoje</h2>
+            </button>
+            <div className="event-card verde">
+              <span>Próximo Evento</span>
+              <span className="hora">xx/xx</span>
+            </div>
+            <div className="event-card branco">
+              <span>Próximo Feriado</span>
+              <span className="hora">xx/xx</span>
+            </div>
+          </div>
+        </section>
 
-        <div className="event-card amarelo">
-          <span>Evento Hoje</span>
-          <span className="hora">07:00 | 7:45</span>
-        </div>
+        {modalAberto && (
+          <div className="modal-backdrop">
+            <div className="modal">
+              <label><strong>Descrição</strong></label>
+              <textarea
+                rows={4}
+                value={descricao}
+                onChange={(e) => setDescricao(e.target.value)}
+              />
 
-        <div className="event-card azul">
-          <span>Ausência professor</span>
-          <span className="hora">xx/xx</span>
-        </div>
+              <label><strong>Data</strong></label>
+              <input
+                type="date"
+                value={data}
+                onChange={(e) => setData(e.target.value)}
+              />
 
-        <div className="event-card verde">
-          <span>Proximo Feriado</span>
-          <span className="hora">xx/xx</span>
-        </div>
-      </section>
-    </div>
+              <button onClick={enviarAusencia}>ENVIAR</button>
+            </div>
+          </div>
+        )}
+      </div>
     </>
   );
 }
-
-/* HomeSecretaria.css */

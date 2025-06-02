@@ -1,0 +1,105 @@
+.main-content-turmas {
+  flex: 1;
+  padding: 40px 20px;
+  background-color: #c3cecf;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 30px;
+}
+
+.turmas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 25px;
+  width: 100%;
+  justify-items: center;
+}
+
+.card-turma-box {
+  background-color: white;
+  padding: 20px 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+  width: 270px;
+  border-left: 6px solid #f4b400;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-turma-box h2 {
+  color: #004b4f;
+  margin-bottom: 10px;
+}
+
+.turma-info {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-weight: bold;
+}
+
+.turma-info .label {
+  font-size: 14px;
+  color: #4a4a4a;
+}
+
+.ausencia-card {
+  margin-top: 30px;
+  background-color: #d5ecf5;
+  padding: 25px 60px;
+  border-radius: 30px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #1a3458;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  min-width: 300px;
+}
+
+.modal textarea {
+  width: 100%;
+  padding: 10px;
+  resize: none;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.modal input[type="date"] {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.modal button {
+  align-self: center;
+  padding: 10px 25px;
+  border-radius: 6px;
+  background-color: #004b4f;
+  color: white;
+  border: none;
+  cursor: pointer;
+}

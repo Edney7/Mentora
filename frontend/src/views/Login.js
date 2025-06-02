@@ -38,12 +38,11 @@ export default function Login() {
 
   if (!validar) return;
 
-  try {// vai pegar op id e confirmar o tipo
+  try {
     const data = await loginUsuario(email, senha);
 
     alert("Login efetuado com sucesso!");
 
-    // Redireciona conforme o tipo do usuário
     switch (data.tipoUsuario.toUpperCase()) {
       case "SECRETARIA":
         navigate("/homeSecretaria");

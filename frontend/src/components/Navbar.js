@@ -1,9 +1,8 @@
 import React from "react";
 import "../styles/Navbar.css";
-import usuario from "../assets/usuario.png"; // substitua pelo caminho correto
-import logout from "../assets/logout.png"; // substitua pelo caminho correto
+import usuario from "../assets/usuario.png"; 
+import logout from "../assets/logout.png"; 
 import logo from "../assets/logo.png"
-// vou retirar o link da logo se não precisar
 export default function Navbar({ onLogout }) {
   return (
     <header className="navbar-container">
