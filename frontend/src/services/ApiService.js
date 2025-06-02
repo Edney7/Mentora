@@ -45,6 +45,15 @@ export const cadastrarDisciplina = async (disciplinaData) => {
   return response.data;
 };
 
+export const buscarAlunos = async () => {
+  const response = await api.get('/alunos');
+  return response.data;
+};
+
+export const buscarProfessores = async () => {
+  const response = await api.get('/professores');
+  return response.data;
+};
 
 export const buscarDisciplinas = async () => {
   const response = await api.get("/disciplinas"); // Assumindo que este endpoint lista todas
