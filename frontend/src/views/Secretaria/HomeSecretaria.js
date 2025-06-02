@@ -11,14 +11,16 @@ import {
 } from "../../services/ApiService"; 
 import animacaoHomeSecretaria from "../../assets/animacaoHomeSecretaria.png";
 
+
 export default function HomeSecretaria() {
-  const navigate = useNavigate();
+ 
   const [totalUsuarios, setTotalUsuarios] = useState(0);
   const [totalProfessores, setTotalProfessores] = useState(0);
   const [totalAlunos, setTotalAlunos] = useState(0);
   const [totalTurmas, setTotalTurmas] = useState(0);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
+  const navigate = useNavigate();
 
   const carregarTotais = useCallback(async () => {
     setLoading(true);
@@ -93,26 +95,21 @@ export default function HomeSecretaria() {
         </div>
       </div>
 
-        <div onClick={() => Navigate("/listaUsuario")} className="top-card">
+        <div onClick={() => navigate("/listaUsuario")} className="top-card">
           <h2>Gerenciar Usuarios</h2>
          <img src={animacaoHomeSecretaria} alt="Estudante com livros" className="top-img" />
         </div>
        <div className="button-grid">
-          <button onClick={() => Navigate("/secretaria/ausenciaProfessor")} className="btn">Ausência do Professor</button>
-          <button onClick={() => Navigate("/secretaria/ausenciaProfessor")} className="btn">Presença e falta</button>
+          <button onClick={() => navigate("/secretaria/ausenciaProfessor")} className="btn">Ausência do Professor</button>
+          <button onClick={() => navigate("/secretaria/ausenciaProfessor")} className="btn">Presença e falta</button>
         </div>
         <div className="button-grid">
           <button  className="btn">Gerenciar Turmas</button>
-          <button onClick={() => Navigate("/secretaria/disciplina")} className="btn">Gerenciar Disciplinas</button>
+          <button onClick={() => navigate("/secretaria/disciplina")} className="btn">Gerenciar Disciplinas</button>
         </div>
       </main>
 
-      <section className="event-panel">
-       <div className="event-card branco">
-        <div className="calendar-container">
-      <Calendar />
-        </div>
-      </div>
+      
         
         {erro && <p className="error-message" style={{textAlign: 'center', width: '100%', padding: '10px 0'}}>{erro}</p>}
 
