@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import "../../styles/listaUsuario.css"; // VERIFIQUE ESTE CAMINHO
+import "../../styles/ListaUsuario.css"; // VERIFIQUE ESTE CAMINHO
 import Navbar from "../../components/Navbar"; // VERIFIQUE ESTE CAMINHO
 import {
   listarUsuario, // Para a secretaria ver todos
