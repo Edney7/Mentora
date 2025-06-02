@@ -29,6 +29,15 @@ export const buscarTurmas = async () => {
   return response.data;
 };
 
+export const buscarAlunos = async () => {
+  const response = await api.get('/alunos');
+  return response.data;
+};
+
+export const buscarProfessores = async () => {
+  const response = await api.get('/professores');
+  return response.data;
+};
 
 //vai pegas as disciplinas dinamicamente no back para o cadastro do professor
 export const buscarDisciplinas = async () => {
