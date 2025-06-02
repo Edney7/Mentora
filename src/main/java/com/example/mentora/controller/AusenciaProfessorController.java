@@ -30,7 +30,18 @@ public class AusenciaProfessorController {
     public AusenciaProfessorController(AusenciaProfessorService ausenciaProfessorService) {
         this.ausenciaProfessorService = ausenciaProfessorService;
     }
+    @Operation(summary = "Filtrar ausências por nome e mês de ausência ou mês de registro")
+    @GetMapping("/filtro")
+    public ResponseEntity<List<AusenciaProfessorResponseDTO>> filtrarAusencias(
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) Integer mesAusencia,
+            @RequestParam(required = false) Integer mesRegistro) {
 
+        List<AusenciaProfessorResponseDTO> ausencias = ausenciaProfessorService
+                .filtrarAusencias(nome, mesAusencia, mesRegistro);
+
+        return ResponseEntity.ok(ausencias);
+    }
     @Operation(summary = "Registar uma nova ausência planeada para um professor")
     @PostMapping
     public ResponseEntity<AusenciaProfessorResponseDTO> registarAusencia(
@@ -86,6 +97,9 @@ public class AusenciaProfessorController {
         List<AusenciaProfessorResponseDTO> ausencias = ausenciaProfessorService.listarTodasAusencias();
         return ResponseEntity.ok(ausencias);
     }
+
+
+
 
     @Operation(summary = "Cancelar (excluir) uma ausência planeada de professor")
     @DeleteMapping("/{ausenciaId}")

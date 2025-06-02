@@ -58,6 +58,8 @@ public interface AusenciaProfessorService {
      */
     void cancelarAusencia(Long ausenciaId, Long usuarioLogadoId);
 
+    List<AusenciaProfessorResponseDTO> filtrarAusencias(String nome, Integer mesAusencia, Integer mesRegistro);
+
     // Poderiam existir métodos para atualizar uma ausência, se permitido pelas regras de negócio.
     // AusenciaProfessorResponseDTO atualizarAusencia(Long ausenciaId, AusenciaProfessorUpdateDTO dto, Long professorLogadoId);
 }
