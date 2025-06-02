@@ -16,7 +16,7 @@ export const loginUsuario = async (email, senha) => {
   return response.data;
 };
 
-export const listarTodosOsUsuarios = async (filtros = {}) => {
+export const listarUsuario = async (filtros = {}) => {
   const response = await api.get("/usuarios/todos", { params: filtros });
   return response.data;
 };
