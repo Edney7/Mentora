@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import "../../styles/ListaUsuario.css";
 import Navbar from "../../components/Navbar";
 import { listarUsuario } from "../../services/ApiService";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash, FaArrowLeft } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function ListaUsuario() {
   const [usuarios, setUsuarios] = useState([]);
@@ -10,7 +11,12 @@ export default function ListaUsuario() {
   const [tipoUsuario, setTipoUsuario] = useState("");
   const [sexo, setSexo] = useState("");
 
+  const navigate = useNavigate();
+console.log("Renderizou ListaUsuario");
+
   useEffect(() => {
+      console.log("Chamando listarUsuario com:", nome, tipoUsuario, sexo);
+
     async function carregarUsuarios() {
       try {
         const response = await listarUsuario(nome, tipoUsuario, sexo);
@@ -28,10 +34,11 @@ export default function ListaUsuario() {
       <Navbar onLogout={() => console.log("Logout clicado")} />
       <div className="usuarios-container">
         <div className="usuarios-header">
+          <div className="voltar-seta" onClick={() => navigate(-1)}>
+             <FaArrowLeft />
+            </div>
           <h2>USUÁRIOS</h2>
-         
-        
-
+<h4>Arrumar filtro, editar e botao do ativo</h4>
         <div className="usuarios-filtros">
           <input
             type="text"

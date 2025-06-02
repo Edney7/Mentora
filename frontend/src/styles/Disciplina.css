@@ -1,0 +1,156 @@
+.usuarios-container {
+  
+  padding: 20px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.usuarios-header {
+  display: flex;
+ flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.usuarios-header h2 {
+  color: #004e64;
+  margin-bottom: 10px;
+  ;
+}
+
+
+
+.usuarios-filtros {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.usuarios-filtros input{
+  padding: 5px 10px;
+  width: 400px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+.usuarios-filtros select {
+  padding:5px 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 150px;
+}
+
+.btn-add {
+  background-color: #004e64;
+  color: white;
+  font-size: 1.5rem;
+  border: none;
+  border-radius: 8px;
+  padding:5px 12px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-add:hover {
+  background-color: #00748d;
+}
+
+
+.usuarios-lista {
+  background-color: #eaf3f7;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 0 250px 0 250px ;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  max-height: 490px;
+}
+
+.usuario-row {
+  display: flex;
+  border-bottom: 1px solid #eee;
+  padding: 2px;
+}
+
+.usuario-borda {
+  width: 8px;
+  border-radius: 4px 0 0 4px;
+}
+
+
+.usuario-borda.professor {
+  background-color: #4db5ff;
+}
+
+.usuario-borda.secretaria {
+  background-color: #0062c5;
+}
+
+.usuario-borda.aluno {
+  background-color: #e6a23c;
+}
+
+.usuario-conteudo {
+  display: flex;
+  align-items:center;
+  background-color: white;
+  border-radius: 8px;
+  align-items: center;
+  padding: 1rem;
+  flex: 1;
+  overflow: hidden;
+} 
+
+.usuario-info {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  color: #004b64;
+  gap: 1rem;
+  flex: 1;
+}
+
+.usuario-info span {
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.usuario-acoes {
+  display: flex;
+  gap: 0.75rem;
+  margin: 0 10px;;
+}
+
+.usuario-acoes button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: #004e64;
+  transition: 0.2s;
+}
+
+.usuario-acoes button:hover {
+  color: #00bcd4;
+}
+
+.sem-usuarios {
+  padding: 1rem;
+  text-align: center;
+  color: #777;
+}
+
+.voltar-seta {
+  position: absolute;
+  top: 70px;
+  left: 30px;
+  font-size: 24px;
+  color: #004b64;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.voltar-seta:hover {
+  color: #007a99;
+}

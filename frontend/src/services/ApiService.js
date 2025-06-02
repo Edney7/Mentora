@@ -22,16 +22,6 @@ export const listarUsuario = async (nome,  tipoUsuario, sexo) => {
   });
   return response.data;
 };
-/*export async function listarUsuario(nome, tipoUsuario, sexo) {
-  const params = new URLSearchParams();
-
-  if (nome) params.append("nome", nome);
-  if (tipoUsuario) params.append("tipoUsuario", tipoUsuario);
-  if (sexo) params.append("sexo", sexo);
-
-  const response = await api.get(`/usuarios/filtros?${params.toString()}`);
-  return response.data;
-}*/
 
 //vai pegas as turmas  dinamicamente no back para o cadastro do aluno
 export const buscarTurmas = async () => {
@@ -45,4 +35,6 @@ export const buscarDisciplinas = async () => {
   const response = await api.get('/disciplinas');
   return response.data;
 };
-
+export const excluirDisciplina = async (id) => {
+  await api.delete(`/disciplinas/${id}`);
+};

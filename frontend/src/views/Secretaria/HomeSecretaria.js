@@ -1,8 +1,9 @@
 import React from "react";
-import "../../styles/Home.css"; // Certifique-se de que o caminho está correto
-import Navbar from "../../components/Navbar"; // Certifique-se de que o caminho está correto
-
+import "../../styles/Home.css";
+import Navbar from "../../components/Navbar"; 
+import { useNavigate } from "react-router-dom";
 export default function HomeSecretaria() {
+  const Navigate = useNavigate();
   return (
     <>
     <Navbar onLogout={() => console.log("Logout clicado")} />
@@ -10,15 +11,15 @@ export default function HomeSecretaria() {
       
    <h1>Secretaria</h1>
       <main className="main-content">
-        <a href="/listaUsuario" className="top-card">
-        <div >
+       
+        <div onClick={() => Navigate("/listaUsuario")} className="top-card">
         
           <h2>Gerenciar Usuarios</h2>
         </div>
-      </a>
+      
         <div className="button-grid">
-          <button className="btn">Gerenciar Turmas</button>
-          <button className="btn">Gerenciar Disciplinas</button>
+          <button  className="btn">Gerenciar Turmas</button>
+          <button onClick={() => Navigate("/disciplina")} className="btn">Gerenciar Disciplinas</button>
         </div>
       </main>
 

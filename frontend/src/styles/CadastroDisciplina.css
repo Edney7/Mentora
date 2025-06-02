@@ -1,0 +1,61 @@
+.cadastro-disciplina-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f2f9fc;
+}
+
+.form-disciplina {
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-disciplina h2 {
+  text-align: center;
+  color: #004b64;
+}
+
+.form-disciplina input,
+.form-disciplina textarea {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.form-disciplina button {
+  background-color: #007a99;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.form-disciplina button:hover {
+  background-color: #005f73;
+}
+
+.btn-voltar {
+  background-color: #ccc;
+  color: #333;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btn-voltar:hover {
+  background-color: #aaa;
+}
