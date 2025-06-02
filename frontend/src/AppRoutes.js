@@ -5,9 +5,9 @@ import Cadastro from './views/Cadastro';
 import HomeSecretaria from './views/Secretaria/HomeSecretaria';
 import HomeAluno from './views/Aluno/HomeAluno';
 import HomeProfessor from './views/Professor/HomeProfessor';
-import ListaUsuario from './views/Secretaria/ListaUsuario';
-import Disciplina from './views/Secretaria/Disciplina';
-import TurmaDetalhe from './views/Professor/TurmaDetalhe';
+import SecretariaListaUsuarios from './views/Secretaria/ListaUsuario';
+import SecretariaDisciplinas from './views/Secretaria/Disciplina';
+import SecretariaTurmas from './views/Secretaria/ListaTurmas';
 
 export default function AppRoutes() {
   return (
@@ -17,9 +17,9 @@ export default function AppRoutes() {
       <Route path="/homeSecretaria" element={<HomeSecretaria/>} />
       <Route path="/homeProfessor" element={<HomeProfessor/>} />
       <Route path="/homeAluno" element={<HomeAluno/>} />
-      <Route path="/listaUsuario" element={<ListaUsuario/>} />
-      <Route path="/turmaDetalhe/:id" element={<TurmaDetalhe />} />
-      <Route path="/disciplina" element={<Disciplina/>} />
+      <Route path="/secretaria/usuarios" element={<SecretariaListaUsuarios/>} />
+      <Route path="/secretaria/disciplinas" element={<SecretariaDisciplinas />} />
+      <Route path="/secretaria/turmas" element={<SecretariaTurmas />} />
 
     </Routes>
   );
