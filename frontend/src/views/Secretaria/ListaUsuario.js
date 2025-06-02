@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
-import "../../styles/ListaUsuario.css"; 
-import Navbar from "../../components/Navbar"; 
+import "../../styles/ListaUsuario.css";
+import Navbar from "../../components/Navbar";
 
 import {
-  listarTodosOsUsuarios, 
+  listarTodosOsUsuarios,
   desativarUsuario,
   reativarUsuario,
-} from "../../services/ApiService"; 
+} from "../../services/ApiService";
 import { FaEdit, FaTrash, FaArrowLeft, FaPlus, FaRedo } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
@@ -15,7 +15,7 @@ export default function ListaUsuario() {
   const [nomeFiltro, setNomeFiltro] = useState("");
   const [tipoUsuarioFiltro, setTipoUsuarioFiltro] = useState("");
   const [sexoFiltro, setSexoFiltro] = useState("");
-  const [statusFiltro, setStatusFiltro] = useState(""); 
+  const [statusFiltro, setStatusFiltro] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [erroApi, setErroApi] = useState("");
@@ -42,7 +42,7 @@ export default function ListaUsuario() {
     } finally {
       setLoading(false);
     }
-  }, [nomeFiltro, tipoUsuarioFiltro, sexoFiltro]); 
+  }, [nomeFiltro, tipoUsuarioFiltro, sexoFiltro]);
 
   useEffect(() => {
     carregarUsuarios();
@@ -170,7 +170,7 @@ export default function ListaUsuario() {
               <option value="INATIVO">Apenas Inativos</option>
             </select>
             <button
-              onClick={() => navigate("/cadastro")} 
+              onClick={() => navigate("/cadastro")}
               className="btn-add"
               title="Cadastrar Novo Usuário"
             >
@@ -225,14 +225,13 @@ export default function ListaUsuario() {
                   </div>
                   <div className="usuario-acoes">
                     <button
-                      onClick={
-                        () =>
-                          alert(
-                            `Editar usuário ID: ${usuario.id}. Funcionalidade a implementar.`
-                          )
+                      onClick={() =>
+                        alert(
+                          `Editar usuário ID: ${usuario.id}. Funcionalidade a implementar.`
+                        )
                       }
                       title="Editar Usuário"
-                      disabled 
+                      disabled
                     >
                       <FaEdit />
                     </button>
@@ -249,7 +248,7 @@ export default function ListaUsuario() {
                       <button
                         onClick={() => handleReativar(usuario.id, usuario.nome)}
                         title="Reativar Usuário"
-                        className="btn-action btn-reactivate" 
+                        className="btn-action btn-reactivate"
                       >
                         <FaRedo />
                       </button>
