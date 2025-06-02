@@ -56,3 +56,50 @@
   color: #1a3458;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  min-width: 300px;
+}
+
+.modal textarea {
+  width: 100%;
+  padding: 10px;
+  resize: none;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.modal input[type="date"] {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.modal button {
+  align-self: center;
+  padding: 10px 25px;
+  border-radius: 6px;
+  background-color: #004b4f;
+  color: white;
+  border: none;
+  cursor: pointer;
+}

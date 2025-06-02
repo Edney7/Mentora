@@ -167,6 +167,15 @@
   transition: background-color 0.2s ease;
 }
 
+.event-card.branco {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #ccc;
+  background-color: white;
+}
+
 .event-card.laranja:hover {
   background-color: #e67e22;
 }
