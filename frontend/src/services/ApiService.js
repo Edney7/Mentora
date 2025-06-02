@@ -4,7 +4,6 @@ const api = axios.create({
   baseURL: "http://localhost:8080", 
 });
 
-
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("userToken"); 
@@ -34,7 +33,7 @@ export const logoutUsuario = () => {
   delete api.defaults.headers.common['Authorization'];
 };
 
-export const listarUsuariosAtivos = async (filtros = {}) => {
+export const listarUsuariosAtivos = async (filtros = {}) => { 
   const response = await api.get("/usuarios", { params: filtros }); 
   return response.data;
 };
@@ -54,6 +53,11 @@ export const buscarUsuarioPorIdIncluindoInativos = async (id) => {
   return response.data;
 };
 
+export const atualizarUsuario = async (id, usuarioData) => {
+  const response = await api.put(`/usuarios/${id}`, usuarioData);
+  return response.data;
+};
+
 export const desativarUsuario = async (id) => {
   await api.delete(`/usuarios/${id}`);
 };
@@ -61,7 +65,6 @@ export const desativarUsuario = async (id) => {
 export const reativarUsuario = async (id) => {
   await api.post(`/usuarios/${id}/reativar`);
 };
-
 
 // --- Alunos (Perfis) ---
 export const listarAlunosAtivos = async () => {
@@ -80,7 +83,7 @@ export const listarAlunosDaTurma = async (turmaId) => {
 };
 
 export const vincularAlunoATurma = async (alunoId, turmaId) => {
-  const response = await api.put(`/alunos/${alunoId}/vincular-turma/${turmaId}`); 
+  const response = await api.put(`/alunos/${alunoId}/vincular-turma/${turmaId}`);
   return response.data; 
 };
 
@@ -100,7 +103,6 @@ export const buscarProfessorAtivoPorId = async (professorId) => {
     return response.data;
 };
 
-
 // --- Secretarias (Perfis) ---
 export const listarSecretariasAtivas = async () => {
     const response = await api.get("/secretarias");
@@ -111,7 +113,6 @@ export const buscarSecretariaAtivaPorId = async (secretariaId) => {
     const response = await api.get(`/secretarias/${secretariaId}`);
     return response.data;
 };
-
 
 // --- Disciplinas ---
 export const buscarDisciplinas = async () => {
@@ -138,14 +139,22 @@ export const excluirDisciplina = async (id) => {
   await api.delete(`/disciplinas/${id}`);
 };
 
-
 // --- Turmas ---
 export const buscarTurmasAtivas = async () => { 
   const response = await api.get('/turmas'); 
   return response.data;
 };
 
-export const cadastrarTurma = async (turmaData) => {
+/**
+ * Busca TODAS as turmas (ativas e inativas) - geralmente para admin.
+ * @returns {Promise<Array<object>>} Lista de todas as turmas.
+ */
+export const buscarTodasAsTurmas = async () => { // <<< FUNÇÃO ADICIONADA
+    const response = await api.get('/turmas/todas'); // Chama o novo endpoint do backend
+    return response.data;
+};
+
+export const cadastrarTurma = async (turmaData) => { 
   const response = await api.post("/turmas", turmaData);
   return response.data;
 };
@@ -155,7 +164,7 @@ export const buscarTurmaAtivaPorId = async (id) => {
   return response.data;
 };
 
-export const atualizarTurma = async (id, turmaData) => {
+export const atualizarTurma = async (id, turmaData) => { 
   const response = await api.put(`/turmas/${id}`, turmaData);
   return response.data;
 };
@@ -168,7 +177,7 @@ export const reativarTurma = async (id) => {
   await api.post(`/turmas/${id}/reativar`);
 };
 
-
+// --- Associação Turma-Disciplina ---
 export const listarDisciplinasDaTurma = async (turmaId) => {
   const response = await api.get(`/turmas/${turmaId}/disciplinas`);
   return response.data;
@@ -185,7 +194,6 @@ export const desvincularDisciplinaDaTurma = async (turmaId, disciplinaId) => {
 export const atualizarDisciplinasDaTurma = async (turmaId, disciplinaIds) => {
   await api.put(`/turmas/${turmaId}/disciplinas`, disciplinaIds);
 };
-
 
 // --- Associação Professor-Disciplina ---
 export const listarDisciplinasDoProfessor = async (professorId) => {
@@ -209,7 +217,6 @@ export const desvincularDisciplinaDoProfessor = async (professorId, disciplinaId
 export const atualizarDisciplinasDoProfessor = async (professorId, disciplinaIds) => {
     await api.put(`/professores/${professorId}/disciplinas`, disciplinaIds);
 };
-
 
 // --- Notas ---
 export const lancarNota = async (notaData) => {
@@ -271,7 +278,6 @@ export const listarFaltasPorData = async (dataFalta) => {
 export const excluirFalta = async (faltaId) => {
     await api.delete(`/faltas/${faltaId}`);
 };
-
 
 // --- Ausência de Professor ---
 export const registarAusenciaProfessor = async (ausenciaData) => {
