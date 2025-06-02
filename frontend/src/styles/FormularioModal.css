@@ -1,23 +1,18 @@
-/* src/styles/FormularioModal.css ou adicione ao seu CadastroDisciplina.css */
-
-/* Estilos para o formulário quando dentro de um modal */
-.form-disciplina { /* Esta é a classe principal do seu <form> no DisciplinaForm.jsx */
-  background-color: transparent; /* O modal já tem fundo branco */
-  padding: 0; /* O modal já tem padding, o formulário não precisa de padding extra que o afaste das bordas do modal-body */
-  border-radius: 0; /* O modal já tem bordas arredondadas */
-  box-shadow: none; /* O modal já tem sombra */
-  width: 100%; /* Ocupa a largura do modal-body */
+.form-disciplina {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 18px; /* Espaçamento entre os grupos de formulário */
+  gap: 18px;
 }
 
-/* O título H2 foi removido do DisciplinaForm, pois o Modal tem seu próprio título */
-
-.form-disciplina .form-group { /* Se você usar divs com a classe form-group */
+.form-disciplina .form-group {
   display: flex;
   flex-direction: column;
-  gap: 5px; /* Espaço entre label e input */
+  gap: 5px;
 }
 
 .form-disciplina .form-group label {
@@ -28,30 +23,28 @@
 
 .form-disciplina input[type="text"],
 .form-disciplina textarea {
-  padding: 12px 15px; /* Padding aumentado para melhor toque */
+  padding: 12px 15px;
   border-radius: 6px;
   border: 1px solid #ccc;
-  font-size: 1rem; /* Tamanho de fonte consistente */
-  width: 100%; /* Faz o input ocupar toda a largura disponível no form-group */
-  box-sizing: border-box; /* Garante que padding e borda não aumentem a largura total */
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-disciplina textarea {
-  min-height: 80px; /* Altura mínima para textarea */
-  resize: vertical; /* Permite redimensionamento vertical */
+  min-height: 80px;
+  resize: vertical;
 }
 
-/* Container para os botões de ação do formulário no modal */
 .form-actions-modal {
   margin-top: 20px;
   display: flex;
-  justify-content: flex-end; /* Alinha botões à direita */
-  gap: 10px; /* Espaço entre os botões */
+  justify-content: flex-end;
+  gap: 10px;
 }
 
-/* Estilo para o botão principal de salvar/cadastrar no modal */
-.form-disciplina .btn-salvar-modal { /* Usando a classe específica sugerida */
-  background-color: #007a99; /* Cor principal do seu tema */
+.form-disciplina .btn-salvar-modal {
+  background-color: #007a99;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -63,12 +56,11 @@
 }
 
 .form-disciplina .btn-salvar-modal:hover {
-  background-color: #005f73; /* Cor mais escura no hover */
+  background-color: #005f73;
 }
 
-/* Estilo para o botão de cancelar no modal */
-.form-disciplina .btn-cancelar-modal { /* Usando a classe específica sugerida */
-  background-color: #6c757d; /* Cinza para ação secundária/cancelar */
+.form-disciplina .btn-cancelar-modal {
+  background-color: #6c757d;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -83,13 +75,11 @@
   background-color: #5a6268;
 }
 
-/* Mensagem de erro dentro do formulário/modal */
-.form-disciplina .error-message { 
+.form-disciplina .error-message {
   color: red;
   background-color: #ffe0e0;
   border: 1px solid red;
   padding: 10px;
   border-radius: 4px;
   font-size: 0.9rem;
-  /* margin-bottom: 15px; // Já tem gap no form-disciplina */
 }

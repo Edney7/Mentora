@@ -1,26 +1,23 @@
 import React, { useEffect, useState, useCallback } from "react";
-import "../../styles/listaUsuario.css"; // VERIFIQUE ESTE CAMINHO
-import Navbar from "../../components/Navbar"; // VERIFIQUE ESTE CAMINHO
+import "../../styles/ListaUsuario.css"; 
+import Navbar from "../../components/Navbar"; 
 import {
-  listarUsuario, // Para a secretaria ver todos
+  listarTodosOsUsuarios, 
   desativarUsuario,
   reativarUsuario,
-} from "../../services/ApiService"; // VERIFIQUE ESTE CAMINHO
+} from "../../services/ApiService"; 
 import { FaEdit, FaTrash, FaArrowLeft, FaPlus, FaRedo } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-// import { toast, ToastContainer } from 'react-toastify'; // Opcional para feedback
-// import 'react-toastify/dist/ReactToastify.css';
 
 export default function ListaUsuario() {
   const [usuarios, setUsuarios] = useState([]);
-  // Renomeando estados de filtro para evitar conflito e maior clareza
   const [nomeFiltro, setNomeFiltro] = useState("");
   const [tipoUsuarioFiltro, setTipoUsuarioFiltro] = useState("");
   const [sexoFiltro, setSexoFiltro] = useState("");
-  const [statusFiltro, setStatusFiltro] = useState(""); // "ATIVO", "INATIVO", ou "" para todos
+  const [statusFiltro, setStatusFiltro] = useState(""); 
 
   const [loading, setLoading] = useState(true);
-  const [erroApi, setErroApi] = useState(""); // Estado para erros da API
+  const [erroApi, setErroApi] = useState("");
 
   const navigate = useNavigate();
 
@@ -28,18 +25,12 @@ export default function ListaUsuario() {
     setLoading(true);
     setErroApi("");
     try {
-      const filtros = {
-        nome: nomeFiltro || undefined, // Envia undefined se vazio para não filtrar por string vazia no backend
-        tipoUsuario: tipoUsuarioFiltro || undefined,
-        sexo: sexoFiltro || undefined,
-        // status: statusFiltro // Se o backend suportar filtro por status no endpoint listarTodosOsUsuarios
-      };
-      // Remove chaves com valor undefined para não enviar query params vazios
-      Object.keys(filtros).forEach(
-        (key) => filtros[key] === undefined && delete filtros[key]
-      );
+      const filtros = {};
+      if (nomeFiltro) filtros.nome = nomeFiltro;
+      if (tipoUsuarioFiltro) filtros.tipoUsuario = tipoUsuarioFiltro;
+      if (sexoFiltro) filtros.sexo = sexoFiltro;
 
-      const data = await listarUsuario(filtros); // Secretaria vê todos
+      const data = await listarTodosOsUsuarios(filtros);
       setUsuarios(data || []);
     } catch (error) {
       console.error("Erro ao carregar usuários:", error);
@@ -50,11 +41,11 @@ export default function ListaUsuario() {
     } finally {
       setLoading(false);
     }
-  }, [nomeFiltro, tipoUsuarioFiltro, sexoFiltro]); // Adicionar filtros como dependência
+  }, [nomeFiltro, tipoUsuarioFiltro, sexoFiltro]); 
 
   useEffect(() => {
     carregarUsuarios();
-  }, [carregarUsuarios]); // carregarUsuarios é agora dependência por causa do useCallback e seus filtros
+  }, [carregarUsuarios]);
 
   const handleDesativar = async (id, nomeUsuario) => {
     if (
@@ -68,7 +59,6 @@ export default function ListaUsuario() {
           prevUsuarios.map((u) => (u.id === id ? { ...u, ativo: false } : u))
         );
         alert(`Usuário "${nomeUsuario}" desativado com sucesso.`);
-        // toast.success(`Usuário "${nomeUsuario}" desativado com sucesso.`);
       } catch (error) {
         console.error("Erro ao desativar usuário:", error);
         const errorMsg =
@@ -76,7 +66,6 @@ export default function ListaUsuario() {
           error.message ||
           "Erro desconhecido.";
         alert(`Erro ao desativar usuário: ${errorMsg}`);
-        // toast.error(`Erro ao desativar usuário: ${errorMsg}`);
       }
     }
   };
@@ -93,7 +82,6 @@ export default function ListaUsuario() {
           prevUsuarios.map((u) => (u.id === id ? { ...u, ativo: true } : u))
         );
         alert(`Usuário "${nomeUsuario}" reativado com sucesso.`);
-        // toast.success(`Usuário "${nomeUsuario}" reativado com sucesso.`);
       } catch (error) {
         console.error("Erro ao reativar usuário:", error);
         const errorMsg =
@@ -101,31 +89,24 @@ export default function ListaUsuario() {
           error.message ||
           "Erro desconhecido.";
         alert(`Erro ao reativar usuário: ${errorMsg}`);
-        // toast.error(`Erro ao reativar usuário: ${errorMsg}`);
       }
     }
   };
 
-  // Filtragem no frontend (se o backend não suportar todos os filtros ou para refinar)
   const usuariosFiltrados = usuarios.filter((usuario) => {
-    // A filtragem por nome, tipo e sexo já foi feita no backend se os filtros foram passados
-    // Aqui, podemos adicionar o filtro de status se ele for apenas frontend
     let correspondeAoStatus = true;
     if (statusFiltro === "ATIVO") {
       correspondeAoStatus = usuario.ativo === true;
     } else if (statusFiltro === "INATIVO") {
       correspondeAoStatus = usuario.ativo === false;
     }
-    // Se os filtros principais (nome, tipo, sexo) já foram aplicados no backend,
-    // esta filtragem de frontend pode ser simplificada ou focada apenas no statusFiltro.
-    // Se o backend não filtrou, mantenha os outros filtros aqui:
-    const nomeMatch = usuario.nome
-      ?.toLowerCase()
-      .includes(nomeFiltro.toLowerCase());
+    const nomeMatch = nomeFiltro
+      ? usuario.nome?.toLowerCase().includes(nomeFiltro.toLowerCase())
+      : true;
     const tipoMatch = tipoUsuarioFiltro
       ? usuario.tipoUsuario === tipoUsuarioFiltro
       : true;
-    const sexoMatch = sexoFiltro ? usuario.sexo === sexoFiltro : true; // Ajuste para os valores exatos do seu backend (ex: "Masculino" vs "M")
+    const sexoMatch = sexoFiltro ? usuario.sexo === sexoFiltro : true;
 
     return nomeMatch && tipoMatch && sexoMatch && correspondeAoStatus;
   });
@@ -143,7 +124,6 @@ export default function ListaUsuario() {
 
   return (
     <>
-      {/* <ToastContainer /> */}
       <Navbar onLogout={() => console.log("Logout placeholder")} />
       <div className="usuarios-container">
         <div className="usuarios-header">
@@ -176,8 +156,7 @@ export default function ListaUsuario() {
               onChange={(e) => setSexoFiltro(e.target.value)}
             >
               <option value="">Todos os Sexos</option>
-              <option value="Masculino">Masculino</option>{" "}
-              {/* Certifique-se que estes valores correspondem aos do seu DTO/backend */}
+              <option value="Masculino">Masculino</option>
               <option value="Feminino">Feminino</option>
               <option value="Outro">Outro</option>
             </select>
@@ -190,7 +169,7 @@ export default function ListaUsuario() {
               <option value="INATIVO">Apenas Inativos</option>
             </select>
             <button
-              onClick={() => navigate("/cadastro")}
+              onClick={() => navigate("/cadastro")} 
               className="btn-add"
               title="Cadastrar Novo Usuário"
             >
@@ -231,8 +210,7 @@ export default function ListaUsuario() {
                     </span>
                     <span>
                       <strong>Nasc:</strong> {usuario.dtNascimento}
-                    </span>{" "}
-                    {/* Formato da data do DTO */}
+                    </span>
                     <span>
                       <strong>Status:</strong>{" "}
                       <span
@@ -246,14 +224,14 @@ export default function ListaUsuario() {
                   </div>
                   <div className="usuario-acoes">
                     <button
-                      onClick={() =>
-                        alert(
-                          `Editar usuário ID: ${usuario.id}. Funcionalidade a implementar.`
-                        )
+                      onClick={
+                        () =>
+                          alert(
+                            `Editar usuário ID: ${usuario.id}. Funcionalidade a implementar.`
+                          )
                       }
-                      // onClick={() => navigate(`/secretaria/usuarios/editar/${usuario.id}`)} // Descomente quando a rota de edição existir
                       title="Editar Usuário"
-                      disabled // Habilitar quando a tela de edição existir
+                      disabled 
                     >
                       <FaEdit />
                     </button>
@@ -270,10 +248,8 @@ export default function ListaUsuario() {
                       <button
                         onClick={() => handleReativar(usuario.id, usuario.nome)}
                         title="Reativar Usuário"
-                        className="btn-action btn-reactivate"
+                        className="btn-action btn-reactivate" 
                       >
-                        {" "}
-                        {/* Adicione a classe btn-action se quiser o mesmo estilo dos outros */}
                         <FaRedo />
                       </button>
                     )}

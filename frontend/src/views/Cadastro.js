@@ -1,21 +1,18 @@
 import React, { useState, useEffect, useCallback } from "react";
-import "../styles/Cadastro.css"; // Certifique-se que o caminho está correto
-import animacaoCadastro from "../assets/animacaoCadastro.png"; // Certifique-se que o caminho está correto
+import "../styles/Cadastro.css";
+import animacaoCadastro from "../assets/animacaoCadastro.png"; 
 import {
-  buscarTurmasAtivas, // Usar a função que busca turmas ativas
+  buscarTurmasAtivas,
   buscarDisciplinas,
   cadastrarUsuario,
-} from "../services/ApiService"; // Ajuste o caminho se necessário
-import { useNavigate } from "react-router-dom";
-import { FaArrowLeft } from "react-icons/fa";
-// Considere usar uma biblioteca de notificações como react-toastify
-// import { toast, ToastContainer } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
+} from "../services/ApiService"; 
+
+import { FaArrowLeft } from "react-icons/fa"; 
 
 export default function Cadastro() {
   const [nome, setNome] = useState("");
   const [cpf, setCpf] = useState("");
-  const [dataNascimentoInput, setDataNascimentoInput] = useState(""); // Estado para o input date (formato yyyy-MM-dd)
+  const [dataNascimentoInput, setDataNascimentoInput] = useState("");
   const [sexo, setSexo] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -26,13 +23,11 @@ export default function Cadastro() {
   const [disciplinas, setDisciplinas] = useState([]);
 
   const [turmaSelecionada, setTurmaSelecionada] = useState("");
-  const [disciplinasSelecionadas, setDisciplinasSelecionadas] = useState([]); // Array para IDs de disciplinas
+  const [disciplinasSelecionadas, setDisciplinasSelecionadas] = useState([]);
 
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState("");
-
-  const navigate = useNavigate();
 
   const formatarCPF = (value) => {
     value = value.replace(/\D/g, "");
@@ -42,14 +37,13 @@ export default function Cadastro() {
     return value;
   };
 
-  // Função para formatar data de yyyy-MM-dd (do input) para dd-MM-yyyy (para o backend)
   const formatarDataParaBackend = (dataYYYYMMDD) => {
     if (!dataYYYYMMDD) return "";
-    const partes = dataYYYYMMDD.split("-"); // [yyyy, MM, dd]
+    const partes = dataYYYYMMDD.split("-");
     if (partes.length === 3) {
-      return `${partes[2]}-${partes[1]}-${partes[0]}`; // Retorna dd-MM-yyyy
+      return `${partes[2]}-${partes[1]}-${partes[0]}`;
     }
-    return ""; // Retorna vazio se o formato for inesperado
+    return "";
   };
 
   const handleSubmit = async (e) => {
@@ -109,13 +103,12 @@ export default function Cadastro() {
     const dadosUsuario = {
       nome,
       cpf,
-      dtNascimento: dataFormatadaBackend, // Nome do campo correto e valor formatado
+      dtNascimento: dataFormatadaBackend,
       sexo,
       email,
       senha,
       tipoUsuario,
       turmaId: tipoUsuario === "ALUNO" ? turmaSelecionada || null : null,
-      // Envia um array de IDs de disciplinas para o backend
       disciplinaIds:
         tipoUsuario === "PROFESSOR"
           ? disciplinasSelecionadas
@@ -127,9 +120,8 @@ export default function Cadastro() {
     try {
       await cadastrarUsuario(dadosUsuario);
       setSucesso("Cadastro de usuário realizado com sucesso!");
-      alert("Cadastro de usuário realizado com sucesso!"); // Pode substituir por toast
+      alert("Cadastro de usuário realizado com sucesso!");
 
-      // Limpa os campos
       setNome("");
       setCpf("");
       setDataNascimentoInput("");
@@ -140,7 +132,6 @@ export default function Cadastro() {
       setTipoUsuario("");
       setTurmaSelecionada("");
       setDisciplinasSelecionadas([]);
-      // navigate("/login"); // Opcional: redirecionar
     } catch (error) {
       console.error("Erro ao cadastrar usuário:", error);
       const errorMsg =
@@ -157,10 +148,10 @@ export default function Cadastro() {
 
   const carregarDependenciasTipoUsuario = useCallback(async () => {
     setErro("");
-    setLoading(true); // Adiciona loading ao carregar dependências
+    setLoading(true);
     if (tipoUsuario === "ALUNO") {
       try {
-        const data = await buscarTurmasAtivas(); // Usando buscarTurmasAtivas
+        const data = await buscarTurmasAtivas();
         setTurmas(data || []);
       } catch (err) {
         console.error("Erro ao buscar turmas:", err);
@@ -191,7 +182,6 @@ export default function Cadastro() {
     carregarDependenciasTipoUsuario();
   }, [carregarDependenciasTipoUsuario]);
 
-  // Handler para o select múltiplo de disciplinas
   const handleDisciplinasChange = (e) => {
     const options = e.target.options;
     const values = [];
@@ -201,19 +191,16 @@ export default function Cadastro() {
       }
     }
     if (values.length > 2) {
-      // Sua regra de negócio para no máximo 2 disciplinas
       setErro("Você pode selecionar no máximo 2 disciplinas.");
-      // Mantém a seleção anterior ou apenas as duas primeiras
       setDisciplinasSelecionadas(values.slice(0, 2));
     } else {
       setDisciplinasSelecionadas(values);
-      if (erro === "Você pode selecionar no máximo 2 disciplinas.") setErro(""); // Limpa o erro específico
+      if (erro === "Você pode selecionar no máximo 2 disciplinas.") setErro("");
     }
   };
 
   return (
     <div className="cadastro-container">
-      {/* <ToastContainer /> */}
       <img
         src={animacaoCadastro}
         alt="Estudante com livros"
@@ -223,25 +210,12 @@ export default function Cadastro() {
 
       <div className="cadastro-right">
         <div className="cadastro-form-container">
-          {" "}
-          {/* Container para o formulário */}
           <div className="header-formulario-cadastro">
-            {" "}
-            {/* Cabeçalho do formulário */}
-            <div
-              className="voltar-seta-cadastro"
-              onClick={() => navigate(-1)}
-              title="Voltar"
-            >
-              <FaArrowLeft />
-            </div>
             <h1 className="cadastro-title">Cadastro de Usuário</h1>
           </div>
           {erro && <p className="error-message">{erro}</p>}
           {sucesso && <p className="success-message">{sucesso}</p>}
           <form className="form-cadastro" onSubmit={handleSubmit}>
-            {" "}
-            {/* Classe para o formulário */}
             <input
               type="text"
               placeholder="Nome Completo"
@@ -262,9 +236,8 @@ export default function Cadastro() {
                 maxLength={14}
               />
               <input
-                type="date" // O input type="date" do HTML usa o formato yyyy-MM-dd
-                // placeholder="Data de Nascimento" // Placeholder não funciona bem com type="date"
-                value={dataNascimentoInput} // Vinculado ao estado correto
+                type="date"
+                value={dataNascimentoInput}
                 onChange={(e) => setDataNascimentoInput(e.target.value)}
                 required
               />
@@ -274,8 +247,7 @@ export default function Cadastro() {
                 required
               >
                 <option value="">Sexo</option>
-                <option value="Feminino">Feminino</option>{" "}
-                {/* Valores mais descritivos */}
+                <option value="Feminino">Feminino</option>
                 <option value="Masculino">Masculino</option>
                 <option value="Outro">Outro</option>
               </select>
@@ -305,7 +277,7 @@ export default function Cadastro() {
                 <select
                   value={turmaSelecionada}
                   onChange={(e) => setTurmaSelecionada(e.target.value)}
-                  required={tipoUsuario === "ALUNO"} // Torna obrigatório se for aluno
+                  required={tipoUsuario === "ALUNO"}
                 >
                   <option value="">Selecione a Turma</option>
                   {turmas.map((turma) => (
@@ -318,14 +290,13 @@ export default function Cadastro() {
 
               {tipoUsuario === "PROFESSOR" && (
                 <select
-                  multiple // Habilita seleção múltipla
-                  value={disciplinasSelecionadas} // Vinculado ao array de IDs
-                  onChange={handleDisciplinasChange} // Handler para seleção múltipla
-                  required={tipoUsuario === "PROFESSOR"} // Torna obrigatório se for professor
-                  size={Math.min(disciplinas.length, 3) || 1} // Mostra alguns itens, ou 1 se vazio
-                  className="select-disciplinas-multiplo" // Para estilização específica se necessário
+                  multiple
+                  value={disciplinasSelecionadas}
+                  onChange={handleDisciplinasChange}
+                  required={tipoUsuario === "PROFESSOR"}
+                  size={Math.min(disciplinas.length, 3) || 1}
+                  className="select-disciplinas-multiplo"
                 >
-                  {/* <option value="" disabled>Selecione até 2 Disciplinas (Ctrl+Click)</option> // Instrução */}
                   {disciplinas.map((d) => (
                     <option key={d.id} value={d.id}>
                       {d.nome}
@@ -333,6 +304,10 @@ export default function Cadastro() {
                   ))}
                 </select>
               )}
+              {tipoUsuario !== "ALUNO" && tipoUsuario !== "PROFESSOR" && (
+                <div />
+              )}
+              {tipoUsuario === "SECRETARIA" && <div />}
             </div>
             <div className="form-senha-grid">
               <input

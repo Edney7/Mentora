@@ -57,7 +57,6 @@
   background-color: #00748d;
 }
 
-/* Lista */
 .usuarios-lista {
   background-color: #eaf3f7;
   border-radius: 10px;
@@ -81,7 +80,6 @@
   border-radius: 4px 0 0 4px;
 }
 
-/* Cores por tipo */
 .usuario-borda.professor {
   background-color: #4db5ff;
 }

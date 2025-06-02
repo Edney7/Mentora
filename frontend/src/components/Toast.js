@@ -17,7 +17,6 @@ export const showWarn = (mensagem) => {
   toast.warn(mensagem);
 };
 
-// Componente que precisa ser exibido em pelo menos uma página
 export  const Toast = () => (
   <ToastContainer
     position="top-right"

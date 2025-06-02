@@ -1,6 +1,6 @@
 import React from "react";
 import "../../styles/Home.css";
-import Navbar from "../../components/Navbar"; // Certifique-se de que o caminho está correto
+import Navbar from "../../components/Navbar"; 
 
 export default function HomeProfessor() {
   return (
@@ -44,4 +44,3 @@ export default function HomeProfessor() {
   );
 }
 
-/* HomeSecretaria.css */
