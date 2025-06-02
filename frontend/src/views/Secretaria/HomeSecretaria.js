@@ -95,7 +95,7 @@ export default function HomeSecretaria() {
         </div>
       </div>
 
-        <div onClick={() => navigate("/listaUsuario")} className="top-card">
+        <div onClick={() => navigate("/secretaria/usuarios")} className="top-card">
           <h2>Gerenciar Usuarios</h2>
          <img src={animacaoHomeSecretaria} alt="Estudante com livros" className="top-img" />
         </div>
@@ -104,7 +104,7 @@ export default function HomeSecretaria() {
           <button onClick={() => navigate("/secretaria/ausenciaProfessor")} className="btn">Presença e falta</button>
         </div>
         <div className="button-grid">
-          <button  className="btn">Gerenciar Turmas</button>
+          <button onClick={() => navigate("/secretaria/turmas")} className="btn">Gerenciar Turmas</button>
           <button onClick={() => navigate("/secretaria/disciplina")} className="btn">Gerenciar Disciplinas</button>
         </div>
       </main>

@@ -19,7 +19,7 @@ export default function AppRoutes() {
       <Route path="/homeProfessor" element={<HomeProfessor/>} />
       <Route path="/homeAluno" element={<HomeAluno/>} />
       <Route path="/secretaria/usuarios" element={<SecretariaListaUsuarios/>} />
-      <Route path="/secretaria/disciplinas" element={<SecretariaDisciplinas />} />
+      <Route path="/secretaria/disciplina" element={<SecretariaDisciplinas />} />
       <Route path="/secretaria/turmas" element={<SecretariaTurmas />} />
       <Route path="/secretaria/ausenciaProfessor" element={<SecretariaAusenciaProfessor />} />
 
