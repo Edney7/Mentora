@@ -8,6 +8,7 @@ import HomeProfessor from './views/Professor/HomeProfessor';
 import SecretariaListaUsuarios from './views/Secretaria/ListaUsuario';
 import SecretariaDisciplinas from './views/Secretaria/Disciplina';
 import SecretariaTurmas from './views/Secretaria/ListaTurmas';
+import SecretariaAusenciaProfessor from './views/Secretaria/AusenciaProfessor';
 
 export default function AppRoutes() {
   return (
@@ -20,6 +21,8 @@ export default function AppRoutes() {
       <Route path="/secretaria/usuarios" element={<SecretariaListaUsuarios/>} />
       <Route path="/secretaria/disciplinas" element={<SecretariaDisciplinas />} />
       <Route path="/secretaria/turmas" element={<SecretariaTurmas />} />
+      <Route path="/secretaria/ausenciaProfessor" element={<SecretariaAusenciaProfessor />} />
+
 
     </Routes>
   );
