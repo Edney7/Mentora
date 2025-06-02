@@ -59,8 +59,8 @@ export default function HomeSecretaria() {
          <img src={animacaoHomeSecretaria} alt="Estudante com livros" className="top-img" />
         </div>
        <div className="button-grid">
-          <button  className="btn">Ausência do Professor</button>
-          <button onClick={() => Navigate("/disciplina")} className="btn">Presença e falta</button>
+          <button onClick={() => Navigate("/ausenciaProfessor")} className="btn">Ausência do Professor</button>
+          <button onClick={() => Navigate("/ausenciaProfessor")} className="btn">Presença e falta</button>
         </div>
         <div className="button-grid">
           <button  className="btn">Gerenciar Turmas</button>

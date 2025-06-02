@@ -76,3 +76,23 @@ export const atualizarDisciplina = async (id, disciplinaData) => {
 export const excluirDisciplina = async (id) => {
   await api.delete(`/disciplinas/${id}`);
 };
+
+// services/Api.js
+export const buscarAusencias = async () => {
+  const response = await api.get("/ausencias-professor");
+  return response.data;
+};
+
+// ApiService.js
+export const buscarAusenciasComFiltro = async ({ nome, mesAusencia, mesRegistro }) => {
+  const params = new URLSearchParams();
+
+  if (nome) params.append("nome", nome);
+  if (mesAusencia) params.append("mesAusencia", mesAusencia);
+  if (mesRegistro) params.append("mesRegistro", mesRegistro);
+
+  const response = await api.get(`/ausencias-professor/filtro?${params.toString()}`);
+  return response.data;
+};
+
+
