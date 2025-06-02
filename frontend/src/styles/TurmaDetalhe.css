@@ -1,0 +1,99 @@
+.turma-detalhe-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #c3cecf;
+  height: 100vh;
+}
+
+h1 {
+  text-align: center;
+  color: #004b4f;
+}
+
+.conteudo {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.alunos-coluna, .notas-coluna {
+  background-color: #f7f7f7;
+  border-radius: 10px;
+  padding: 20px;
+  width: 300px;
+}
+
+.alunos-header, .notas-header {
+  font-weight: bold;
+  color: #187fa6;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #187fa6;
+  padding-bottom: 5px;
+}
+
+.aluno-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0;
+  padding: 8px;
+  background-color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.aluno-item.selecionado {
+  background-color: #d9d9d9;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 5px;
+  margin: 5px 0 10px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.btn-enviar {
+  padding: 10px 20px;
+  background-color: #004b4f;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: white;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal h3 {
+  margin-bottom: 10px;
+}
+
+.modal select,
+.modal input {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 100%;
+  margin-top: 5px;
+}

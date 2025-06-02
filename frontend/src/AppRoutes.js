@@ -7,6 +7,7 @@ import HomeAluno from './views/Aluno/HomeAluno';
 import HomeProfessor from './views/Professor/HomeProfessor';
 import ListaUsuario from './views/Secretaria/ListaUsuario';
 import Disciplina from './views/Secretaria/Disciplina';
+import TurmaDetalhe from './views/Professor/TurmaDetalhe';
 
 export default function AppRoutes() {
   return (
@@ -17,7 +18,9 @@ export default function AppRoutes() {
       <Route path="/homeProfessor" element={<HomeProfessor/>} />
       <Route path="/homeAluno" element={<HomeAluno/>} />
       <Route path="/listaUsuario" element={<ListaUsuario/>} />
+      <Route path="/turmaDetalhe/:id" element={<TurmaDetalhe />} />
       <Route path="/disciplina" element={<Disciplina/>} />
+
     </Routes>
   );
 }
