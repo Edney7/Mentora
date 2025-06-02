@@ -1,4 +1,4 @@
-package com.example.mentora.dto.turmadisciplina;
+package com.example.mentora.dto.turmadisciplina; // Ou seu pacote de DTOs
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

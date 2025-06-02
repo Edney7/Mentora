@@ -11,6 +11,5 @@ public class AtualizarDisciplinasTurmaRequestDTO {
     @NotNull(message = "ID da Turma é obrigatório")
     private Long turmaId;
 
-    // Pode ser uma lista vazia para remover todas as disciplinas
-    private List<Long> disciplinaIds;
+    private List<Long> disciplinaIds; // Lista dos IDs das disciplinas a serem associadas
 }
