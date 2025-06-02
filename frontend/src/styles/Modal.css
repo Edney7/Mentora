@@ -53,5 +53,5 @@
 }
 
 .modal-body {
-  overflow-y: auto; /* Scroll se o conteúdo for maior que o modal */
+  overflow-y: auto;
 }

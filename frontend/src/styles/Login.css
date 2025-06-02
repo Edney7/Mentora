@@ -53,7 +53,7 @@
     max-height: 80vh;
     width: auto;
     height: auto;
-    object-fit: contain;/* evita esticar a imagem ou cortar*/
+    object-fit: contain;
     z-index: 2;
     pointer-events: none; 
   }

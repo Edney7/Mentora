@@ -11,7 +11,7 @@
   overflow: hidden;
 }
 
-.main-content {/*painel esquerdo*/
+.main-content {
   flex: 1;
   padding: 40px 20px;
   background-color: #ffffff;
@@ -61,7 +61,7 @@
 
 
 
-.card-info { /*  cards de infomarçoes no topo*/
+.card-info {
   display: flex;
   justify-content: space-around;
   flex-wrap: nowrap; 
@@ -104,7 +104,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 20px;
   width: 60%;   
-  height: 130px;       /* MESMA largura do top-card */
+  height: 130px;      
   margin: 0 auto; 
   
 }
@@ -126,7 +126,7 @@
   background-color: #157a80;
 }
 
-.event-panel { /*painel direito com  o calendario*/
+.event-panel { 
   background-color: #C5E6EA;
   padding: 20px 50px;
   width: 35%;
@@ -135,7 +135,7 @@
   gap: 30px;
 }
 
-.event-card {/* card geral dos eventos*/
+.event-card {
    border-radius: 16px;
   padding: 20px;
   min-width: 200px;

@@ -3,6 +3,10 @@ import "../../styles/HomeProfessor.css";
 import Calendar from "../../components/Calendar";
 import Navbar from "../../components/Navbar";
 import { useNavigate } from "react-router-dom";
+import React from "react";
+import "../../styles/Home.css";
+import Navbar from "../../components/Navbar"; 
+
 
 export default function HomeProfessor() {
   const navigate = useNavigate();

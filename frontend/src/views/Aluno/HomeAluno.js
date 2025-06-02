@@ -1,6 +1,6 @@
 import React from "react";
 import "../../styles/Home.css";
-import Navbar from "../../components/Navbar"; // Certifique-se de que o caminho está correto
+import Navbar from "../../components/Navbar";
 
 export default function HomeAluno() {
   return (
@@ -11,11 +11,6 @@ export default function HomeAluno() {
 <h1>Aluno</h1>
       <main className="main-content">
         <div className="top-card">
-         {/* <img
-            src={animacaoHomeSecretaria}
-            alt="Ilustração"
-            className="top-img"
-          />*/}
           <h2>Gerenciar Usuarios</h2>
         </div>
 
@@ -48,4 +43,3 @@ export default function HomeAluno() {
   );
 }
 
-/* HomeSecretaria.css */
