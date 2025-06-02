@@ -114,48 +114,7 @@ export default function HomeSecretaria() {
         {erro && <p className="error-message" style={{textAlign: 'center', width: '100%', padding: '10px 0'}}>{erro}</p>}
 
 
-        <main className="main-content"> 
-          <div className="card-info"> 
-            <div className="card-info-item"> 
-              <h3>Total de Usuários</h3>
-              <p>{totalUsuarios}</p> 
-            </div>
-            <div className="card-info-item">
-              <h3>Professores Ativos</h3>
-              <p>{totalProfessores}</p>
-            </div>
-            <div className="card-info-item">
-              <h3>Alunos Ativos</h3>
-              <p>{totalAlunos}</p>
-            </div>
-            <div className="card-info-item">
-              <h3>Turmas Ativas</h3>
-              <p>{totalTurmas}</p>
-            </div>
-          </div>
-
-          <div onClick={() => navigate("/secretaria/usuarios")} className="top-card"> 
-            <h2>Gerenciar Usuários</h2> 
-            <img src={animacaoHomeSecretaria} alt="Gerenciamento de usuários" className="top-img" /> 
-          </div>
-          
-          <div className="button-grid"> 
-            <button onClick={() => navigate("/secretaria/ausencias-professor")} className="btn"> 
-                Ausências de Professores
-            </button>
-            <button onClick={() => navigate("/secretaria/gestao-frequencia")} className="btn">
-                Presenças e Faltas
-            </button>
-          </div>
-          <div className="button-grid">
-            <button onClick={() => navigate("/secretaria/turmas")} className="btn">
-                Gerenciar Turmas
-            </button>
-            <button onClick={() => navigate("/secretaria/disciplinas")} className="btn">
-                Gerenciar Disciplinas
-            </button>
-          </div>
-        </main>
+        
 
         <section className="event-panel"> 
           <div className="event-card branco"> 
