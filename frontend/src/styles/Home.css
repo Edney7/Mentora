@@ -165,7 +165,9 @@
   color: white;
   cursor: pointer;
   transition: background-color 0.2s ease;
-}
+  max-height: 70px;
+  text-align: center;
+  }
 
 .event-card.branco {
   display: flex;
