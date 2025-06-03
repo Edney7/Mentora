@@ -17,7 +17,7 @@ api.interceptors.request.use(
   }
 );
 
-// --- Usuários e Autenticação ---
+
 export const cadastrarUsuario = async (usuarioDados) => {
   const response = await api.post("/usuarios", usuarioDados);
   return response.data;
@@ -288,6 +288,17 @@ export const listarFaltasDoProfessor = async (professorId) => {
     const response = await api.get(`/faltas/professor/${professorId}`);
     return response.data;
 };
+
+export const listarTodasNotas = async () => {
+  const response = await api.get("/notas");
+  return response.data;
+};
+
+export const listarTodasFaltas = async () => {
+  const response = await api.get("/faltas");
+  return response.data;
+};
+
 
 export const listarFaltasPorData = async (dataFalta) => { 
     const response = await api.get(`/faltas/data/${dataFalta}`);

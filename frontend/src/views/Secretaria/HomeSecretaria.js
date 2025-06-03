@@ -101,7 +101,7 @@ export default function HomeSecretaria() {
         </div>
        <div className="button-grid">
           <button onClick={() => navigate("/secretaria/ausenciaProfessor")} className="btn">Ausência do Professor</button>
-          <button onClick={() => navigate("/secretaria/ausenciaProfessor")} className="btn">Presença e falta</button>
+          <button onClick={() => navigate("/secretaria/notasPresencasAlunos")} className="btn">Presença e falta</button>
         </div>
         <div className="button-grid">
           <button onClick={() => navigate("/secretaria/turmas")} className="btn">Gerenciar Turmas</button>
