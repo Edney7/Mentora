@@ -2,7 +2,7 @@ import React from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 
-function Calendario() {
+function Calendario({ eventos}) {
   return (
     <div style={{
       background: '#fff',
@@ -16,11 +16,7 @@ function Calendario() {
       <FullCalendar
         plugins={[dayGridPlugin]}
         initialView="dayGridMonth"
-        events={[
-          { title: 'Reunião Pedagógica', date: '2025-06-05' },
-          { title: 'Fechamento de Notas', date: '2025-06-10' },
-          { title: 'Provas Finais', date: '2025-06-20' },
-        ]}
+        events={eventos}
         height="auto"
       />
     </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import "../../styles/Home.css"; 
 import Navbar from "../../components/Navbar"; 
 import { useNavigate } from "react-router-dom";
-import Calendar from "../../components/Calendar";
+import Calendar from "../../components/Calendario";
 import { 
     listarTodosOsUsuarios, 
     listarProfessoresAtivos, 
@@ -10,8 +10,9 @@ import {
     buscarTurmasAtivas       
 } from "../../services/ApiService"; 
 import animacaoHomeSecretaria from "../../assets/animacaoHomeSecretaria.png";
+import Modal from "react-modal";
 
-
+Modal.setAppElement("#root"); // Define o elemento raiz para acessibilidade
 export default function HomeSecretaria() {
  
   const [totalUsuarios, setTotalUsuarios] = useState(0);
@@ -22,6 +23,28 @@ export default function HomeSecretaria() {
   const [erro, setErro] = useState("");
   const navigate = useNavigate();
 
+  const [eventos, setEventos] = useState([]);
+
+  const [modalAberto, setModalAberto] = useState(false);
+  const [novoEvento, setNovoEvento] = useState({ title: '', date: '' });
+
+  const abrirModal = () => setModalAberto(true);
+  const fecharModal = () => setModalAberto(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setNovoEvento((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const adicionarEvento = () => {
+    if (novoEvento.title && novoEvento.date) {
+      setEventos([...eventos, novoEvento]);
+      setNovoEvento({ title: '', date: '' });
+      fecharModal();
+    } else {
+      alert('Preencha todos os campos.');
+    }
+  };
   const carregarTotais = useCallback(async () => {
     setLoading(true);
     setErro("");
@@ -119,7 +142,7 @@ export default function HomeSecretaria() {
         <section className="event-panel"> 
           <div className="event-card branco"> 
             <div className="calendar-container"> 
-              <Calendar />
+              <Calendar  eventos={eventos} />
             </div>
           </div>
           
@@ -128,9 +151,42 @@ export default function HomeSecretaria() {
               <span>Próximo Feriado</span>
               <span className="hora">xx/xx</span>
             </div>
-            <button className="event-card laranja" onClick={() => navigate("/secretaria/calendario/eventos/cadastrar")}>
+            <button className="event-card laranja" onClick={abrirModal}>
               <h2>Cadastrar Eventos</h2>
             </button>
+    
+            <Modal
+        isOpen={modalAberto}
+        onRequestClose={fecharModal}
+        contentLabel="Cadastrar Evento"
+        style={{
+          content: {
+            maxWidth: '400px',
+            margin: 'auto',
+            borderRadius: '8px',
+            padding: '20px',
+          },
+        }}
+      >
+        <h3>Cadastrar Evento</h3>
+        <input
+          type="text"
+          name="title"
+          placeholder="Título"
+          value={novoEvento.title}
+          onChange={handleChange}
+          style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
+        />
+        <input
+          type="date"
+          name="date"
+          value={novoEvento.date}
+          onChange={handleChange}
+          style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
+        />
+        <button onClick={adicionarEvento} style={{ marginRight: '10px' }}>Salvar</button>
+        <button onClick={fecharModal}>Cancelar</button>
+      </Modal>
           </div>
         </section>
       </div>
