@@ -1,13 +1,12 @@
 /* Reset */
 .usuarios-container {
-  
   padding: 20px;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: "Segoe UI", sans-serif;
 }
 
 .usuarios-header {
   display: flex;
- flex-direction: column;
+  flex-direction: column;
   align-items: center;
   margin-bottom: 20px;
 }
@@ -15,10 +14,7 @@
 .usuarios-header h2 {
   color: #004e64;
   margin-bottom: 10px;
-  ;
 }
-
-
 
 /* Filtros */
 .usuarios-filtros {
@@ -28,7 +24,7 @@
   justify-content: center;
 }
 
-.usuarios-filtros input{
+.usuarios-filtros input {
   padding: 5px 10px;
   width: 400px;
   border-radius: 5px;
@@ -36,7 +32,7 @@
   font-size: 1rem;
 }
 .usuarios-filtros select {
-  padding:5px 10px;
+  padding: 5px 10px;
   border-radius: 5px;
   border: 1px solid #ccc;
   width: 150px;
@@ -48,7 +44,7 @@
   font-size: 1.5rem;
   border: none;
   border-radius: 8px;
-  padding:5px 12px;
+  padding: 5px 12px;
   cursor: pointer;
   transition: 0.3s;
 }
@@ -61,13 +57,12 @@
   background-color: #eaf3f7;
   border-radius: 10px;
   padding: 15px;
-  margin: 0 250px 0 250px ;
+  margin: 0 250px 0 250px;
   display: grid;
 
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
   max-height: 600px;
- 
 }
 
 .usuario-row {
@@ -101,7 +96,7 @@
   border-radius: 8px;
   padding: 1rem;
   flex: 1;
-} 
+}
 
 .usuario-info {
   display: grid;
@@ -115,13 +110,12 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  
 }
 
 .usuario-acoes {
   display: flex;
   gap: 0.75rem;
-  margin: 0 10px;;
+  margin: 0 10px;
 }
 
 .usuario-acoes button {
