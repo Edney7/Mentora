@@ -6,6 +6,7 @@ import {
     buscarDisciplinas, 
     cadastrarUsuario 
 } from "../services/ApiService"; 
+import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 export default function Cadastro() {
@@ -181,11 +182,18 @@ export default function Cadastro() {
         alt="Estudante com livros"
         className="animacaoCadastro"
       />
+      
       <div className="cadastro-left"></div>
       <div className="cadastro-right">
         <form className="cadastro-form" onSubmit={handleSubmit}>
           <h1 className="cadastro-title">Cadastro de Usuário</h1>
-          
+          <div
+            className="voltar-seta"
+            onClick={() => navigate(-1)}
+            title="Voltar"
+          >
+            <FaArrowLeft />
+          </div>
           {erro && <p className="error-message" style={{textAlign: 'center', marginBottom: '15px'}}>{erro}</p>}
           {sucesso && <p className="success-message" style={{textAlign: 'center', marginBottom: '15px'}}>{sucesso}</p>}
 
