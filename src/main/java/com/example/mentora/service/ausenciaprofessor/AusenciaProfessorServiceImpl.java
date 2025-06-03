@@ -107,6 +107,16 @@ public class AusenciaProfessorServiceImpl implements AusenciaProfessorService {
                 });
         return toAusenciaProfessorResponseDTO(ausencia);
     }
+    public List<AusenciaProfessorResponseDTO> filtrarAusencias(String nome, Integer mesAusencia, Integer mesRegistro) {
+        List<AusenciaProfessor> todas = ausenciaProfessorRepository.findAll();
+
+        return todas.stream()
+                .filter(a -> nome == null || a.getProfessor().getUsuario().getNome().toLowerCase().contains(nome.toLowerCase()))
+                .filter(a -> mesAusencia == null || a.getDataAusencia().getMonthValue() == mesAusencia)
+                .filter(a -> mesRegistro == null || a.getDataRegistro().getMonthValue() == mesRegistro)
+                .map(this::toAusenciaProfessorResponseDTO)
+                .toList();
+    }
 
     @Override
     @Transactional(readOnly = true)
