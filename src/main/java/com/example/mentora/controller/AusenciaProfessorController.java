@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/ausencias-professor") // Endpoint base para ausências de professor
 @Tag(name = "Ausências de Professores", description = "Operações relacionadas ao registo e gestão de ausências de professores")

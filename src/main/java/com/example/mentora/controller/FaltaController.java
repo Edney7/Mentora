@@ -52,6 +52,10 @@ public class FaltaController {
         FaltaResponseDTO falta = faltaService.buscarFaltaPorId(id);
         return ResponseEntity.ok(falta);
     }
+    @GetMapping
+    public List<FaltaResponseDTO> listarTodasFaltas() {
+        return faltaService.listarTodasFaltas(); // método no service
+    }
 
     @Operation(summary = "Listar todas as faltas de um aluno específico")
     @GetMapping("/aluno/{alunoId}")
