@@ -58,36 +58,4 @@ public class NotaController {
         return ResponseEntity.ok(notas);
     }
 
-    // --- Endpoints Opcionais (descomente e implemente no serviço se necessário) ---
-
-    /*
-    @Operation(summary = "Atualizar uma nota existente")
-    @PutMapping("/{notaId}")
-    public ResponseEntity<NotaResponseDTO> atualizarNota(
-            @Parameter(description = "ID da nota a ser atualizada") @PathVariable Long notaId,
-            @Valid @RequestBody NotaUpdateDTO notaUpdateDTO) {
-        NotaResponseDTO notaAtualizada = notaService.atualizarNota(notaId, notaUpdateDTO);
-        return ResponseEntity.ok(notaAtualizada);
-    }
-    */
-
-    /*
-    @Operation(summary = "Excluir uma nota específica")
-    @DeleteMapping("/{notaId}")
-    public ResponseEntity<Void> excluirNota(
-            @Parameter(description = "ID da nota a ser excluída") @PathVariable Long notaId) {
-        notaService.excluirNota(notaId);
-        return ResponseEntity.noContent().build();
-    }
-    */
-
-    /*
-    @Operation(summary = "Listar todas as notas lançadas por um professor específico")
-    @GetMapping("/professor/{professorId}")
-    public ResponseEntity<List<NotaResponseDTO>> listarNotasDoProfessor(
-            @Parameter(description = "ID do professor para buscar as notas lançadas") @PathVariable Long professorId) {
-        List<NotaResponseDTO> notas = notaService.listarNotasPorProfessor(professorId); // Requer implementação no serviço
-        return ResponseEntity.ok(notas);
-    }
-    */
 }

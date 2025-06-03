@@ -10,15 +10,14 @@ public interface TurmaService {
 
     TurmaResponseDTO cadastrar(TurmaCreateDTO dto);
 
-    List<TurmaResponseDTO> listarTurmasAtivas();
+    List<TurmaResponseDTO> listarTurmasAtivas(); // Método existente para turmas ativas
     TurmaResponseDTO buscarTurmaAtivaPorId(Long id);
 
-    TurmaResponseDTO atualizar(Long id, TurmaUpdateDTO dto); // MÉTODO QUE VAMOS IMPLEMENTAR/REVISAR
+    TurmaResponseDTO atualizar(Long id, TurmaUpdateDTO dto);
 
     void desativarTurma(Long id);
     void reativarTurma(Long id);
 
-    // Métodos para buscar todas as turmas (incluindo inativas) podem ser adicionados aqui para admin
-    // List<TurmaResponseDTO> listarTodasAsTurmas();
-    // TurmaResponseDTO buscarTurmaPorIdIncluindoInativas(Long id);
+    // NOVO MÉTODO para listar TODAS as turmas (ativas e inativas)
+    List<TurmaResponseDTO> listarTodasAsTurmas();
 }

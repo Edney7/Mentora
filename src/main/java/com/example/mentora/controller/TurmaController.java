@@ -1,33 +1,39 @@
 package com.example.mentora.controller;
 
-import com.example.mentora.dto.aluno.AlunoResponseDTO; // 1. Importar AlunoResponseDTO
+import com.example.mentora.dto.aluno.AlunoResponseDTO;
+import com.example.mentora.dto.disciplina.DisciplinaResponseDTO;
 import com.example.mentora.dto.turma.TurmaCreateDTO;
 import com.example.mentora.dto.turma.TurmaResponseDTO;
 import com.example.mentora.dto.turma.TurmaUpdateDTO;
-import com.example.mentora.service.aluno.AlunoService; // 2. Importar AlunoService
+import com.example.mentora.dto.turmadisciplina.AtualizarDisciplinasTurmaRequestDTO;
+import com.example.mentora.dto.turmadisciplina.VincularDisciplinaTurmaRequestDTO;
+import com.example.mentora.service.aluno.AlunoService;
 import com.example.mentora.service.turma.TurmaService;
+import com.example.mentora.service.turmadisciplina.TurmaDisciplinaService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter; // Importar @Parameter
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+// import org.springframework.security.access.prepost.PreAuthorize; // Para segurança do endpoint
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/turmas")
-@Tag(name = "Turmas", description = "Operações CRUD para Turmas e visualização de seus alunos") // Tag description atualizada
+@Tag(name = "Turmas", description = "Gerenciamento de turmas, suas disciplinas e alunos")
 public class TurmaController {
 
     private final TurmaService turmaService;
-    private final AlunoService alunoService; // 3. Declarar AlunoService
+    private final AlunoService alunoService;
+    // TurmaDisciplinaService será usado pelo TurmaDisciplinaController
 
-    // 4. Adicionar AlunoService ao construtor para injeção de dependência
-    public TurmaController(TurmaService turmaService, AlunoService alunoService) {
+    public TurmaController(TurmaService turmaService,
+                           AlunoService alunoService) {
         this.turmaService = turmaService;
-        this.alunoService = alunoService; // 5. Atribuir AlunoService
+        this.alunoService = alunoService;
     }
 
     @Operation(summary = "Cadastrar uma nova turma")
@@ -41,6 +47,13 @@ public class TurmaController {
     @GetMapping
     public ResponseEntity<List<TurmaResponseDTO>> listarTurmasAtivas() {
         List<TurmaResponseDTO> turmas = turmaService.listarTurmasAtivas();
+        return ResponseEntity.ok(turmas);
+    }
+
+    @Operation(summary = "Listar TODAS as turmas (ativas e inativas) - Acesso restrito (ex: Admin)")
+    @GetMapping("/todas")
+    public ResponseEntity<List<TurmaResponseDTO>> listarTodasAsTurmas() {
+        List<TurmaResponseDTO> turmas = turmaService.listarTodasAsTurmas();
         return ResponseEntity.ok(turmas);
     }
 
@@ -74,7 +87,6 @@ public class TurmaController {
         return ResponseEntity.ok().build();
     }
 
-    // --- NOVO ENDPOINT PARA LISTAR ALUNOS DA TURMA ---
     @Operation(summary = "Listar todos os alunos ativos de uma turma específica")
     @GetMapping("/{turmaId}/alunos")
     public ResponseEntity<List<AlunoResponseDTO>> listarAlunosDaTurma(
@@ -82,7 +94,4 @@ public class TurmaController {
         List<AlunoResponseDTO> alunos = alunoService.listarAlunosPorTurma(turmaId);
         return ResponseEntity.ok(alunos);
     }
-
-    // Os métodos que gerenciavam a associação Turma-Disciplina
-    // devem estar APENAS no TurmaDisciplinaController.
 }
