@@ -13,5 +13,5 @@ public class TurmaResponseDTO {
     private String turno;
     private String serieAno;
     private Integer anoLetivo;
-    private Boolean ativa; // Campo adicionado para ser incluído na resposta
+    private Boolean ativa;
 }

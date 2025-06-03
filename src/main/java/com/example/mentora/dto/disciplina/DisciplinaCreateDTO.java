@@ -14,8 +14,6 @@ public class DisciplinaCreateDTO {
     private String nome;
 
     @Size(max = 1000, message = "A descrição não pode exceder 1000 caracteres.")
-    private String descricao; // Descrição é opcional na criação
+    private String descricao;
 
-    // Se disciplinas tivessem um status 'ativa' na criação:
-    // private Boolean ativa = true;
 }

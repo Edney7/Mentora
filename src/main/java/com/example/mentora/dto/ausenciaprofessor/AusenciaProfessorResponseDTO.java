@@ -10,14 +10,12 @@ import java.time.LocalDate;
 @Setter
 @Builder
 public class AusenciaProfessorResponseDTO {
-    private Long id; // ID da ausência
+    private Long id;
     private LocalDate dataAusencia;
     private String motivo;
     private LocalDate dataRegistro;
 
     private Long professorId;
-    private String nomeProfessor; // Para facilitar a visualização
+    private String nomeProfessor;
 
-    // Se tivesse um campo status na entidade:
-    // private String status;
 }

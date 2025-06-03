@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/turmas") // Continua com o mesmo base path para manter a estrutura RESTful (/turmas/{turmaId}/disciplinas)
+@RequestMapping("/turmas") 
 @Tag(name = "Turma - Disciplinas", description = "Gerenciamento da associação entre Turmas e Disciplinas")
 public class TurmaDisciplinaController {
 

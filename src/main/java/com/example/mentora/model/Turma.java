@@ -7,12 +7,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "turma") // Was: Turma
+@Table(name = "turma")
 public class Turma {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id") // Was: id_turma
+    @Column(name = "id")
     private Long id;
 
     @Column(nullable = false, length = 100)
@@ -27,6 +27,6 @@ public class Turma {
     @Column(name = "ano_letivo")
     private Integer anoLetivo;
 
-    @Column(name = "ativa", nullable = false) // Was: ativo, 'ativa' matches common DDL
-    private Boolean ativa = true; // Field name updated for consistency
+    @Column(name = "ativa", nullable = false)
+    private Boolean ativa = true;
 }

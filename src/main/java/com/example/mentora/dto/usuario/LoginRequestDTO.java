@@ -16,5 +16,4 @@ public class LoginRequestDTO {
     @NotBlank(message = "Senha é obrigatória")
     private String senha;
 
-    // getters e setters
 }

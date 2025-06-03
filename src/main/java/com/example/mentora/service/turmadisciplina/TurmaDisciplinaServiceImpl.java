@@ -66,7 +66,6 @@ public class TurmaDisciplinaServiceImpl implements TurmaDisciplinaService {
         Turma turma = turmaRepository.findById(dto.getTurmaId())
                 .orElseThrow(() -> new RuntimeException("Turma com ID " + dto.getTurmaId() + " não encontrada."));
 
-        // Utiliza o método customizado no repositório para deletar associações existentes por turmaId
         turmaDisciplinaRepository.deleteByTurmaId(turma.getId());
 
         if (dto.getDisciplinaIds() != null && !dto.getDisciplinaIds().isEmpty()) {
@@ -90,12 +89,11 @@ public class TurmaDisciplinaServiceImpl implements TurmaDisciplinaService {
         List<TurmaDisciplina> associacoes = turmaDisciplinaRepository.findByTurmaId(turmaId);
 
         return associacoes.stream()
-                .map(TurmaDisciplina::getDisciplina) // Extrai a Disciplina da associação
-                .map(this::toDisciplinaResponseDTO)  // Converte Disciplina para DTO
+                .map(TurmaDisciplina::getDisciplina)
+                .map(this::toDisciplinaResponseDTO)
                 .collect(Collectors.toList());
     }
 
-    // Método auxiliar para converter uma entidade Disciplina para DisciplinaResponseDTO.
     private DisciplinaResponseDTO toDisciplinaResponseDTO(Disciplina disciplina) {
         return DisciplinaResponseDTO.builder()
                 .id(disciplina.getId())

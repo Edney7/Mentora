@@ -10,10 +10,10 @@ import lombok.AllArgsConstructor; // Construtor com todos os argumentos (opciona
 
 @Getter
 @Setter
-@NoArgsConstructor // JPA requer um construtor sem argumentos
-@AllArgsConstructor // Opcional, pode ser útil
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "disciplina", uniqueConstraints = { // Garante que o nome da disciplina seja único
+@Table(name = "disciplina", uniqueConstraints = {
         @UniqueConstraint(columnNames = "nome", name = "uk_disciplina_nome")
 })
 public class Disciplina {
@@ -23,23 +23,13 @@ public class Disciplina {
     @Column(name = "id")
     private Long id;
 
-    @NotBlank(message = "O nome da disciplina não pode ser vazio.") // Validação a nível de DTO é mais comum para entrada
+    @NotBlank(message = "O nome da disciplina não pode ser vazio.")
     @Size(max = 100, message = "O nome da disciplina não pode exceder 100 caracteres.")
     @Column(name = "nome", nullable = false, unique = true, length = 100)
     private String nome;
 
     @Size(max = 1000, message = "A descrição não pode exceder 1000 caracteres.")
-    @Column(name = "descricao", columnDefinition = "TEXT") // TEXT para descrições mais longas
-    private String descricao; // Descrição é opcional
+    @Column(name = "descricao", columnDefinition = "TEXT")
+    private String descricao;
 
-    // Se precisar de um campo 'ativo' para soft delete de disciplinas:
-    // @Column(name = "ativa", nullable = false)
-    // private Boolean ativa = true;
-
-    // Construtores, getters e setters são gerenciados pelo Lombok
-    // Se não usar @AllArgsConstructor, pode criar um construtor para nome e descrição, por exemplo:
-    // public Disciplina(String nome, String descricao) {
-    //     this.nome = nome;
-    //     this.descricao = descricao;
-    // }
 }

@@ -21,27 +21,23 @@ public class SecretariaServiceImpl implements SecretariaService {
         this.secretariaRepository = secretariaRepository;
     }
 
-    // Método auxiliar para mapear Secretaria para SecretariaResponseDTO
     private SecretariaResponseDTO toSecretariaResponseDTO(Secretaria secretaria) {
         if (secretaria == null) {
             return null;
         }
-        Usuario usuario = secretaria.getUsuario(); // Obter o utilizador associado
+        Usuario usuario = secretaria.getUsuario();
 
         return SecretariaResponseDTO.builder()
                 .id(secretaria.getId())
                 .idUsuario(usuario != null ? usuario.getId() : null)
                 .nomeUsuario(usuario != null ? usuario.getNome() : "N/A")
                 .emailUsuario(usuario != null ? usuario.getEmail() : "N/A")
-                // Adicionar outros campos relevantes, como estado ativo do utilizador, se necessário no DTO
-                // .ativo(usuario != null ? usuario.getAtivo() : false)
                 .build();
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<SecretariaResponseDTO> listarSecretariasAtivas() {
-        // Utiliza o novo método do repositório que já filtra por utilizador ativo
         return secretariaRepository.findAllWhereUsuarioAtivoTrue()
                 .stream()
                 .map(this::toSecretariaResponseDTO)
@@ -51,12 +47,9 @@ public class SecretariaServiceImpl implements SecretariaService {
     @Override
     @Transactional(readOnly = true)
     public SecretariaResponseDTO buscarSecretariaAtivaPorId(Long id) {
-        // Utiliza o novo método do repositório que busca por ID de Secretaria e verifica se o utilizador está ativo
         Secretaria secretaria = secretariaRepository.findByIdAndUsuarioAtivoTrue(id)
                 .orElseThrow(() -> new RuntimeException("Perfil de Secretaria ativo com ID " + id + " não encontrado, ou o utilizador associado está inativo."));
-        // Considere usar uma exceção mais específica, como ResourceNotFoundException
         return toSecretariaResponseDTO(secretaria);
     }
 
-    // Implementar outros métodos da interface SecretariaService se adicionados
 }

@@ -1,4 +1,4 @@
-package com.example.mentora.config; // Ou o seu pacote de configuração
+package com.example.mentora.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,16 +9,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig {
 
     @Bean
-    public WebMvcConfigurer corsConfigurer() {
+    public WebMvcConfigurer corsConfigurer() { // Este é o bean
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**") // Aplica a todos os endpoints da API
-                        .allowedOrigins("http://localhost:3000") // URL do seu frontend React
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH") // Métodos HTTP permitidos
-                        .allowedHeaders("*") // Permite todos os cabeçalhos na requisição
-                        .allowCredentials(true) // Permite o envio de credenciais (cookies, cabeçalhos de autorização)
-                        .maxAge(3600); // Tempo (em segundos) que o resultado da requisição preflight OPTIONS pode ser cacheado
+                registry.addMapping("/**")
+                        .allowedOrigins("http://localhost:3000")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
+                        .allowedHeaders("*")
+                        .allowCredentials(true)
+                        .maxAge(3600);
             }
         };
     }

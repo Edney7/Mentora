@@ -25,7 +25,6 @@ public class FaltaServiceImpl implements FaltaService {
     private final AlunoRepository alunoRepository;
     private final DisciplinaRepository disciplinaRepository;
     private final ProfessorRepository professorRepository;
-    // Repositórios adicionais para validações de negócio
     private final TurmaDisciplinaRepository turmaDisciplinaRepository;
     private final ProfessorDisciplinaRepository professorDisciplinaRepository;
 
@@ -50,7 +49,6 @@ public class FaltaServiceImpl implements FaltaService {
         log.info("A registar falta para aluno ID {}, disciplina ID {}, data {}, por professor ID {}",
                 dto.getAlunoId(), dto.getDisciplinaId(), dto.getDataFalta(), dto.getProfessorId());
 
-        // 1. Buscar entidades principais
         Aluno aluno = alunoRepository.findById(dto.getAlunoId())
                 .orElseThrow(() -> {
                     log.warn("Aluno com ID {} não encontrado ao registar falta.", dto.getAlunoId());
@@ -69,26 +67,21 @@ public class FaltaServiceImpl implements FaltaService {
                     return new RuntimeException("Professor com ID " + dto.getProfessorId() + " não encontrado.");
                 });
 
-        // 2. Validações de Negócio
-        // 2.1 Verificar se o aluno (via utilizador) está ativo
         if (aluno.getUsuario() == null || !aluno.getUsuario().getAtivo()) {
             log.warn("Tentativa de registar falta para aluno (Utilizador ID {}) inativo.", aluno.getUsuario() != null ? aluno.getUsuario().getId() : "N/A");
             throw new RuntimeException("Não é possível registar falta para um aluno inativo.");
         }
 
-        // 2.2 Verificar se o professor (via utilizador) está ativo
         if (professor.getUsuario() == null || !professor.getUsuario().getAtivo()) {
             log.warn("Tentativa de registo de falta por professor (Utilizador ID {}) inativo.", professor.getUsuario() != null ? professor.getUsuario().getId() : "N/A");
             throw new RuntimeException("Professor inativo não pode registar faltas.");
         }
 
-        // 2.3 Verificar se já existe uma falta para este aluno, nesta disciplina, nesta data
         if (faltaRepository.existsByAlunoIdAndDisciplinaIdAndDataFalta(aluno.getId(), disciplina.getId(), dto.getDataFalta())) {
             log.warn("Já existe uma falta registada para o aluno ID {}, disciplina ID {} na data {}.", aluno.getId(), disciplina.getId(), dto.getDataFalta());
             throw new RuntimeException("Já existe uma falta registada para este aluno nesta disciplina e data.");
         }
 
-        // 2.4 Verificar se a disciplina está associada à turma do aluno
         Turma turmaDoAluno = aluno.getTurma();
         if (turmaDoAluno == null) {
             log.warn("Aluno ID {} não está associado a nenhuma turma.", aluno.getId());
@@ -104,7 +97,6 @@ public class FaltaServiceImpl implements FaltaService {
                     " não pertence à turma do aluno ID " + aluno.getId() + ".");
         }
 
-        // 2.5 Verificar se o professor está associado a esta disciplina
         boolean professorLecionaDisciplina = professorDisciplinaRepository.findByProfessorId(professor.getId())
                 .stream()
                 .anyMatch(pd -> pd.getDisciplina().getId().equals(disciplina.getId()));
@@ -115,13 +107,12 @@ public class FaltaServiceImpl implements FaltaService {
                     " não leciona a disciplina ID " + disciplina.getId() + ".");
         }
 
-        // 3. Criar e salvar a falta
         Falta falta = new Falta();
         falta.setAluno(aluno);
         falta.setDisciplina(disciplina);
         falta.setProfessor(professor);
         falta.setDataFalta(dto.getDataFalta());
-        falta.setJustificada(false); // Faltas são criadas como não justificadas por defeito
+        falta.setJustificada(false);
 
         Falta faltaSalva = faltaRepository.save(falta);
         log.info("Falta ID {} registada com sucesso para aluno ID {}, disciplina ID {}, data {}, por professor ID {}.",
@@ -140,8 +131,6 @@ public class FaltaServiceImpl implements FaltaService {
                     return new RuntimeException("Falta com ID " + faltaId + " não encontrada.");
                 });
 
-        // Validação adicional: Quem pode justificar? (Ex: Professor que lançou, ou Secretaria)
-        // Esta lógica de permissão seria mais complexa e envolveria o utilizador autenticado.
 
         falta.setJustificada(true);
         falta.setDescricaoJustificativa(dto.getDescricaoJustificativa());
@@ -232,13 +221,10 @@ public class FaltaServiceImpl implements FaltaService {
             log.warn("Falta com ID {} não encontrada para exclusão.", faltaId);
             throw new RuntimeException("Falta com ID " + faltaId + " não encontrada para exclusão.");
         }
-        // Adicionar lógica de permissão aqui: Quem pode excluir uma falta?
-        // Ex: apenas o professor que a lançou ou um administrador/secretaria.
         faltaRepository.deleteById(faltaId);
         log.info("Falta ID {} excluída com sucesso.", faltaId);
     }
 
-    // Método auxiliar para converter uma entidade Falta para FaltaResponseDTO.
     private FaltaResponseDTO toFaltaResponseDTO(Falta falta) {
         Aluno aluno = falta.getAluno();
         Disciplina disciplina = falta.getDisciplina();
@@ -262,7 +248,6 @@ public class FaltaServiceImpl implements FaltaService {
                 .build();
     }
 
-    // Método auxiliar para converter uma lista de entidades Falta para uma lista de FaltaResponseDTOs.
     private List<FaltaResponseDTO> toFaltaResponseDTOList(List<Falta> faltas) {
         return faltas.stream()
                 .map(this::toFaltaResponseDTO)

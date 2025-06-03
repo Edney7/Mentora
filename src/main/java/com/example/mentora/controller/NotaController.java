@@ -33,6 +33,7 @@ public class NotaController {
         NotaResponseDTO notaCriada = notaService.lancarNota(notaCreateDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(notaCriada);
     }
+    @Operation(summary = "Listar todas as notas")
     @GetMapping
     public List<NotaResponseDTO> listarTodasNotas() {
         return notaService.listarTodasNotas();

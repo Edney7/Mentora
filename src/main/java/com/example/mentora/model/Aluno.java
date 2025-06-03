@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "aluno") // Certifique-se de que o nome da tabela no BD é "aluno"
+@Table(name = "aluno")
 public class Aluno {
 
     @Id
@@ -17,7 +17,7 @@ public class Aluno {
 
     @OneToOne(optional = false)
     @JoinColumn(name = "usuario_id", referencedColumnName = "id", nullable = false, unique = true)
-    private Usuario usuario; // O status 'ativo' deste aluno será determinado pelo usuario.getAtivo()
+    private Usuario usuario;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "turma_id", referencedColumnName = "id", nullable = false)

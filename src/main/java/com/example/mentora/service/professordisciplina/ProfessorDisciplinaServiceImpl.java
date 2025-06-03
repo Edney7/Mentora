@@ -39,8 +39,6 @@ public class ProfessorDisciplinaServiceImpl implements ProfessorDisciplinaServic
         this.disciplinaRepository = disciplinaRepository;
     }
 
-    // ... (métodos vincularDisciplinaAoProfessor, desvincularDisciplinaDoProfessor, atualizarDisciplinasDoProfessor, listarDisciplinasPorProfessor permanecem os mesmos)
-
     @Override
     @Transactional(readOnly = true)
     public List<ProfessorResponseDTO> listarProfessoresPorDisciplina(Long disciplinaId) {
@@ -60,7 +58,6 @@ public class ProfessorDisciplinaServiceImpl implements ProfessorDisciplinaServic
                 .collect(Collectors.toList());
     }
 
-    // Método auxiliar para converter Disciplina para DisciplinaResponseDTO (já existente)
     private DisciplinaResponseDTO toDisciplinaResponseDTO(Disciplina disciplina) {
         return DisciplinaResponseDTO.builder()
                 .id(disciplina.getId())
@@ -69,20 +66,17 @@ public class ProfessorDisciplinaServiceImpl implements ProfessorDisciplinaServic
                 .build();
     }
 
-    // NOVO/ATUALIZADO: Método auxiliar para converter Professor para ProfessorResponseDTO
     private ProfessorResponseDTO toProfessorResponseDTO(Professor professor) {
         if (professor == null) {
             log.warn("Tentativa de converter um Professor nulo para ProfessorResponseDTO.");
-            // Pode retornar null ou um DTO com valores padrão/indicativos de erro
             return null;
         }
         Usuario usuario = professor.getUsuario();
         if (usuario == null) {
             log.warn("Professor com ID {} não possui um Usuário associado ao converter para DTO.", professor.getId());
-            // Pode retornar um DTO com informações parciais ou lançar uma exceção
             return ProfessorResponseDTO.builder()
                     .id(professor.getId())
-                    .idUsuario(null) // Usuário não encontrado
+                    .idUsuario(null)
                     .nomeUsuario("Usuário não associado")
                     .build();
         }
@@ -93,7 +87,6 @@ public class ProfessorDisciplinaServiceImpl implements ProfessorDisciplinaServic
                 .build();
     }
 
-    // Implementação dos outros métodos da interface...
     @Override
     @Transactional
     public void vincularDisciplinaAoProfessor(VincularDisciplinaProfessorRequestDTO dto) {

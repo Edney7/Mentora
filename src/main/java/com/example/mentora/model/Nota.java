@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-@NoArgsConstructor // JPA requer um construtor sem argumentos
+@NoArgsConstructor
 @Entity
 @Table(name = "nota")
 public class Nota {
@@ -19,28 +19,24 @@ public class Nota {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "valor", nullable = false, scale = 2) // Ex: DECIMAL(5,2) no banco
+    @Column(name = "valor", nullable = false, scale = 2)
     private Double valor;
 
     @Column(name = "data_lancamento")
     private LocalDate dataLancamento;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY) // Uma nota sempre pertence a um aluno
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "aluno_id", referencedColumnName = "id", nullable = false)
     private Aluno aluno;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY) // Uma nota sempre pertence a uma disciplina
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "disciplina_id", referencedColumnName = "id", nullable = false)
     private Disciplina disciplina;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY) // Uma nota é lançada por um professor
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "professor_id", referencedColumnName = "id", nullable = false)
-    private Professor professor; // Novo campo para referenciar o professor
+    private Professor professor;
 
-    /**
-     * Define a data de lançamento automaticamente antes de persistir a entidade pela primeira vez.
-     * Também pode ser usado para definir a data de atualização se houver um campo para isso.
-     */
     @PrePersist
     protected void onCreate() {
         if (dataLancamento == null) {
@@ -48,7 +44,6 @@ public class Nota {
         }
     }
 
-    // Construtor opcional para facilitar a criação
     public Nota(Double valor, Aluno aluno, Disciplina disciplina, Professor professor) {
         this.valor = valor;
         this.aluno = aluno;

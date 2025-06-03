@@ -10,19 +10,13 @@ import java.util.Optional;
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
-    // Métodos para verificar existência por email e cpf (independentemente do status ativo)
     boolean existsByEmail(String email);
     boolean existsByCpf(String cpf);
 
-    // Encontrar por email (para login)
     Optional<Usuario> findByEmail(String email);
 
-    // Encontrar um usuário pelo ID somente se ele estiver ativo
-    Optional<Usuario> findByIdAndAtivoTrue(Long id); // MÉTODO ADICIONADO
+    Optional<Usuario> findByIdAndAtivoTrue(Long id);
 
-    // Listar todos os usuários que estão ativos
-    List<Usuario> findAllByAtivoTrue(); // MÉTODO ADICIONADO
+    List<Usuario> findAllByAtivoTrue();
 
-    // O JpaRepository já fornece findAll() e findById(Long id) que buscam todos,
-    // independentemente do status 'ativo'.
 }

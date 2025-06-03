@@ -60,7 +60,6 @@ public class NotaServiceImpl implements NotaService {
         log.info("Tentando lançar nota para aluno ID: {}, disciplina ID: {}, por professor ID: {}",
                 dto.getAlunoId(), dto.getDisciplinaId(), dto.getProfessorId());
 
-        // 1. Buscar as entidades principais
         Aluno aluno = alunoRepository.findById(dto.getAlunoId())
                 .orElseThrow(() -> {
                     log.warn("Aluno com ID {} não encontrado.", dto.getAlunoId());
@@ -79,20 +78,16 @@ public class NotaServiceImpl implements NotaService {
                     return new RuntimeException("Professor com ID " + dto.getProfessorId() + " não encontrado.");
                 });
 
-        // 2. Validações de Negócio Cruciais
-        // 2.1 Verificar se o aluno está ativo (se o usuário do aluno está ativo)
         if (aluno.getUsuario() == null || !aluno.getUsuario().getAtivo()) {
             log.warn("Tentativa de lançar nota para aluno (ID Usuário: {}) que está inativo ou sem usuário associado.", aluno.getUsuario() != null ? aluno.getUsuario().getId() : "N/A");
             throw new RuntimeException("Não é possível lançar nota para um aluno inativo.");
         }
 
-        // 2.2 Verificar se o professor está ativo
         if (professor.getUsuario() == null || !professor.getUsuario().getAtivo()) {
             log.warn("Tentativa de lançamento de nota por professor (ID Usuário: {}) que está inativo ou sem usuário associado.", professor.getUsuario() != null ? professor.getUsuario().getId() : "N/A");
             throw new RuntimeException("Professor inativo não pode lançar notas.");
         }
 
-        // 2.3 Verificar se a disciplina está associada à turma do aluno
         Turma turmaDoAluno = aluno.getTurma();
         if (turmaDoAluno == null) {
             log.warn("Aluno ID {} não está associado a nenhuma turma.", aluno.getId());
@@ -108,7 +103,6 @@ public class NotaServiceImpl implements NotaService {
                     " não pertence à turma do aluno ID " + aluno.getId() + ".");
         }
 
-        // 2.4 Verificar se o professor está associado a esta disciplina
         boolean professorLecionaDisciplina = professorDisciplinaRepository.findByProfessorId(professor.getId())
                 .stream()
                 .anyMatch(pd -> pd.getDisciplina().getId().equals(disciplina.getId()));
@@ -119,18 +113,11 @@ public class NotaServiceImpl implements NotaService {
                     " não leciona a disciplina ID " + disciplina.getId() + ".");
         }
 
-        // (Opcional) Verificar se o professor leciona esta disciplina especificamente para a turma do aluno.
-        // Esta validação seria mais complexa, envolvendo a tabela turma_professor_disciplina se existir,
-        // ou uma lógica que verifique se o professor está alocado à turma e à disciplina.
-        // Por agora, as validações acima são um bom começo.
-
-        // 3. Criar e salvar a nota
         Nota nota = new Nota();
         nota.setAluno(aluno);
         nota.setDisciplina(disciplina);
         nota.setProfessor(professor); // Associar o professor
         nota.setValor(dto.getValor());
-        // dataLancamento é definida via @PrePersist
 
         Nota notaSalva = notaRepository.save(nota);
         log.info("Nota ID {} lançada com sucesso para aluno ID {}, disciplina ID {}, por professor ID {}.",
@@ -162,12 +149,11 @@ public class NotaServiceImpl implements NotaService {
     @Transactional(readOnly = true)
     public List<NotaResponseDTO> listarNotasPorAluno(Long alunoId) {
         log.debug("Listando notas para o aluno ID: {}", alunoId);
-        // Verifica se o aluno existe e se o usuário associado está ativo
+
         Aluno aluno = alunoRepository.findById(alunoId)
                 .orElseThrow(() -> new RuntimeException("Aluno com ID " + alunoId + " não encontrado."));
         if (aluno.getUsuario() == null || !aluno.getUsuario().getAtivo()) {
             log.warn("Tentativa de listar notas para aluno (ID Usuário: {}) que está inativo ou sem usuário.", aluno.getUsuario() != null ? aluno.getUsuario().getId() : "N/A");
-            // Poderia retornar lista vazia ou lançar exceção, dependendo da regra de negócio
             throw new RuntimeException("Não é possível listar notas de um aluno inativo.");
         }
 
@@ -179,14 +165,12 @@ public class NotaServiceImpl implements NotaService {
     @Transactional(readOnly = true)
     public List<NotaResponseDTO> listarNotasPorAlunoEDisciplina(Long alunoId, Long disciplinaId) {
         log.debug("Listando notas para o aluno ID: {} e disciplina ID: {}", alunoId, disciplinaId);
-        // Verifica se o aluno existe e se o usuário associado está ativo
         Aluno aluno = alunoRepository.findById(alunoId)
                 .orElseThrow(() -> new RuntimeException("Aluno com ID " + alunoId + " não encontrado."));
         if (aluno.getUsuario() == null || !aluno.getUsuario().getAtivo()) {
             log.warn("Tentativa de listar notas para aluno (ID Usuário: {}) que está inativo ou sem usuário.", aluno.getUsuario() != null ? aluno.getUsuario().getId() : "N/A");
             throw new RuntimeException("Não é possível listar notas de um aluno inativo.");
         }
-        // Verifica se a disciplina existe
         if (!disciplinaRepository.existsById(disciplinaId)) {
             throw new RuntimeException("Disciplina com ID " + disciplinaId + " não encontrada.");
         }
@@ -195,54 +179,6 @@ public class NotaServiceImpl implements NotaService {
         return toResponseDTOList(notas);
     }
 
-
-    // --- Implementações para métodos opcionais (se descomentados na interface) ---
-    /*
-    @Override
-    @Transactional
-    public NotaResponseDTO atualizarNota(Long notaId, NotaUpdateDTO dto) {
-        log.info("Atualizando nota ID: {}", notaId);
-        Nota notaExistente = notaRepository.findById(notaId)
-                .orElseThrow(() -> new RuntimeException("Nota com ID " + notaId + " não encontrada para atualização."));
-
-        // Validação: Quem pode atualizar? Apenas o professor que lançou? Apenas se o aluno/professor estiverem ativos?
-        // Ex: if (!notaExistente.getProfessor().getId().equals(ID_PROFESSOR_LOGADO)) {
-        //         throw new RuntimeException("Você não tem permissão para alterar esta nota.");
-        //     }
-
-        notaExistente.setValor(dto.getValor());
-        // notaExistente.setDataLancamento(LocalDate.now()); // Ou manter a original, ou ter um campo data_atualizacao
-
-        Nota notaAtualizada = notaRepository.save(notaExistente);
-        log.info("Nota ID {} atualizada com sucesso.", notaAtualizada.getId());
-        return toResponseDTO(notaAtualizada);
-    }
-
-    @Override
-    @Transactional
-    public void excluirNota(Long notaId) {
-        log.info("Excluindo nota ID: {}", notaId);
-        if (!notaRepository.existsById(notaId)) {
-            throw new RuntimeException("Nota com ID " + notaId + " não encontrada para exclusão.");
-        }
-        // Validações de permissão semelhantes ao atualizarNota
-        notaRepository.deleteById(notaId);
-        log.info("Nota ID {} excluída com sucesso.", notaId);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<NotaResponseDTO> listarNotasPorProfessor(Long professorId) {
-        log.debug("Listando notas lançadas pelo professor ID: {}", professorId);
-        if (!professorRepository.existsById(professorId)) {
-            throw new RuntimeException("Professor com ID " + professorId + " não encontrado.");
-        }
-        List<Nota> notas = notaRepository.findByProfessorId(professorId); // Requer este método no NotaRepository
-        return toResponseDTOList(notas);
-    }
-    */
-
-    // Método auxiliar para converter uma entidade Nota para NotaResponseDTO.
     private NotaResponseDTO toResponseDTO(Nota nota) {
         Aluno aluno = nota.getAluno();
         Disciplina disciplina = nota.getDisciplina();
@@ -260,8 +196,8 @@ public class NotaServiceImpl implements NotaService {
                 .nomeAluno(nomeAluno)
                 .disciplinaId(disciplina != null ? disciplina.getId() : null)
                 .nomeDisciplina(nomeDisciplina)
-                .professorId(professor != null ? professor.getId() : null) // Adicionado
-                .nomeProfessor(nomeProfessor) // Adicionado
+                .professorId(professor != null ? professor.getId() : null)
+                .nomeProfessor(nomeProfessor)
                 .build();
     }
 

@@ -9,5 +9,5 @@ public interface TurmaDisciplinaService {
     void vincularDisciplina(VincularDisciplinaTurmaRequestDTO dto);
     void desvincularDisciplina(Long turmaId, Long disciplinaId);
     void atualizarDisciplinasDaTurma(AtualizarDisciplinasTurmaRequestDTO dto);
-    List<DisciplinaResponseDTO> listarDisciplinasPorTurma(Long turmaId); // <-- O MÉTODO DEVE ESTAR AQUI
+    List<DisciplinaResponseDTO> listarDisciplinasPorTurma(Long turmaId);
 }

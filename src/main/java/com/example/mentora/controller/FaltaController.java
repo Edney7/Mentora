@@ -52,6 +52,8 @@ public class FaltaController {
         FaltaResponseDTO falta = faltaService.buscarFaltaPorId(id);
         return ResponseEntity.ok(falta);
     }
+
+    @Operation(summary = "Listar todas as faltas")
     @GetMapping
     public List<FaltaResponseDTO> listarTodasFaltas() {
         return faltaService.listarTodasFaltas(); // método no service

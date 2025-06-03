@@ -73,7 +73,6 @@ public class UsuarioServiceImpl implements UsuarioService {
         return toResponseDTO(usuario);
     }
 
-    // --- NOVAS IMPLEMENTAÇÕES ---
     @Override
     @Transactional(readOnly = true)
     public List<UsuarioResponseDTO> listarTodosOsUsuarios() {
@@ -91,7 +90,6 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .orElseThrow(() -> new RuntimeException("Usuário com ID " + id + " não encontrado."));
         return toResponseDTO(usuario);
     }
-    // --- FIM DAS NOVAS IMPLEMENTAÇÕES ---
 
 
     @Override
@@ -153,7 +151,6 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .build();
     }
 
-    // Implementação do método cadastrar como estava antes
     @Override
     @Transactional
     public UsuarioResponseDTO cadastrar(UsuarioCreateDTO dto) {

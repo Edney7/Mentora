@@ -60,7 +60,7 @@ public class TurmaServiceImpl implements TurmaService {
     @Transactional(readOnly = true)
     public List<TurmaResponseDTO> listarTurmasAtivas() {
         log.info("Listando todas as turmas ativas");
-        return turmaRepository.findAllByAtivaTrue().stream() // Este método já existia no repositório
+        return turmaRepository.findAllByAtivaTrue().stream()
                 .map(this::toTurmaResponseDTO)
                 .collect(Collectors.toList());
     }
@@ -69,7 +69,7 @@ public class TurmaServiceImpl implements TurmaService {
     @Transactional(readOnly = true)
     public TurmaResponseDTO buscarTurmaAtivaPorId(Long id) {
         log.info("Buscando turma ativa com ID: {}", id);
-        Turma turma = turmaRepository.findByIdAndAtivaTrue(id) // Este método já existia no repositório
+        Turma turma = turmaRepository.findByIdAndAtivaTrue(id)
                 .orElseThrow(() -> {
                     log.warn("Turma ativa com ID: {} não encontrada.", id);
                     return new RuntimeException("Turma ativa com ID " + id + " não encontrada.");
@@ -77,7 +77,6 @@ public class TurmaServiceImpl implements TurmaService {
         return toTurmaResponseDTO(turma);
     }
 
-    // --- NOVA IMPLEMENTAÇÃO ---
     @Override
     @Transactional(readOnly = true)
     public List<TurmaResponseDTO> listarTodasAsTurmas() {
@@ -87,7 +86,6 @@ public class TurmaServiceImpl implements TurmaService {
                 .map(this::toTurmaResponseDTO)
                 .collect(Collectors.toList());
     }
-    // --- FIM DA NOVA IMPLEMENTAÇÃO ---
 
     @Override
     @Transactional

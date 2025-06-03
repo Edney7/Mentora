@@ -9,17 +9,17 @@ import java.time.LocalDate;
 @Setter
 @Builder
 public class FaltaResponseDTO {
-    private Long id; // ID da falta
+    private Long id;
     private LocalDate dataFalta;
     private Boolean justificada;
     private String descricaoJustificativa;
 
     private Long alunoId;
-    private String nomeAluno; // Para facilitar a exibição
+    private String nomeAluno;
 
     private Long disciplinaId;
-    private String nomeDisciplina; // Para facilitar a exibição
+    private String nomeDisciplina;
 
     private Long professorId;
-    private String nomeProfessor; // Professor que registou a falta
+    private String nomeProfessor;
 }
