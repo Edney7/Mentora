@@ -1,4 +1,4 @@
-package com.example.mentora.service.ausenciaprofessor; // Crie este pacote se necessário
+package com.example.mentora.service.ausenciaprofessor;
 
 import com.example.mentora.dto.ausenciaprofessor.AusenciaProfessorCreateDTO;
 import com.example.mentora.dto.ausenciaprofessor.AusenciaProfessorResponseDTO;
