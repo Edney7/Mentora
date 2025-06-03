@@ -59,12 +59,27 @@ export default function Login() {
     }
 
   } catch (error) {
-    const mensagemErro =
-      error.response?.data?.mensagem ||
-      error.response?.data ||
-      "Erro no login";
-    setErroLogin(mensagemErro);
+  console.error("Erro ao fazer login:", error);
+
+  let mensagemErro = "Erro no login";
+
+  // Se a mensagem estiver dentro de error.response.data.message
+  if (typeof error.response?.data?.message === "string") {
+    mensagemErro = error.response.data.message;
   }
+
+  // Se error.response.data for uma string diretamente
+  else if (typeof error.response?.data === "string") {
+    mensagemErro = error.response.data;
+  }
+
+  // Se não encontrar nenhuma string, força string com JSON.stringify
+  else if (error.response?.data) {
+    mensagemErro = JSON.stringify(error.response.data);
+  }
+
+  setErroLogin(mensagemErro);
+}
 };
 
 
@@ -101,7 +116,11 @@ export default function Login() {
             </div>
 
             <button type="submit">ENTRAR</button>
-            {erroLogin && <p style={{ color: "red", marginTop: "10px" }}>{erroLogin}</p>}
+            {erroLogin && (
+  <p style={{ color: "red", marginTop: "10px" }}>
+    {String(erroLogin)}
+  </p>
+)}
           </form>
         </div>
       </div>
