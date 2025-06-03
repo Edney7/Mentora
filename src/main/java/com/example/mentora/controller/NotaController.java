@@ -33,7 +33,10 @@ public class NotaController {
         NotaResponseDTO notaCriada = notaService.lancarNota(notaCreateDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(notaCriada);
     }
-
+    @GetMapping
+    public List<NotaResponseDTO> listarTodasNotas() {
+        return notaService.listarTodasNotas();
+    }
     @Operation(summary = "Buscar uma nota específica pelo seu ID")
     @GetMapping("/{id}")
     public ResponseEntity<NotaResponseDTO> buscarNotaPorId(@PathVariable Long id) {

@@ -78,4 +78,6 @@ public interface FaltaService {
      * @throws RuntimeException se a falta não for encontrada ou se o utilizador não tiver permissão.
      */
     void excluirFalta(Long faltaId);
+
+    List<FaltaResponseDTO> listarTodasFaltas();
 }

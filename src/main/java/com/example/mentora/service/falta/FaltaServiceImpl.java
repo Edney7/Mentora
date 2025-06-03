@@ -162,6 +162,10 @@ public class FaltaServiceImpl implements FaltaService {
                 });
         return toFaltaResponseDTO(falta);
     }
+    public List<FaltaResponseDTO> listarTodasFaltas() {
+        List<Falta> faltas = faltaRepository.findAll();
+        return faltas.stream().map(this::toFaltaResponseDTO).toList();
+    }
 
     @Override
     @Transactional(readOnly = true)
