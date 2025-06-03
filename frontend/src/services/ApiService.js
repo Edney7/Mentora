@@ -339,4 +339,15 @@ export const cancelarAusenciaProfessor = async (ausenciaId) => {
     await api.delete(`/ausencias-professor/${ausenciaId}`);
 };
 
+// Buscar todos os eventos do calendário
+export const listarEventos = async () => {
+  const response = await api.get("/eventos");
+  return response.data;
+};
+
+// Cadastrar novo evento
+export const cadastrarEvento = async (evento) => {
+  const response = await api.post("/eventos", evento);
+  return response.data;
+};
 export default api;

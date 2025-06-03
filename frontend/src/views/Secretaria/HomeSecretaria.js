@@ -7,7 +7,7 @@ import {
     listarTodosOsUsuarios, 
     listarProfessoresAtivos, 
     listarAlunosAtivos,      
-    buscarTurmasAtivas       
+    buscarTurmasAtivas, listarEventos, cadastrarEvento       
 } from "../../services/ApiService"; 
 import animacaoHomeSecretaria from "../../assets/animacaoHomeSecretaria.png";
 import Modal from "react-modal";
@@ -31,20 +31,46 @@ export default function HomeSecretaria() {
   const abrirModal = () => setModalAberto(true);
   const fecharModal = () => setModalAberto(false);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNovoEvento((prev) => ({ ...prev, [name]: value }));
-  };
+  const carregarEventos = async () => {
+  try {
+    const dados = await listarEventos();
+    const formatados = dados.map(ev => ({
+      title: ev.titulo,
+      date: ev.data
+    }));
+    setEventos(formatados);
+  } catch (error) {
+    console.error("Erro ao carregar eventos:", error);
+  }
+};
 
-  const adicionarEvento = () => {
-    if (novoEvento.title && novoEvento.date) {
-      setEventos([...eventos, novoEvento]);
-      setNovoEvento({ title: '', date: '' });
-      fecharModal();
-    } else {
-      alert('Preencha todos os campos.');
-    }
-  };
+useEffect(() => {
+  carregarEventos();
+}, []);
+
+  const adicionarEvento = async () => {
+  if (!novoEvento.title || !novoEvento.date) {
+    alert('Preencha todos os campos.');
+    return;
+  }
+
+  try {
+    await cadastrarEvento({
+      titulo: novoEvento.title,
+      descricao: "Criado via modal",
+      data: novoEvento.date,
+      tipo: "MANUAL",
+      idSecretaria: 3, // substitua conforme o ID real
+      idCalendario: 1  // substitua conforme o ID real
+    });
+    setNovoEvento({ title: '', date: '' });
+    fecharModal();
+    carregarEventos(); // atualiza o calendário
+  } catch (err) {
+    console.error("Erro ao cadastrar evento:", err);
+    alert("Erro ao cadastrar evento.");
+  }
+};
   const carregarTotais = useCallback(async () => {
     setLoading(true);
     setErro("");
