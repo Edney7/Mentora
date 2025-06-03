@@ -65,24 +65,21 @@ export default function HomeProfessor() {
           </div>
         </main>
 
-        <section className="event-panel">
-          <div className="event-card branco">
-            <div className="calendar-container">
+        <section className="event-panel"> 
+          <div className="event-card branco"> 
+            <div className="calendar-container"> 
               <Calendar />
             </div>
           </div>
+          
           <div className="event-group">
-            <button className="event-card laranja">
-              <h2>Evento Hoje</h2>
-            </button>
             <div className="event-card verde">
-              <span>Próximo Evento</span>
-              <span className="hora">xx/xx</span>
-            </div>
-            <div className="event-card branco">
               <span>Próximo Feriado</span>
               <span className="hora">xx/xx</span>
             </div>
+            <button className="event-card laranja" onClick={() => navigate("/secretaria/calendario/eventos/cadastrar")}>
+              <h2>Cadastrar Eventos</h2>
+            </button>
           </div>
         </section>
 

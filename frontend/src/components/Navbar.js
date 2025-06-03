@@ -7,13 +7,13 @@ export default function Navbar({ onLogout }) {
   return (
     <header className="navbar-container">
       <div className="navbar-left">
-        <a href="/login"><img src={usuario} alt="Usuário" className="navbar-user-icon" /></a>
+        <img src={usuario} alt="Usuário" className="navbar-user-icon" />
       </div>
       <div className="navbar-center">
-          <a href="/"><img src={logo} alt="Logo" className="navbar-logo"></img></a>
+          <img src={logo} alt="Logo" className="navbar-logo"></img>
       </div>
       <div className="navbar-right" onClick={onLogout} title="Sair">
-        <a href="/login"><img src={logout} alt="Logout" className="navbar-logout-icon" /></a>
+        <a href="/"><img src={logout} alt="Logout" className="navbar-logout-icon" /></a>
       </div>
     </header>
   );
