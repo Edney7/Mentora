@@ -7,6 +7,7 @@ import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.br.CPF;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,6 +21,7 @@ public class UsuarioCreateDTO {
     @NotBlank(message = "Nome é obrigatório")
     private String nome;
 
+    @CPF
     @NotBlank(message = "CPF é obrigatório")
     private String cpf;
 
