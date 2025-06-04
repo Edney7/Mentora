@@ -26,7 +26,7 @@ export default function HomeSecretaria() {
   const [eventos, setEventos] = useState([]);
 
   const [modalAberto, setModalAberto] = useState(false);
-  const [novoEvento, setNovoEvento] = useState({ title: '', date: '' });
+  const [novoEvento, setNovoEvento] = useState({ titulo: '', descricao: '', data: '' , tipo: ''});
 
   const abrirModal = () => setModalAberto(true);
   const fecharModal = () => setModalAberto(false);
@@ -36,7 +36,8 @@ export default function HomeSecretaria() {
     const dados = await listarEventos();
     const formatados = dados.map(ev => ({
       title: ev.titulo,
-      date: ev.data
+      date: ev.data,
+      
     }));
     setEventos(formatados);
   } catch (error) {
@@ -49,21 +50,21 @@ useEffect(() => {
 }, []);
 
   const adicionarEvento = async () => {
-  if (!novoEvento.title || !novoEvento.date) {
+  if (!novoEvento.titulo || !novoEvento.descricao || !novoEvento.data || !novoEvento.tipo) {
     alert('Preencha todos os campos.');
     return;
   }
 
   try {
     await cadastrarEvento({
-      titulo: novoEvento.title,
-      descricao: "Criado via modal",
-      data: novoEvento.date,
-      tipo: "MANUAL",
+      titulo: novoEvento.titulo,
+      descricao: novoEvento.descricao,
+      data: novoEvento.data,
+      tipo: novoEvento.tipo,
       idSecretaria: 3, // substitua conforme o ID real
       idCalendario: 1  // substitua conforme o ID real
     });
-    setNovoEvento({ title: '', date: '' });
+    setNovoEvento({ titulo: '', descricao: '' , data: '' , tipo: ''  });
     fecharModal();
     carregarEventos(); // atualiza o calendário
   } catch (err) {
@@ -189,25 +190,51 @@ useEffect(() => {
           content: {
             maxWidth: '400px',
             margin: 'auto',
-            borderRadius: '8px',
+            borderRadius: '10px',
             padding: '20px',
+            fontFamily: 'arial',
+            color: 'orange'
           },
         }}
       >
         <h3>Cadastrar Evento</h3>
         <input
           type="text"
-          name="title"
+          name="titulo"
           placeholder="Título"
-          value={novoEvento.title}
-          onChange={handleChange}
+          value={novoEvento.titulo}
+          onChange={(e) =>
+            setNovoEvento((prev) => ({ ...prev, titulo: e.target.value }))
+          }
+          style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
+        />
+        <input
+          type="text"
+          name="descricao"
+          placeholder="descricao"
+          value={novoEvento.descricao}
+          onChange={(e) =>
+            setNovoEvento((prev) => ({ ...prev, descricao: e.target.value }))
+          }
           style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
         />
         <input
           type="date"
-          name="date"
-          value={novoEvento.date}
-          onChange={handleChange}
+          name="data"
+          value={novoEvento.data}
+          onChange={(e) =>
+            setNovoEvento((prev) => ({ ...prev, data: e.target.value }))
+          }
+          style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
+        />
+        <input
+          type="text"
+          name="tipo"
+          placeholder="TTipo"
+          value={novoEvento.tipo}
+          onChange={(e) =>
+            setNovoEvento((prev) => ({ ...prev, tipo: e.target.value }))
+          }
           style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
         />
         <button onClick={adicionarEvento} style={{ marginRight: '10px' }}>Salvar</button>

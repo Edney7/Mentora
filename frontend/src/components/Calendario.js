@@ -19,6 +19,7 @@ function Calendario({ eventos}) {
         events={eventos}
         height="auto"
       />
+      
     </div>
   );
 }
