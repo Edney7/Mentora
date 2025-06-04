@@ -41,6 +41,7 @@ public interface NotaService {
      */
     List<NotaResponseDTO> listarNotasPorAlunoEDisciplina(Long alunoId, Long disciplinaId);
 
+    List<NotaResponseDTO> listarTodasNotas();
     // --- Métodos Opcionais (descomente e defina se necessário) ---
 
     /**

@@ -1,5 +1,6 @@
-package com.example.mentora.dto.falta; // Ou o seu pacote de DTOs
+package com.example.mentora.dto.falta;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,8 +20,6 @@ public class FaltaCreateDTO {
     private Long professorId;
 
     @NotNull(message = "A data da falta é obrigatória.")
-    private LocalDate dataFalta;
-
-    // A justificação não é fornecida na criação inicial da falta.
-    // Uma falta é criada como não justificada por defeito.
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", locale = "pt-BR", timezone = "America/Sao_Paulo")
+    private LocalDate dataFalta; // Para entrada: aceita "dd-MM-yyyy"
 }

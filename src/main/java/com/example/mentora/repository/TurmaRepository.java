@@ -16,6 +16,9 @@ public interface TurmaRepository extends JpaRepository<Turma, Long> {
     // Lista todas as turmas que estão ativas
     List<Turma> findAllByAtivaTrue();
 
+    // NOVO MÉTODO: Verifica se uma turma existe pelo ID e se está ativa
+    boolean existsByIdAndAtivaTrue(Long id);
+
     // Exemplo: Verificar se existe turma com mesmo nome e ano letivo (pode ser útil)
     // boolean existsByNomeAndAnoLetivo(String nome, Integer anoLetivo);
 

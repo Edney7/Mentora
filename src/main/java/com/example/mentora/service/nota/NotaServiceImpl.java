@@ -150,6 +150,13 @@ public class NotaServiceImpl implements NotaService {
                 });
         return toResponseDTO(nota);
     }
+    @Override
+    public List<NotaResponseDTO> listarTodasNotas() {
+        List<Nota> notas = notaRepository.findAll();
+        return notas.stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -187,6 +194,7 @@ public class NotaServiceImpl implements NotaService {
         List<Nota> notas = notaRepository.findByAlunoIdAndDisciplinaId(alunoId, disciplinaId);
         return toResponseDTOList(notas);
     }
+
 
     // --- Implementações para métodos opcionais (se descomentados na interface) ---
     /*
