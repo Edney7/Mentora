@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -18,4 +20,8 @@ public class Professor {
     @OneToOne(optional = false) // Assuming Professor must have a Usuario profile
     @JoinColumn(name = "usuario_id", referencedColumnName = "id", nullable = false, unique = true) // Was: id_usuario, referenced id_usuario
     private Usuario usuario;
+
+    @ManyToMany(mappedBy = "professores")
+    private List<Disciplina> disciplinas;
+
 }

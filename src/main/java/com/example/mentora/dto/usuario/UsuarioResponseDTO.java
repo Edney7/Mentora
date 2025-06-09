@@ -1,9 +1,7 @@
 package com.example.mentora.dto.usuario;
 
 import com.example.mentora.enums.TipoUsuario;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter; // Opcional se usar apenas @Builder e @Getter para o DTO
+import lombok.*;
 
 import java.time.LocalDate;
 

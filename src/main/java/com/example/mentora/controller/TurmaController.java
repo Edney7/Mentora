@@ -2,6 +2,7 @@ package com.example.mentora.controller;
 
 import com.example.mentora.dto.aluno.AlunoResponseDTO; // 1. Importar AlunoResponseDTO
 import com.example.mentora.dto.turma.TurmaCreateDTO;
+import com.example.mentora.dto.turma.TurmaDetalhadaDTO;
 import com.example.mentora.dto.turma.TurmaResponseDTO;
 import com.example.mentora.dto.turma.TurmaUpdateDTO;
 import com.example.mentora.service.aluno.AlunoService; // 2. Importar AlunoService
@@ -82,6 +83,12 @@ public class TurmaController {
         List<AlunoResponseDTO> alunos = alunoService.listarAlunosPorTurma(turmaId);
         return ResponseEntity.ok(alunos);
     }
+
+    @GetMapping("/{id}/detalhes")
+    public ResponseEntity<TurmaDetalhadaDTO> buscarDetalhes(@PathVariable Long id) {
+        return ResponseEntity.ok(turmaService.buscarDetalhesDaTurma(id));
+    }
+
 
     // Os métodos que gerenciavam a associação Turma-Disciplina
     // devem estar APENAS no TurmaDisciplinaController.

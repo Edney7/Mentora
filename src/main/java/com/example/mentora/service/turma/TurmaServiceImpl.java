@@ -1,8 +1,13 @@
 package com.example.mentora.service.turma;
 
+import com.example.mentora.dto.aluno.AlunoResponseDTO;
+import com.example.mentora.dto.disciplina.DisciplinaResponseDTO;
+import com.example.mentora.dto.professor.ProfessorResponseDTO;
 import com.example.mentora.dto.turma.TurmaCreateDTO;
+import com.example.mentora.dto.turma.TurmaDetalhadaDTO;
 import com.example.mentora.dto.turma.TurmaResponseDTO;
 import com.example.mentora.dto.turma.TurmaUpdateDTO;
+import com.example.mentora.model.Professor;
 import com.example.mentora.model.Turma;
 import com.example.mentora.repository.TurmaRepository;
 // Importar AlunoRepository se for verificar alunos vinculados antes de desativar
@@ -16,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -171,4 +177,56 @@ public class TurmaServiceImpl implements TurmaService {
         turmaRepository.save(turma);
         log.info("Turma ID {} reativada.", id);
     }
+    @Override
+    public TurmaDetalhadaDTO buscarDetalhesDaTurma(Long id) {
+        Turma turma = turmaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Turma não encontrada"));
+
+        // Alunos
+        List<AlunoResponseDTO> alunos = turma.getAlunos().stream()
+                .map(aluno -> AlunoResponseDTO.builder()
+                        .id(aluno.getId())
+                        .usuarioId(aluno.getUsuario().getId())
+                        .nomeUsuario(aluno.getUsuario().getNome())
+                        .emailUsuario(aluno.getUsuario().getEmail())
+                        .turmaId(turma.getId())
+                        .nomeTurma(turma.getNome())
+                        .build())
+                .toList();
+
+        // Professores (a partir das disciplinas vinculadas)
+        Set<Professor> professoresSet = turma.getDisciplinas().stream()
+                .flatMap(d -> d.getProfessores().stream())
+                .collect(Collectors.toSet());
+
+        List<ProfessorResponseDTO> professores = professoresSet.stream()
+                .map(prof -> ProfessorResponseDTO.builder()
+                        .id(prof.getId())
+                        .idUsuario(prof.getUsuario().getId())
+                        .nomeUsuario(prof.getUsuario().getNome())
+
+                        .build())
+                .toList();
+
+        // Disciplinas
+        List<DisciplinaResponseDTO> disciplinas = turma.getDisciplinas().stream()
+                .map(d -> DisciplinaResponseDTO.builder()
+                        .id(d.getId())
+                        .nome(d.getNome())
+                        .descricao(d.getDescricao())
+                        .build())
+                .toList();
+
+        return TurmaDetalhadaDTO.builder()
+                .id(turma.getId())
+                .nome(turma.getNome())
+                .turno(turma.getTurno())
+                .serieAno(turma.getSerieAno())
+                .anoLetivo(turma.getAnoLetivo())
+                .alunos(alunos)
+                .professores(professores)
+                .disciplinas(disciplinas)
+                .build();
+    }
+
 }

@@ -3,6 +3,7 @@ package com.example.mentora.service.usuario;
 import com.example.mentora.dto.usuario.LoginRequestDTO;
 import com.example.mentora.dto.usuario.UsuarioCreateDTO;
 import com.example.mentora.dto.usuario.UsuarioResponseDTO;
+import com.example.mentora.dto.usuario.UsuarioUpdateDTO;
 import com.example.mentora.enums.TipoUsuario;
 import com.example.mentora.model.Aluno;
 import com.example.mentora.model.Disciplina;
@@ -225,4 +226,17 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
         return toResponseDTO(usuarioSalvo);
     }
+    public UsuarioResponseDTO atualizar(Long id, UsuarioUpdateDTO dto) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        usuario.setNome(dto.getNome());
+        usuario.setEmail(dto.getEmail());
+        usuario.setSexo(dto.getSexo());
+        // atualize os outros campos aqui
+
+        usuarioRepository.save(usuario);
+        return toResponseDTO(usuario);
+    }
+
 }

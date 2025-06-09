@@ -3,6 +3,7 @@ package com.example.mentora.controller;
 import com.example.mentora.dto.usuario.UsuarioCreateDTO;
 import com.example.mentora.dto.usuario.UsuarioResponseDTO;
 import com.example.mentora.dto.usuario.LoginRequestDTO;
+import com.example.mentora.dto.usuario.UsuarioUpdateDTO;
 import com.example.mentora.service.usuario.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -82,4 +83,11 @@ public class UsuarioController {
         usuarioService.reativarUsuario(id);
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UsuarioResponseDTO> atualizarUsuario(@PathVariable Long id, @RequestBody UsuarioUpdateDTO dto) {
+        UsuarioResponseDTO atualizado = usuarioService.atualizar(id, dto);
+        return ResponseEntity.ok(atualizado);
+    }
+
 }

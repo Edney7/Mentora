@@ -8,6 +8,8 @@ import lombok.Setter;
 import lombok.NoArgsConstructor; // Construtor padrão para JPA
 import lombok.AllArgsConstructor; // Construtor com todos os argumentos (opcional)
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor // JPA requer um construtor sem argumentos
@@ -31,6 +33,14 @@ public class Disciplina {
     @Size(max = 1000, message = "A descrição não pode exceder 1000 caracteres.")
     @Column(name = "descricao", columnDefinition = "TEXT") // TEXT para descrições mais longas
     private String descricao; // Descrição é opcional
+
+    @ManyToMany
+    @JoinTable(
+            name = "professor_disciplina",
+            joinColumns = @JoinColumn(name = "disciplina_id"),
+            inverseJoinColumns = @JoinColumn(name = "professor_id")
+    )
+    private List<Professor> professores;
 
     // Se precisar de um campo 'ativo' para soft delete de disciplinas:
     // @Column(name = "ativa", nullable = false)

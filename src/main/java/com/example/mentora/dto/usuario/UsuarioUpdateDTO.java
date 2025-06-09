@@ -1,0 +1,20 @@
+package com.example.mentora.dto.usuario;
+
+import com.example.mentora.enums.TipoUsuario;
+import lombok.*;
+
+import java.time.LocalDate;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class UsuarioUpdateDTO {
+    private String nome;
+    private String cpf;
+    private String email;
+    private String sexo;
+    private LocalDate dtNascimento;
+    private TipoUsuario tipoUsuario;
+    private Boolean ativo;
+}

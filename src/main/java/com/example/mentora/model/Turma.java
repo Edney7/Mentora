@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -29,4 +31,16 @@ public class Turma {
 
     @Column(name = "ativa", nullable = false) // Was: ativo, 'ativa' matches common DDL
     private Boolean ativa = true; // Field name updated for consistency
+
+    @OneToMany(mappedBy = "turma")
+    private List<Aluno> alunos;
+
+    @ManyToMany
+    @JoinTable(
+            name = "turma_disciplina",
+            joinColumns = @JoinColumn(name = "turma_id"),
+            inverseJoinColumns = @JoinColumn(name = "disciplina_id")
+    )
+    private List<Disciplina> disciplinas;
+
 }
