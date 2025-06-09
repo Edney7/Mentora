@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function DashboardAluno() {
+export default function Dashboard() {
   const [faltas, setFaltas] = useState(0);
   const [media, setMedia] = useState(0);
   const [eventoHoje, setEventoHoje] = useState('07:00 | 7:45');
