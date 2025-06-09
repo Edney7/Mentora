@@ -163,6 +163,11 @@ export const buscarTurmasAtivas = async () => {
   const response = await api.get('/turmas'); 
   return response.data;
 };
+export const buscarTurmaDetalhada = async (id) => {
+  const response = await api.get(`/turmas/${id}/detalhes`);
+  return response.data;
+};
+
 
 /**
  * Busca TODAS as turmas (ativas e inativas) - geralmente para admin.
@@ -204,7 +209,7 @@ export const listarDisciplinasDaTurma = async (turmaId) => {
 
 export const vincularDisciplinaNaTurma = async (turmaId, disciplinaId) => {
   await api.post(`/turmas/${turmaId}/disciplinas/${disciplinaId}`);
-};
+}; // UTILIZADA
 
 export const desvincularDisciplinaDaTurma = async (turmaId, disciplinaId) => {
   await api.delete(`/turmas/${turmaId}/disciplinas/${disciplinaId}`);
