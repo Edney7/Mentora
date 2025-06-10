@@ -1,8 +1,12 @@
-import React, { use, useEffect, useState } from "react";
+import React, {  useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import "../../styles/DetalhesTurma.css";
-import { buscarTurmaDetalhada, buscarDisciplinas, listarDisciplinasDaTurma, vincularDisciplinaNaTurma, listarProfessoresDaDisciplina } from "../../services/ApiService";
+import { buscarTurmaDetalhada,
+         buscarDisciplinas,
+         listarProfessoresDaDisciplina, 
+         vincularDisciplinaEProfessorNaTurma, 
+         listarDisciplinaTurma } from "../../services/ApiService";
 import { FaArrowLeft, FaPlus, FaPen } from "react-icons/fa";
 import Modal from "../../components/Modal";
 
@@ -12,34 +16,35 @@ export default function DetalhesTurma() {
   const [turma, setTurma] = useState(null);
   const [todasDisciplinas, setTodasDisciplinas] = useState([]);
   const [disciplinaSelecionada, setDisciplinaSelecionada] = useState("");
-  const [disciplinasDaTurma, setDisciplinasDaTurma] = useState([]);
+  const [ofertasDisciplinaTurma, setOfertasDisciplinaTurma] = useState([]);
   const [modalDisciplinaAberto, setModalDisciplinaAberto] = useState(false);
   const [professoresDaDisciplina, setProfessoresDaDisciplina] = useState([]);
   const [professorSelecionado, setProfessorSelecionado] = useState("");
 
+console.log("Professores retornados:", professoresDaDisciplina);
 
   useEffect(() => {
     const carregarDados = async () => {
-      try {
-        const dados = await buscarTurmaDetalhada(id);
-        const todas = await buscarDisciplinas();
-        const vinculadas = await listarDisciplinasDaTurma(id); // <- aqui pega as disciplinas da turma
+        try {
+            const dados = await buscarTurmaDetalhada(id);
+            const todas = await buscarDisciplinas();
+            // const vinculadas = await listarDisciplinasDaTurma(id); // <--- Esta pode ser removida ou adaptada
+            const ofertas = await listarDisciplinaTurma(id); // <-- NOVA CHAMADA
 
-       setTurma({
-        ...dados,
-        disciplinas: dados.disciplinas || [],
-        });
-        setDisciplinasDaTurma(vinculadas);
-        setTodasDisciplinas(todas);
-      } catch (error) {
-        console.error("Erro ao buscar detalhes da turma:", error);
-        alert("Erro ao buscar turma.");
-      }
+            setTurma({
+                ...dados,
+                disciplinas: dados.disciplinas || [], // Manter se precisar de outras lógicas
+            });
+            // setDisciplinasDaTurma(vinculadas); // Adapte ou remova
+            setTodasDisciplinas(todas);
+            setOfertasDisciplinaTurma(ofertas); // <--- ATUALIZA O NOVO ESTADO
+        } catch (error) {
+            console.error("Erro ao buscar detalhes da turma:", error);
+            alert("Erro ao buscar turma.");
+        }
     };
-
     carregarDados();
-  }, [id]);
-
+}, [id]);
   if (!turma) return <p>Carregando turma...</p>;
 
   return (
@@ -90,18 +95,16 @@ export default function DetalhesTurma() {
               <input value={turma.serieAno} readOnly />
 
               <h4>Disciplinas</h4>
-              <button 
-                onClick={() => setModalDisciplinaAberto(true)}>
-                <FaPlus className="btn-icone" /> 
-                </button>
+<button onClick={() => setModalDisciplinaAberto(true)}>
+    <FaPlus className="btn-icone" /> 
+</button>
 
-              {disciplinasDaTurma.map((d) => (
-                <div className="item" key={d.id}>
-                    <div className="linha-cor disciplina"></div>
-                    {d.nome}
-                    
-                </div>
-                ))}
+{ofertasDisciplinaTurma.map((oferta) => ( // <--- MAPA O NOVO ESTADO
+    <div className="item" key={oferta.id}> {/* Use o ID da oferta */}
+        <div className="linha-cor disciplina"></div>
+        {oferta.nomeDisciplina} - Prof: {oferta.nomeProfessor} {/* Mostra disciplina E professor */}
+    </div>
+))}
               
                 </div>
 
@@ -150,46 +153,51 @@ export default function DetalhesTurma() {
             </select>
             )}
 
-            
-            <button
-            className="btn-salvar"
-            onClick={async () => {
-                const disciplina = todasDisciplinas.find(
-                (d) => d.id === parseInt(disciplinaSelecionada)
-                );
-                const professor = professoresDaDisciplina.find(
-                (p) => p.id === parseInt(professorSelecionado)
-                );
+          <button
+    className="btn-salvar"
+    onClick={async () => {
+        const disciplina = todasDisciplinas.find(
+            (d) => d.id === parseInt(disciplinaSelecionada)
+        );
+        const professor = professoresDaDisciplina.find(
+            (p) => p.id === parseInt(professorSelecionado)
+        );
 
-                if (!disciplina || !professor) {
-                alert("Selecione uma disciplina e um professor.");
-                return;
+        if (!disciplina || !professor) {
+            alert("Selecione uma disciplina e um professor.");
+            return;
+        }
+
+        try {
+            // CHAMA A NOVA API PARA VINCULAR DISCIPLINA E PROFESSOR NA TURMA
+            await vincularDisciplinaEProfessorNaTurma(id, disciplina.id, professor.id);
+
+            // Após o sucesso, atualiza o estado de 'ofertasDisciplinaTurma'
+            // para incluir a nova oferta.
+            setOfertasDisciplinaTurma(prevOfertas => [
+                ...prevOfertas,
+                { // Crie um objeto DTO semelhante ao que o backend retornaria
+                    id: Date.now(), // Um ID temporário para o frontend, ou o ID retornado pela API
+                    disciplinaId: disciplina.id,
+                    nomeDisciplina: disciplina.nome,
+                    professorId: professor.id,
+                    nomeProfessor: professor.nomeUsuario
                 }
+            ]);
 
-                try {
-                await vincularDisciplinaNaTurma(id, disciplina.id);
+            // Resetar estados do modal
+            setDisciplinaSelecionada("");
+            setProfessorSelecionado("");
+            setProfessoresDaDisciplina([]); // Limpa os professores do segundo select
+            setModalDisciplinaAberto(false);
 
-                // Atualiza disciplinas se ainda não estiver
-                if (!disciplinasDaTurma.find((d) => d.id === disciplina.id)) {
-                    setDisciplinasDaTurma((prev) => [...prev, disciplina]);
-                }
-
-                // Atualiza professores se ainda não estiver
-                if (!professoresDaDisciplina.find((p) => p.id === professor.id)) {
-                    setProfessoresDaDisciplina((prev) => [...prev, professor]);
-                }
-
-                setDisciplinaSelecionada("");
-                setProfessorSelecionado("");
-                setProfessoresDaDisciplina([]);
-                setModalDisciplinaAberto(false);
-                } catch (error) {
-                console.error("Erro ao vincular:", error);
-                alert("Erro ao adicionar disciplina/professor.");
-                }
-            }}
-            >
-  Adicionar
+        } catch (error) {
+            console.error("Erro ao vincular disciplina e professor na turma:", error);
+            alert("Erro ao adicionar disciplina e professor à turma.");
+        }
+    }}
+>
+    Adicionar
 </button>
             </Modal>
           </div>
