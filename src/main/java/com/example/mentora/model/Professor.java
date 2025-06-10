@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -24,4 +25,11 @@ public class Professor {
     @ManyToMany(mappedBy = "professores")
     private List<Disciplina> disciplinas;
 
+
+    // NOVO: Adicionar uma lista de associações TurmaDisciplinaProfessor
+    // Isso é útil para navegação JPA. MappedBy indica que a relação é bidirecional
+    // e o mapeamento é feito pela entidade TurmaDisciplinaProfessor
+    @OneToMany(mappedBy = "professor", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TurmaDisciplinaProfessor> ofertasDeDisciplinaNaTurma = new ArrayList<>();
+    // OU Set<TurmaDisciplinaProfessor> para evitar duplicatas, se aplicável ao seu caso.
 }
