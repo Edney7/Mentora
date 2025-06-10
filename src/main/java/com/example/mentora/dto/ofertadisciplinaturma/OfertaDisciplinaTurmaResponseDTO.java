@@ -1,0 +1,17 @@
+package com.example.mentora.dto.ofertadisciplinaturma;
+
+
+import lombok.*;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class OfertaDisciplinaTurmaResponseDTO {
+    private Long id; // ID da associação TurmaDisciplinaProfessor (se tiver um ID próprio)
+    private Long disciplinaId;
+    private String nomeDisciplina;
+    private Long professorId;
+    private String nomeProfessor;
+}
