@@ -9,7 +9,7 @@ import {
     cadastrarDisciplina, 
     atualizarDisciplina 
 } from "../../services/ApiService";
-import { FaEdit, FaTrash, FaArrowLeft, FaPlus } from "react-icons/fa";
+import { FaEdit, FaTrash, FaArrowLeft, FaPlus, FaEye } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 export default function Disciplina() {
@@ -162,6 +162,12 @@ export default function Disciplina() {
                     <span><strong>Descrição:</strong> {disciplina.descricao || "Sem descrição"}</span>
                   </div>
                   <div className="usuario-acoes">
+                  <button onClick={() =>
+                   navigate(`/secretaria/disciplina/detalhes/${disciplina.id}`)}
+                   className="btn-action btn-view"
+                   title="Ver Detalhes e Gerenciar">
+                    <FaEye />
+                    </button>         
                     <button 
                       onClick={() => handleOpenEditModal(disciplina)}
                       title="Editar Disciplina"
