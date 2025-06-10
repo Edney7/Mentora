@@ -1,0 +1,97 @@
+.detalhes-turma-container {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.btn-voltar {
+  background-color: transparent;
+  border: none;
+  font-size: 16px;
+  color: #007bff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.painel-duplo {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.painel-esquerdo, .painel-direito {
+  flex: 1;
+  background-color: #e7f3f6;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
+.azul {
+  color: #007bff;
+}
+
+.grupo h4 {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #333;
+}
+
+.item {
+  background: white;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  position: relative;
+}
+
+.linha-cor {
+  width: 5px;
+  height: 100%;
+  margin-right: 10px;
+  border-radius: 3px;
+}
+
+.professor { background-color: #007bff; }
+.aluno { background-color: #28a745; }
+.disciplina { background-color: #17a2b8; }
+
+.btn-trash {
+  color: #dc3545;
+  cursor: pointer;
+}
+
+.btn-icone {
+  cursor: pointer;
+  color: #007bff;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  margin: 6px 0 12px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+

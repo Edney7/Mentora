@@ -163,6 +163,11 @@ export const buscarTurmasAtivas = async () => {
   const response = await api.get('/turmas'); 
   return response.data;
 };
+export const buscarTurmaDetalhada = async (id) => {
+  const response = await api.get(`/turmas/${id}/detalhes`);
+  return response.data;
+};
+
 
 /**
  * Busca TODAS as turmas (ativas e inativas) - geralmente para admin.
@@ -197,14 +202,14 @@ export const reativarTurma = async (id) => {
 };
 
 // --- Associação Turma-Disciplina ---
-export const listarDisciplinasDaTurma = async (turmaId) => {
+/*export const listarDisciplinasDaTurma = async (turmaId) => {
   const response = await api.get(`/turmas/${turmaId}/disciplinas`);
   return response.data;
-};
+};*/
 
 export const vincularDisciplinaNaTurma = async (turmaId, disciplinaId) => {
   await api.post(`/turmas/${turmaId}/disciplinas/${disciplinaId}`);
-};
+}; // UTILIZADA
 
 export const desvincularDisciplinaDaTurma = async (turmaId, disciplinaId) => {
   await api.delete(`/turmas/${turmaId}/disciplinas/${disciplinaId}`);
@@ -221,9 +226,29 @@ export const listarDisciplinasDoProfessor = async (professorId) => {
 };
 
 export const listarProfessoresDaDisciplina = async (disciplinaId) => {
-    const response = await api.get(`/disciplinas/${disciplinaId}/professores`);
+    try{
+    const response = await api.get(`professores/disciplinas/${disciplinaId}/professores`);
     return response.data;
-};
+    } catch (error) {
+        console.error("Erro na API ao listar professores da disciplina:", error);
+        throw error; // Re-lança o erro para ser tratado no componente
+    } //nao vou usar ela
+}; ///modifcar essa parte
+
+export const vincularDisciplinaEProfessorNaTurma = async (turmaId, disciplinaId, professorId) => {
+    const response = await api.post(`/turma-disciplina-professor`, { // Use a rota do seu novo controller
+        turmaId,
+        disciplinaId,
+        professorId
+    });
+    return response.data;
+};//nova estou usando
+
+// E uma para listar  (disciplina + professor) para a turma
+export const listarDisciplinaTurma = async (turmaId) => {
+    const response = await api.get(`/turma-disciplina-professor/turma/${turmaId}`);
+    return response.data;
+};//nova estou usando
 
 export const vincularDisciplinaAoProfessor = async (professorId, disciplinaId) => {
     await api.post(`/professores/${professorId}/disciplinas/${disciplinaId}`);

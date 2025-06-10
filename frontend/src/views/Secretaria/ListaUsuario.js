@@ -225,13 +225,11 @@ export default function ListaUsuario() {
                   </div>
                   <div className="usuario-acoes">
                     <button
-                      onClick={() =>
-                        alert(
-                          `Editar usuário ID: ${usuario.id}. Funcionalidade a implementar.`
-                        )
+                      onClick={() => navigate(`/secretaria/editarUsuario/${usuario.id}`)
+                        
                       }
                       title="Editar Usuário"
-                      disabled
+                      
                     >
                       <FaEdit />
                     </button>
