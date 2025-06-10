@@ -1,36 +1,66 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native'; // Importe useNavigation
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Importe AsyncStorage
+import { useNavigation, useFocusEffect } from '@react-navigation/native'; // Importe useFocusEffect
 
 export default function Dashboard() {
-  const navigation = useNavigation(); // Hook para navegação
+  const navigation = useNavigation();
 
-  // Dados fictícios para simular as informações do aluno/professor
-  const [nomeUsuario, setNomeUsuario] = useState('Fulano de Tal');
-  const [tipoUsuario, setTipoUsuario] = useState('ALUNO'); // Pode ser 'ALUNO' ou 'PROFESSOR'
-  const [faltas, setFaltas] = useState(5); // Número fictício de faltas
-  const [aulasAssistidas, setAulasAssistidas] = useState(25); // Dados fictícios
-  const [totalAulas, setTotalAulas] = useState(30); // Dados fictícios
+  // Estados para armazenar os dados do usuário logado
+  const [nomeUsuario, setNomeUsuario] = useState('Carregando...');
+  const [tipoUsuario, setTipoUsuario] = useState(null);
+  const [faltas, setFaltas] = useState(0);
+  const [aulasAssistidas, setAulasAssistidas] = useState(0);
+  const [totalAulas, setTotalAulas] = useState(0);
+  const [faltasPorDisciplina, setFaltasPorDisciplina] = useState([]);
+  const [atividadesProfessor, setAtividadesProfessor] = useState([]);
 
-  // Faltas específicas por disciplina (exemplo)
-  const [faltasPorDisciplina, setFaltasPorDisciplina] = useState([
-    { disciplina: 'Matemática', faltas: 2 },
-    { disciplina: 'Português', faltas: 1 },
-    { disciplina: 'História', faltas: 0 },
-    { disciplina: 'Ciências', faltas: 2 },
-  ]);
+  // Função para carregar os dados do AsyncStorage
+  const loadUserData = async () => {
+    try {
+      const storedUserName = await AsyncStorage.getItem('userName');
+      const storedUserType = await AsyncStorage.getItem('userType');
 
-  // Exemplo de atividades recentes para professores
-  const [atividadesProfessor, setAtividadesProfessor] = useState([
-    { id: 1, descricao: 'Lançar notas - Turma 3B', data: '10/06/2025' },
-    { id: 2, descricao: 'Reunião de pais - 14h', data: '11/06/2025' },
-    { id: 3, descricao: 'Planejamento de aula - Biologia', data: '12/06/2025' },
-  ]);
+      if (!storedUserName || !storedUserType) {
+        // Se não houver dados de login, redireciona para a tela de Login
+        Alert.alert('Sessão Expirada', 'Você precisa fazer login novamente.');
+        navigation.replace('Login');
+        return;
+      }
 
+      setNomeUsuario(storedUserName);
+      setTipoUsuario(storedUserType);
 
-  // Função de Logout (apenas para simular a navegação de volta para o Login)
-  const handleLogout = () => {
+      if (storedUserType === 'ALUNO') {
+        const storedFaltasTotais = await AsyncStorage.getItem('alunoFaltasTotais');
+        const storedAulasAssistidas = await AsyncStorage.getItem('alunoAulasAssistidas');
+        const storedTotalAulas = await AsyncStorage.getItem('alunoTotalAulas');
+        const storedFaltasDisciplinas = await AsyncStorage.getItem('alunoFaltasDisciplinas');
+
+        setFaltas(storedFaltasTotais ? parseInt(storedFaltasTotais) : 0);
+        setAulasAssistidas(storedAulasAssistidas ? parseInt(storedAulasAssistidas) : 0);
+        setTotalAulas(storedTotalAulas ? parseInt(storedTotalAulas) : 0);
+        setFaltasPorDisciplina(storedFaltasDisciplinas ? JSON.parse(storedFaltasDisciplinas) : []);
+      } else if (storedUserType === 'PROFESSOR') {
+        const storedAtividadesProfessor = await AsyncStorage.getItem('professorAtividades');
+        setAtividadesProfessor(storedAtividadesProfessor ? JSON.parse(storedAtividadesProfessor) : []);
+      }
+
+    } catch (error) {
+      console.error('Erro ao carregar dados do AsyncStorage:', error);
+      Alert.alert('Erro', 'Não foi possível carregar os dados do usuário. Tente novamente.');
+    }
+  };
+
+  // Usamos useFocusEffect para recarregar os dados sempre que a tela Dashboard entrar em foco
+  useFocusEffect(
+    useCallback(() => {
+      loadUserData();
+    }, []) // O array de dependências vazio significa que ele só é recriado uma vez
+  );
+
+  const handleLogout = async () => {
     Alert.alert(
       'Sair',
       'Tem certeza que deseja sair?',
@@ -41,7 +71,11 @@ export default function Dashboard() {
         },
         {
           text: 'Sair',
-          onPress: () => navigation.replace('Login'), // Redireciona para a tela de Login
+          onPress: async () => {
+            // Limpa todos os dados do AsyncStorage
+            await AsyncStorage.clear(); // Limpa tudo que foi salvo
+            navigation.replace('Login');
+          },
         },
       ],
       { cancelable: false }
@@ -81,12 +115,16 @@ export default function Dashboard() {
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Faltas por Disciplina</Text>
-            {faltasPorDisciplina.map((item, index) => (
-              <View key={index} style={styles.disciplineItem}>
-                <Text style={styles.disciplineName}>{item.disciplina}</Text>
-                <Text style={styles.disciplineFaltas}>{item.faltas} falta(s)</Text>
-              </View>
-            ))}
+            {faltasPorDisciplina.length > 0 ? (
+              faltasPorDisciplina.map((item, index) => (
+                <View key={index} style={styles.disciplineItem}>
+                  <Text style={styles.disciplineName}>{item.disciplina}</Text>
+                  <Text style={styles.disciplineFaltas}>{item.faltas} falta(s)</Text>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.noDataText}>Nenhuma falta registrada por disciplina.</Text>
+            )}
           </View>
         </>
       )}
@@ -96,24 +134,28 @@ export default function Dashboard() {
         <>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Minhas Atividades</Text>
-            {atividadesProfessor.map((item) => (
-              <View key={item.id} style={styles.activityItem}>
-                <Text style={styles.activityDescription}>{item.descricao}</Text>
-                <Text style={styles.activityDate}>{item.data}</Text>
-              </View>
-            ))}
+            {atividadesProfessor.length > 0 ? (
+              atividadesProfessor.map((item) => (
+                <View key={item.id} style={styles.activityItem}>
+                  <Text style={styles.activityDescription}>{item.descricao}</Text>
+                  <Text style={styles.activityDate}>{item.data}</Text>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.noDataText}>Nenhuma atividade recente.</Text>
+            )}
           </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Turmas</Text>
-            {/* Adicione cards ou listas para turmas aqui */}
+            {/* Adicione cards ou listas para turmas aqui, pode ser um array no Login.js também */}
             <View style={styles.card}>
-                <Text style={styles.value}>Matemática - 2A</Text>
-                <Text style={styles.label}>Ver Alunos</Text>
+              <Text style={styles.value}>Matemática - 2A</Text>
+              <Text style={styles.label}>Ver Alunos</Text>
             </View>
-             <View style={styles.card}>
-                <Text style={styles.value}>Física - 3B</Text>
-                <Text style={styles.label}>Ver Alunos</Text>
+            <View style={styles.card}>
+              <Text style={styles.value}>Física - 3B</Text>
+              <Text style={styles.label}>Ver Alunos</Text>
             </View>
           </View>
         </>
@@ -125,7 +167,7 @@ export default function Dashboard() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#f5f5f5', // Alterei para um fundo mais claro
+    backgroundColor: '#f5f5f5',
     padding: 20,
     flex: 1,
   },
@@ -134,7 +176,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 20,
-    paddingTop: 30, // Espaçamento para a barra de status
+    paddingTop: 30,
   },
   logo: {
     width: 100,
@@ -173,7 +215,7 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: 150,
-    resizeMode: 'cover', // Melhor para imagens de largura total
+    resizeMode: 'cover',
     borderRadius: 10,
     marginTop: 10,
   },
@@ -188,7 +230,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 20,
     alignItems: 'center',
-    width: '46%', // Ajustado para dois cards com espaçamento
+    width: '46%',
     marginVertical: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -222,11 +264,11 @@ const styles = StyleSheet.create({
   },
   disciplineFaltas: {
     fontSize: 18,
-    color: '#ff6347', // Cor para destacar faltas
+    color: '#ff6347',
     fontWeight: 'bold',
   },
   activityItem: {
-    backgroundColor: '#e6ffe6', // Um verde claro
+    backgroundColor: '#e6ffe6',
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
@@ -240,11 +282,17 @@ const styles = StyleSheet.create({
   activityDescription: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#006400', // Verde escuro
+    color: '#006400',
   },
   activityDate: {
     fontSize: 14,
-    color: '#3cb371', // Verde médio
+    color: '#3cb371',
     marginTop: 5,
+  },
+  noDataText: {
+    fontSize: 16,
+    color: '#888',
+    marginTop: 10,
+    fontStyle: 'italic',
   },
 });
