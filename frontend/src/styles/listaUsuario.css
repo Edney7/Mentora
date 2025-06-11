@@ -100,7 +100,7 @@
 
 .usuario-info {
   display: grid;
-  grid-template-columns: 2fr 1fr 2fr 1fr 1fr 1fr 1fr; /* 7 colunas */
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr; /* 7 colunas */
   gap: 10px;
   align-items: center;
   width: 100%;

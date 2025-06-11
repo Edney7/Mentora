@@ -1,7 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import "../../styles/ListaUsuario.css";
 import Navbar from "../../components/Navbar";
-
 import {
   listarTodosOsUsuarios,
   desativarUsuario,
