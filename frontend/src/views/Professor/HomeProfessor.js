@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import "../../styles/HomeProfessor.css";
+import "../../styles/professor/HomeProfessor.css"
 import Calendar from "../../components/Calendario";
 import { useNavigate } from "react-router-dom";
-import "../../styles/Home.css";
+
 import Navbar from "../../components/Navbar"; 
 
 

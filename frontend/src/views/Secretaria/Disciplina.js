@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import "../../styles/Disciplina.css"; 
+import "../../styles/secretaria/Disciplina.css"; 
 import Navbar from "../../components/Navbar";
 import Modal from "../../components/Modal";
 import DisciplinaForm from "../../components/DisciplinaForm"; 

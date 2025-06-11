@@ -1,7 +1,7 @@
 import React, {  useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
-import "../../styles/DetalhesTurma.css";
+import "../../styles/secretaria/DetalhesTurma.css";
 import { buscarTurmaDetalhada,
          buscarDisciplinas,
          listarProfessoresDaDisciplina, 
@@ -64,14 +64,7 @@ console.log("Professores retornados:", professoresDaDisciplina);
               <FaPlus className="btn-icone" />
             </div>
             <div className="grupo">
-              <h4>Professores</h4>
-              {turma.professores.map((p) => (
-                <div className="item" key={p.id}>
-                  <div className="linha-cor professor"></div>
-                  {p.nomeUsuario}
-                
-                </div>
-              ))}
+              
               <h4>Alunos</h4>
               {turma.alunos.map((a) => (
                 <div className="item" key={a.id}>
@@ -86,7 +79,6 @@ console.log("Professores retornados:", professoresDaDisciplina);
           <div className="painel-direito">
             <div className="cabecalho">
               <span>TURMA {turma.nome}</span>
-              <FaPen className="btn-icone" />
             </div>
             <div className="grupo">
               <label>Turno</label>
@@ -95,16 +87,16 @@ console.log("Professores retornados:", professoresDaDisciplina);
               <input value={turma.serieAno} readOnly />
 
               <h4>Disciplinas</h4>
-<button onClick={() => setModalDisciplinaAberto(true)}>
-    <FaPlus className="btn-icone" /> 
-</button>
+              <button onClick={() => setModalDisciplinaAberto(true)}>
+                 <FaPlus className="btn-icone" />
+              </button>
 
-{ofertasDisciplinaTurma.map((oferta) => ( // <--- MAPA O NOVO ESTADO
-    <div className="item" key={oferta.id}> {/* Use o ID da oferta */}
-        <div className="linha-cor disciplina"></div>
-        {oferta.nomeDisciplina} - Prof: {oferta.nomeProfessor} {/* Mostra disciplina E professor */}
-    </div>
-))}
+              {ofertasDisciplinaTurma.map((oferta) => ( // <--- MAPA O NOVO ESTADO
+                  <div className="item" key={oferta.id}> {/* Use o ID da oferta */}
+                      <div className="linha-cor disciplina"></div>
+                      {oferta.nomeDisciplina} - Prof: {oferta.nomeProfessor} {/* Mostra disciplina E professor */}
+                  </div>
+              ))}
               
                 </div>
 

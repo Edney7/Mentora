@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { buscarAusencias, buscarAusenciasComFiltro } from "../../services/ApiService"; // você cria esse endpoint
-import "../../styles/AusenciaProfessor.css";
+import "../../styles/secretaria/AusenciaProfessor.css";
 import Navbar from "../../components/Navbar";
 import {FaArrowLeft} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";

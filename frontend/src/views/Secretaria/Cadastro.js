@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
-import "../styles/Cadastro.css"; 
-import animacaoCadastro from "../assets/animacaoCadastro.png"; 
+import "../../styles/secretaria/Cadastro.css"; 
+import animacaoCadastro from "../../assets/animacaoCadastro.png"; 
 import { 
     buscarTurmasAtivas, 
     buscarDisciplinas, 
     cadastrarUsuario 
-} from "../services/ApiService"; 
+} from "../../services/ApiService"; 
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 

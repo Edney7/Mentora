@@ -2,7 +2,7 @@ import react,{ useEffect, useState} from "react";
 import Navbar from "../../components/Navbar";
 import { useParams, useNavigate } from "react-router-dom";
 import { buscarUsuarioAtivoPorId, atualizarUsuario } from "../../services/ApiService";
-import  "../../styles/EditarUsuario.css";
+import  "../../styles/secretaria/EditarUsuario.css";
 import { FaArrowLeft } from "react-icons/fa";
 
 

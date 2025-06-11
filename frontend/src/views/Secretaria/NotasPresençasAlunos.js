@@ -3,7 +3,7 @@ import { listarTodasNotas, listarTodasFaltas } from "../../services/ApiService";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import { FaArrowLeft } from "react-icons/fa";
-import "../../styles/NotasPresencasAlunos.css";
+import "../../styles/secretaria/NotasPresencasAlunos.css";
 
 export default function NotasPresencasAluno() {
   const [notas, setNotas] = useState([]);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import "../../styles/ListaUsuario.css";
+import "../../styles/secretaria/ListaUsuario.css";
 import Navbar from "../../components/Navbar";
 import Modal from "../../components/Modal";
 import TurmaForm from "../../components/TurmaForm";
