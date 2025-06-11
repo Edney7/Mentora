@@ -9,7 +9,7 @@ import {
     cadastrarDisciplina, 
     atualizarDisciplina 
 } from "../../services/ApiService";
-import { FaEdit, FaTrash, FaArrowLeft, FaPlus, FaEye } from "react-icons/fa";
+import { FaEdit, FaTrash, FaArrowLeft, FaPlus, FaEye, FaAddressCard } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 export default function Disciplina() {
@@ -109,8 +109,9 @@ export default function Disciplina() {
     return (
       <>
         <Navbar />
-        <div className="usuarios-container">
+        <div className="disciplina-container">
           <p>Carregando disciplinas...</p>
+          
         </div>
       </>
     );
@@ -119,49 +120,43 @@ export default function Disciplina() {
   return (
     <>
       <Navbar />
-      <div className="usuarios-container">
-        <div className="usuarios-header">
+      <div className="disciplina-container">
+        <div className="disciplina-header">
           <div className="voltar-seta" onClick={() => navigate(-1)} title="Voltar">
             <FaArrowLeft />
           </div>
           <h2>Gerenciamento de Disciplinas</h2>
-          <div className="usuarios-filtros">
+          <div className="disciplina-filtros">
             <input
               type="text"
               placeholder="Filtrar por Nome"
               value={nomeFiltro}
               onChange={(e) => setNomeFiltro(e.target.value)}
             />
-            <input
-              type="text"
-              placeholder="Filtrar por Descrição"
-              value={descricaoFiltro}
-              onChange={(e) => setDescricaoFiltro(e.target.value)}
-            />
+            
             <button 
               onClick={handleOpenCreateModal} 
-              className="btn-add" 
-              title="Adicionar Nova Disciplina"
-            >
+              className="btn-disciplina" 
+              title="Adicionar Nova Disciplina">
               <FaPlus />
             </button>
           </div>
         </div>
 
         {erroApi && !showCreateModal && !showEditModal && <p className="error-message">{erroApi}</p>} 
-
-        <div className="usuarios-lista">
+        <div className="disciplina-lista">
+          
           {disciplinasFiltradas.length === 0 && !loading ? (
-            <p className="sem-usuarios">Nenhuma disciplina encontrada com os filtros aplicados.</p>
+            <p className="sem-disciplina">Nenhuma disciplina encontrada com os filtros aplicados.</p>
           ) : (
             disciplinasFiltradas.map((disciplina) => (
-              <div className="usuario-row" key={disciplina.id}>
-                <div className="usuario-conteudo">
-                  <div className="usuario-info">
+              <div className="disciplina-row" key={disciplina.id}>
+                <div className="disciplina-conteudo">
+                  <div className="disciplina-info">
                     <span><strong>Nome:</strong> {disciplina.nome}</span>
                     <span><strong>Descrição:</strong> {disciplina.descricao || "Sem descrição"}</span>
                   </div>
-                  <div className="usuario-acoes">
+                  <div className="disciplina-acoes">
                   <button onClick={() =>
                    navigate(`/secretaria/disciplina/detalhes/${disciplina.id}`)}
                    className="btn-action btn-view"

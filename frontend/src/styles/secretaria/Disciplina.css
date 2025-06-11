@@ -1,66 +1,58 @@
-.usuarios-container {
-  
+.disciplina-container {
   padding: 20px;
   font-family: 'Segoe UI', sans-serif;
 }
 
-.usuarios-header {
+.disciplina-header {
   display: flex;
- flex-direction: column;
+  flex-direction: column;
   align-items: center;
   margin-bottom: 20px;
 }
 
-.usuarios-header h2 {
+.disciplina-header h2 {
   color: #004e64;
   margin-bottom: 10px;
-  ;
+  
 }
 
-
-
-.usuarios-filtros {
+.disciplina-filtros {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: center; /* <- Alinha o botão com o input */
 }
 
-.usuarios-filtros input{
+.disciplina-filtros input {
   padding: 5px 10px;
-  width: 400px;
+  width: 500px;
+  height: 45px;
   border-radius: 5px;
   border: 1px solid #ccc;
   font-size: 1rem;
 }
-.usuarios-filtros select {
-  padding:5px 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  width: 150px;
-}
 
-.btn-add {
-  background-color: #004e64;
+.btn-disciplina {
+  background-color: #07718e;
   color: white;
-  font-size: 1.5rem;
+  font-size: 20px;
   border: none;
-  border-radius: 8px;
-  padding:5px 12px;
+  border-radius: 5px;
+  width: 50px;
+  height: 47px;  /* <- Igual ao height do input */
   cursor: pointer;
   transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.btn-add:hover {
-  background-color: #00748d;
-}
-
-
-.usuarios-lista {
+.disciplina-lista {
   background-color: #eaf3f7;
   border-radius: 10px;
   padding: 15px;
-  margin: 0 250px 0 250px ;
+  margin: 0 350px 0 350px ;
   display: flex;
   flex-direction: column;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
@@ -68,31 +60,31 @@
   max-height: 490px;
 }
 
-.usuario-row {
+.disciplina-row {
   display: flex;
   border-bottom: 1px solid #eee;
   padding: 2px;
 }
 
-.usuario-borda {
+.disciplina-borda {
   width: 8px;
   border-radius: 4px 0 0 4px;
 }
 
 
-.usuario-borda.professor {
+.disciplina-borda.professor {
   background-color: #4db5ff;
 }
 
-.usuario-borda.secretaria {
+.disciplina-borda.secretaria {
   background-color: #0062c5;
 }
 
-.usuario-borda.aluno {
+.disciplina-borda.aluno {
   background-color: #e6a23c;
 }
 
-.usuario-conteudo {
+.disciplina-conteudo {
   display: flex;
   align-items:center;
   background-color: white;
@@ -103,26 +95,27 @@
   
 } 
 
-.usuario-info {
+.disciplina-info {
+  margin-left: 10px;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns:  1fr 2fr;
   color: #004b64;
   gap: 1rem;
   flex: 1;
 }
 
-.usuario-info span {
-  font-size: 0.95rem;
+.disciplina-info span {
+  font-size:15px;
   color: #333;
 }
 
-.usuario-acoes {
+.disciplina-acoes {
   display: flex;
   gap: 0.75rem;
   margin: 0 10px;;
 }
 
-.usuario-acoes button {
+.disciplina-acoes button {
   background: none;
   border: none;
   cursor: pointer;
@@ -131,11 +124,11 @@
   transition: 0.2s;
 }
 
-.usuario-acoes button:hover {
+.disciplina-acoes button:hover {
   color: #00bcd4;
 }
 
-.sem-usuarios {
+.sem-disciplina {
   padding: 1rem;
   text-align: center;
   color: #777;
