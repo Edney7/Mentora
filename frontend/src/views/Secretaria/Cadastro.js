@@ -24,7 +24,6 @@ export default function Cadastro() {
   const [disciplinasSelecionadas, setDisciplinasSelecionadas] = useState([]); 
   const [loading, setLoading] = useState(false); 
   const [erro, setErro] = useState("");
-  const [sucesso, setSucesso] = useState("");
   const navigate = useNavigate(); 
 
   const formatarCPF = (value) => {
@@ -48,7 +47,6 @@ export default function Cadastro() {
     e.preventDefault();
     setLoading(true);
     setErro("");
-    setSucesso("");
 
     if (!nome.trim() || !cpf || !dataNascimentoInput || !sexo || !email || !senha || !senhaRepetida || !tipoUsuario) {
       setErro("Todos os campos básicos e o tipo de usuário são obrigatórios.");
@@ -61,12 +59,7 @@ export default function Cadastro() {
       return;
     }
     if (tipoUsuario === "PROFESSOR" && disciplinasSelecionadas.length === 0) {
-      setErro("Por favor, selecione pelo menos uma disciplina para o professor.");
-      setLoading(false);
-      return;
-    }
-     if (disciplinasSelecionadas.length > 2 && tipoUsuario === "PROFESSOR") {
-      setErro("Um professor pode ser vinculado a no máximo 2 disciplinas no cadastro inicial.");
+      setErro("Por favor, selecione uma disciplina para o professor.");
       setLoading(false);
       return;
     }
@@ -97,7 +90,6 @@ export default function Cadastro() {
 
     try {
       await cadastrarUsuario(dadosUsuario);
-      setSucesso("Cadastro de usuário realizado com sucesso!");
       alert("Cadastro de usuário realizado com sucesso!"); 
       
       setNome("");
@@ -159,21 +151,9 @@ export default function Cadastro() {
   }, [carregarDependenciasTipoUsuario]);
 
   const handleDisciplinasChange = (e) => {
-    const options = e.target.options;
-    const values = [];
-    for (let i = 0, l = options.length; i < l; i++) {
-      if (options[i].selected) {
-        values.push(options[i].value);
-      }
-    }
-    if (values.length > 2) { 
-        setErro("Você pode selecionar no máximo 2 disciplinas.");
-        setDisciplinasSelecionadas(values.slice(0, 2)); 
-    } else {
-        setDisciplinasSelecionadas(values);
-        if (erro === "Você pode selecionar no máximo 2 disciplinas.") setErro(""); 
-    }
-  };
+  const selected = Array.from(e.target.selectedOptions, option => option.value);
+  setDisciplinasSelecionadas(selected);
+};
 
   return (
     <div className="cadastro-container">
@@ -195,7 +175,6 @@ export default function Cadastro() {
             <FaArrowLeft />
           </div>
           {erro && <p className="error-message" style={{textAlign: 'center', marginBottom: '15px'}}>{erro}</p>}
-          {sucesso && <p className="success-message" style={{textAlign: 'center', marginBottom: '15px'}}>{sucesso}</p>}
 
           <input
             type="text"
@@ -217,7 +196,7 @@ export default function Cadastro() {
               type="date" 
               value={dataNascimentoInput} 
               onChange={(e) => setDataNascimentoInput(e.target.value)}
-              required
+              required 
             />
             <select
               value={sexo}
@@ -227,7 +206,6 @@ export default function Cadastro() {
               <option value="">Sexo</option>
               <option value="Feminino">Feminino</option> 
               <option value="Masculino">Masculino</option>
-              <option value="Outro">Outro</option>
             </select>
           </div>
 
@@ -268,13 +246,11 @@ export default function Cadastro() {
 
             {tipoUsuario === "PROFESSOR" && (
               <select
-                multiple 
                 value={disciplinasSelecionadas} 
                 onChange={handleDisciplinasChange} 
                 required={tipoUsuario === "PROFESSOR"} 
-                size={Math.min(disciplinas.length, 3) || 1} 
-                className="select-disciplinas-multiplo" 
               >
+                <option value="">Selecione a Disciplina</option>
                 {disciplinas.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.nome}
