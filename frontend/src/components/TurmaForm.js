@@ -1,4 +1,3 @@
-// Sugestão de caminho: src/components/TurmaForm.jsx ou src/views/Secretaria/Turma/components/TurmaForm.jsx
 import React, { useState, useEffect } from 'react';
 import "../styles/FormularioModal.css";
 
@@ -49,7 +48,7 @@ const TurmaForm = ({ onSubmit, onClose, initialData, isEditing }) => {
       {erroInterno && <p className="error-message" style={{marginBottom: '15px'}}>{erroInterno}</p>}
       
       <div className="form-group">
-        <label htmlFor="turma-nome-modal">Nome da Turma:</label>
+        <label htmlFor="turma-nome-modal" className='label-nome'>Nome da Turma:</label>
         <input
           type="text"
           id="turma-nome-modal"
@@ -61,7 +60,7 @@ const TurmaForm = ({ onSubmit, onClose, initialData, isEditing }) => {
           maxLength={100}
         />
         <div className='grid-turma'>
-        <label htmlFor="turma-turno-modal">Turno:</label>
+        <label htmlFor="turma-turno-modal" className='label-grid'>Turno:</label>
         <select 
             id="turma-turno-modal" 
             value={turno} 
@@ -74,7 +73,7 @@ const TurmaForm = ({ onSubmit, onClose, initialData, isEditing }) => {
           <option value="Integral">Integral</option>
         </select>
     
-        <label htmlFor="turma-serieAno-modal">Série/Ano:</label>
+        <label htmlFor="turma-serieAno-modal" className='label-grid'>Série/Ano:</label>
         <input
           type="text"
           id="turma-serieAno-modal"
@@ -84,7 +83,7 @@ const TurmaForm = ({ onSubmit, onClose, initialData, isEditing }) => {
           required
         />
       
-        <label htmlFor="turma-anoLetivo-modal">Ano Letivo:</label>
+        <label htmlFor="turma-anoLetivo-modal" className='label-grid'>Ano Letivo:</label>
         <input
           type="number"
           id="turma-anoLetivo-modal"
@@ -95,13 +94,14 @@ const TurmaForm = ({ onSubmit, onClose, initialData, isEditing }) => {
         />
         </div>
         <label htmlFor="turma-ativa-modal" className="checkbox-label">
+          Turma Ativa
           <input
             type="checkbox"
             id="turma-ativa-modal"
             checked={ativa}
             onChange={(e) => setAtiva(e.target.checked)}
           />
-          Turma Ativa
+          
         </label>
       
       <div className="form-actions-modal" style={{marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '10px'}}>
