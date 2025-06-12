@@ -56,7 +56,17 @@
 .modal-body {
   overflow-y: auto;
 }
+/* Turma */
+.modal-turma{
+  display: flex;
+  flex-direction: column;
+}
+.modal-turma-form input{
+  color: #016cdf;
 
+}
+
+/*  Disciplina */
 .modal-detail-disciplina-conteudo h3{
   color: #016cdf;
   font-size: 20px;

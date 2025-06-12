@@ -355,11 +355,13 @@ export default function ListaTurmas() {
         isOpen={showCreateModal}
         onClose={handleCloseModals}
         title="Cadastrar Nova Turma"
+        className="modal-turma"
       >
         <TurmaForm
           onSubmit={handleSaveTurma}
           onClose={handleCloseModals}
           isEditing={false}
+          className="modal-turma-form"
         />
         {saving === false && erro && showCreateModal && (
           <p className="error-message" style={{ marginTop: "15px" }}>

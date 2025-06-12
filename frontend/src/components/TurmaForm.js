@@ -45,7 +45,7 @@ const TurmaForm = ({ onSubmit, onClose, initialData, isEditing }) => {
   };
 
   return (
-    <form onSubmit={handleSubmitForm} className="form-disciplina"> 
+    <form onSubmit={handleSubmitForm} className="form-turma"> 
       {erroInterno && <p className="error-message" style={{marginBottom: '15px'}}>{erroInterno}</p>}
       
       <div className="form-group">
@@ -53,16 +53,14 @@ const TurmaForm = ({ onSubmit, onClose, initialData, isEditing }) => {
         <input
           type="text"
           id="turma-nome-modal"
-          placeholder="Ex: 1º Ano A - Matutino"
+          placeholder="Ex: 1º Ano A - Integral"
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           required
           minLength={3}
           maxLength={100}
         />
-      </div>
-      
-      <div className="form-group">
+        <div className='grid-turma'>
         <label htmlFor="turma-turno-modal">Turno:</label>
         <select 
             id="turma-turno-modal" 
@@ -75,21 +73,17 @@ const TurmaForm = ({ onSubmit, onClose, initialData, isEditing }) => {
           <option value="Noite">Noite</option>
           <option value="Integral">Integral</option>
         </select>
-      </div>
-
-      <div className="form-group">
+    
         <label htmlFor="turma-serieAno-modal">Série/Ano:</label>
         <input
           type="text"
           id="turma-serieAno-modal"
-          placeholder="Ex: 1º Ano, 9ª Série"
+          placeholder="Ex: 1º Ano"
           value={serieAno}
           onChange={(e) => setSerieAno(e.target.value)}
           required
         />
-      </div>
-
-      <div className="form-group">
+      
         <label htmlFor="turma-anoLetivo-modal">Ano Letivo:</label>
         <input
           type="number"
@@ -99,9 +93,7 @@ const TurmaForm = ({ onSubmit, onClose, initialData, isEditing }) => {
           onChange={(e) => setAnoLetivo(e.target.value)}
           required
         />
-      </div>
-      
-      <div className="form-group">
+        </div>
         <label htmlFor="turma-ativa-modal" className="checkbox-label">
           <input
             type="checkbox"
@@ -111,7 +103,6 @@ const TurmaForm = ({ onSubmit, onClose, initialData, isEditing }) => {
           />
           Turma Ativa
         </label>
-      </div>
       
       <div className="form-actions-modal" style={{marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '10px'}}>
         <button type="submit" className="btn-salvar-modal">
@@ -120,6 +111,7 @@ const TurmaForm = ({ onSubmit, onClose, initialData, isEditing }) => {
         <button type="button" onClick={onClose} className="btn-cancelar-modal secondary">
           Cancelar
         </button>
+      </div>
       </div>
     </form>
   );
