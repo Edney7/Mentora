@@ -10,17 +10,6 @@
   justify-content: space-between;
 }
 
-.btn-voltar {
-  background-color: transparent;
-  border: none;
-  font-size: 16px;
-  color: #007bff;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
 .painel-duplo {
   display: flex;
   gap: 20px;
@@ -43,14 +32,9 @@
   font-size: 18px;
 }
 
-.azul {
+.titulo {/*usando*/
   color: #007bff;
-}
-
-.grupo h4 {
-  margin-top: 10px;
-  font-weight: bold;
-  color: #333;
+  font-size: 20px;
 }
 
 .item { /* input com dados usuarios*/
@@ -65,25 +49,26 @@
   position: relative;
 }
 
-.linha-cor {
-  width: 5px;
-  height: 100%;
-  margin-right: 10px;
-  border-radius: 3px;
-}
-
-.professor { background-color: #007bff; }
-.aluno { background-color: #28a745; }
-.disciplina { background-color: #17a2b8; }
-
 .btn-trash {
   color: #dc3545;
   cursor: pointer;
 }
 
 .btn-icone {
-  cursor: pointer;
+  background: none;
   color: #007bff;
+  font-size: 20px; /* opcional: controla o tamanho do ícone */
+  border: none; /* remove qualquer borda */
+  padding: 0; /* remove espaçamento interno */
+  cursor: pointer; /* cursor de mãozinha */
+}
+.btn-icon-only{
+  
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
 }
 
 input {
