@@ -1,70 +1,114 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Importe AsyncStorage
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// BASE_URL da sua API (Certifique-se de que esta URL está correta!)
+const API_BASE_URL = 'http://192.168.248.47:8080';
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    // --- SIMULANDO O LOGIN E DADOS RETORNADOS PELO BACKEND ---
-    // Você pode ajustar esses dados fictícios conforme o teste:
-    let loggedInUser = null;
-
-    if (email === 'aluno@escola.com' && senha === '123') {
-      loggedInUser = {
-        id: '1', // id_usuario fictício
-        tipoUsuario: 'ALUNO',
-        nome: 'Maria da Silva',
-        alunoId: '101', // id_aluno fictício
-        faltasTotais: 8,
-        faltasDisciplinas: [
-          { disciplina: 'Matemática', faltas: 3 },
-          { disciplina: 'Português', faltas: 2 },
-          { disciplina: 'História', faltas: 1 },
-          { disciplina: 'Ciências', faltas: 2 },
-        ],
-        aulasAssistidas: 25,
-        totalAulas: 30,
-      };
-    } else if (email === 'professor@escola.com' && senha === '123') {
-      loggedInUser = {
-        id: '2', // id_usuario fictício
-        tipoUsuario: 'PROFESSOR',
-        nome: 'Prof. Carlos',
-        professorId: '201', // id_professor fictício
-        atividades: [
-          { id: 1, descricao: 'Lançar notas - Turma 3B', data: '10/06/2025' },
-          { id: 2, descricao: 'Reunião de pais - 14h', data: '11/06/2025' },
-          { id: 3, descricao: 'Planejamento de aula - Biologia', data: '12/06/2025' },
-        ],
-      };
-    } else {
-      Alert.alert('Erro no Login', 'Usuário ou senha inválidos. Tente: aluno@escola.com / 123 ou professor@escola.com / 123');
-      return; // Sai da função se as credenciais não corresponderem
-    }
-
-    // --- ARMAZENANDO OS DADOS FICTÍCIOS NO ASYNCSTORAGE ---
+    setLoading(true);
     try {
-      await AsyncStorage.setItem('userId', loggedInUser.id);
-      await AsyncStorage.setItem('userType', loggedInUser.tipoUsuario);
-      await AsyncStorage.setItem('userName', loggedInUser.nome); // Armazena o nome
+      // 1. Primeira requisição: Login do Usuário
+      const loginResponse = await fetch(`${API_BASE_URL}/usuarios/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, senha }),
+      });
 
-      if (loggedInUser.tipoUsuario === 'ALUNO') {
-        await AsyncStorage.setItem('alunoId', loggedInUser.alunoId);
-        await AsyncStorage.setItem('alunoFaltasTotais', loggedInUser.faltasTotais.toString());
-        await AsyncStorage.setItem('alunoAulasAssistidas', loggedInUser.aulasAssistidas.toString());
-        await AsyncStorage.setItem('alunoTotalAulas', loggedInUser.totalAulas.toString());
-        await AsyncStorage.setItem('alunoFaltasDisciplinas', JSON.stringify(loggedInUser.faltasDisciplinas)); // Armazena array como string JSON
-        navigation.navigate('Dashboard');
-      } else if (loggedInUser.tipoUsuario === 'PROFESSOR') {
-        await AsyncStorage.setItem('professorId', loggedInUser.professorId);
-        await AsyncStorage.setItem('professorAtividades', JSON.stringify(loggedInUser.atividades)); // Armazena array como string JSON
-        navigation.navigate('Dashboard'); // Assumindo que Dashboard será a tela para ambos
+      if (!loginResponse.ok) {
+        const errorText = await loginResponse.text();
+        console.error('Erro no backend no login:', loginResponse.status, errorText);
+        Alert.alert('Erro no Login', `Usuário ou senha inválidos, ou problema no servidor. (${loginResponse.status})`);
+        setLoading(false);
+        return;
       }
+
+      const userData = await loginResponse.json();
+      console.log("1. Dados recebidos do backend após login (userData):", userData);
+
+      if (!userData.id || !userData.tipoUsuario || !userData.nome) {
+        Alert.alert('Erro de Dados', 'Resposta incompleta do servidor. Faltam informações essenciais do usuário (id, tipoUsuario, nome).');
+        setLoading(false);
+        return;
+      }
+
+      // Armazena dados básicos do usuário
+      await AsyncStorage.setItem('userId', userData.id.toString());
+      await AsyncStorage.setItem('userType', userData.tipoUsuario);
+      await AsyncStorage.setItem('userName', userData.nome);
+
+      // 2. Segunda requisição (condicional): Buscar alunoId se for ALUNO ou professorId se for PROFESSOR
+      if (userData.tipoUsuario === 'ALUNO') {
+        try {
+          // Chamada para o NOVO endpoint do backend que você acabou de criar
+          const alunoProfileResponse = await fetch(`${API_BASE_URL}/alunos/by-usuario/${userData.id}`, {
+            headers: { 'Content-Type': 'application/json' },
+          });
+
+          console.log("2. Status da resposta para /alunos/by-usuario/:", alunoProfileResponse.status);
+
+          if (!alunoProfileResponse.ok) {
+            const errorText = await alunoProfileResponse.text();
+            console.error('Erro ao buscar perfil de aluno:', alunoProfileResponse.status, errorText);
+            Alert.alert('Erro', 'Não foi possível obter o perfil do aluno. As faltas podem não ser carregadas.');
+            // Prossegue mesmo com erro, mas o Dashboard vai lidar com a falta do alunoId
+          } else {
+            const alunoProfileData = await alunoProfileResponse.json(); // Isso será seu AlunoResponseDTO
+            console.log("3. Dados recebidos do backend para perfil de aluno (alunoProfileData):", alunoProfileData);
+
+            // Verifique se o DTO contém o 'id' do aluno (que é o alunoId que precisamos)
+            if (alunoProfileData && alunoProfileData.id) {
+              await AsyncStorage.setItem('alunoId', alunoProfileData.id.toString());
+              console.log('4. alunoId salvo no AsyncStorage:', alunoProfileData.id);
+            } else {
+              Alert.alert('Erro', 'A resposta para o perfil do aluno está vazia ou incompleta (sem ID).');
+              console.warn('Resposta de /alunos/by-usuario/ não contém o ID do aluno.');
+            }
+          }
+        } catch (alunoError) {
+          console.error('Erro na segunda requisição para perfil de aluno (catch):', alunoError);
+          Alert.alert('Erro de Conexão', 'Não foi possível buscar o perfil do aluno. Verifique a API.');
+        }
+      } else if (userData.tipoUsuario === 'PROFESSOR') {
+        // Implemente lógica similar para buscar professorId se sua API tiver um endpoint para isso
+        try {
+            const professorProfileResponse = await fetch(`${API_BASE_URL}/professores/by-usuario/${userData.id}`, {
+                headers: { 'Content-Type': 'application/json' },
+            });
+            if (!professorProfileResponse.ok) {
+                const errorText = await professorProfileResponse.text();
+                console.error('Erro ao buscar perfil de professor:', professorProfileResponse.status, errorText);
+                Alert.alert('Erro', 'Não foi possível obter o perfil do professor.');
+            } else {
+                const professorProfileData = await professorProfileResponse.json();
+                if (professorProfileData && professorProfileData.id) { // Supondo que ProfessorResponseDTO também tem 'id'
+                    await AsyncStorage.setItem('professorId', professorProfileData.id.toString());
+                    console.log('professorId salvo no AsyncStorage:', professorProfileData.id);
+                } else {
+                    Alert.alert('Erro', 'A resposta para o perfil do professor está vazia ou incompleta.');
+                }
+            }
+        } catch (professorError) {
+            console.error('Erro na requisição para perfil de professor:', professorError);
+            Alert.alert('Erro de Conexão', 'Não foi possível buscar o perfil do professor.');
+        }
+      }
+
+      // Navega para a Dashboard (que agora é única e se adapta ao tipo de usuário)
+      navigation.navigate('Dashboard');
+
     } catch (error) {
-      Alert.alert('Erro de Armazenamento', 'Não foi possível salvar os dados do usuário. Tente novamente.');
-      console.error('Erro ao salvar no AsyncStorage:', error);
+      console.error('Erro geral no login ou AsyncStorage:', error);
+      Alert.alert('Erro de Conexão', 'Não foi possível conectar ao servidor. Verifique sua internet ou o endereço da API.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -89,8 +133,12 @@ export default function Login({ navigation }) {
         onChangeText={setSenha}
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Entrar</Text>
+      <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Entrar</Text>
+        )}
       </TouchableOpacity>
     </View>
   );
