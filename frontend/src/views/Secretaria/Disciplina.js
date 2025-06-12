@@ -7,22 +7,24 @@ import {
     buscarDisciplinas, 
     excluirDisciplina, 
     cadastrarDisciplina, 
-    atualizarDisciplina 
+    atualizarDisciplina,
+    listarProfessoresDaDisciplina 
 } from "../../services/ApiService";
-import { FaEdit, FaTrash, FaArrowLeft, FaPlus, FaEye, FaAddressCard } from "react-icons/fa";
+import { FaEdit, FaTrash, FaArrowLeft, FaPlus, FaEye } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 export default function Disciplina() {
   const [nomeFiltro, setNomeFiltro] = useState("");
-  const [descricaoFiltro, setDescricaoFiltro] = useState("");
   const [disciplinas, setDisciplinas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [erroApi, setErroApi] = useState("");
-
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const [disciplinaParaEditar, setDisciplinaParaEditar] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [disciplinaDetalhes, setDisciplinaDetalhes] = useState(null);
+ const [professoresDaDisciplina, setProfessoresDaDisciplina] = useState([]);
 
   const navigate = useNavigate();
 
@@ -54,13 +56,30 @@ export default function Disciplina() {
     setDisciplinaParaEditar(disciplina);
     setShowEditModal(true);
   };
+  
+ const handleOpenDetailModal = async (disciplina) => {
+    setDisciplinaDetalhes(disciplina);
+    try {
+      const professores = await listarProfessoresDaDisciplina(disciplina.id);
+      console.log("Professores recebidos:", professores);
+      setProfessoresDaDisciplina(professores || []);
+       
 
-  const handleCloseModals = () => {
-    setShowCreateModal(false);
-    setShowEditModal(false);
-    setDisciplinaParaEditar(null); 
-    setErroApi(""); 
+    } catch (error) {
+      console.error("Erro ao buscar professores da disciplina:", error);
+      setProfessoresDaDisciplina([]);
+    }
+    setShowDetailModal(true);
   };
+
+const handleCloseModals = () => {
+  setShowCreateModal(false);
+  setShowEditModal(false);
+  setShowDetailModal(false);
+  setDisciplinaParaEditar(null);
+  setErroApi("");
+  setProfessoresDaDisciplina([]); // limpa professores
+};
 
   const handleSaveDisciplina = async (disciplinaData) => {
     setSaving(true);
@@ -101,8 +120,8 @@ export default function Disciplina() {
 
   const disciplinasFiltradas = disciplinas.filter(
     (d) =>
-      (d.nome?.toLowerCase() || "").includes(nomeFiltro.toLowerCase()) &&
-      (d.descricao?.toLowerCase() || "").includes(descricaoFiltro.toLowerCase())
+      (d.nome?.toLowerCase() || "").includes(nomeFiltro.toLowerCase()) 
+      
   );
 
   if (loading && !showCreateModal && !showEditModal) {
@@ -125,6 +144,7 @@ export default function Disciplina() {
           <div className="voltar-seta" onClick={() => navigate(-1)} title="Voltar">
             <FaArrowLeft />
           </div>
+          
           <h2>Gerenciamento de Disciplinas</h2>
           <div className="disciplina-filtros">
             <input
@@ -143,7 +163,7 @@ export default function Disciplina() {
           </div>
         </div>
 
-        {erroApi && !showCreateModal && !showEditModal && <p className="error-message">{erroApi}</p>} 
+        {erroApi && !showCreateModal && !showEditModal &&  <p className="error-message">{erroApi}</p>} 
         <div className="disciplina-lista">
           
           {disciplinasFiltradas.length === 0 && !loading ? (
@@ -157,8 +177,7 @@ export default function Disciplina() {
                     <span><strong>Descrição:</strong> {disciplina.descricao || "Sem descrição"}</span>
                   </div>
                   <div className="disciplina-acoes">
-                  <button onClick={() =>
-                   navigate(`/secretaria/disciplina/detalhes/${disciplina.id}`)}
+                  <button onClick={() => handleOpenDetailModal(disciplina)}
                    className="btn-action btn-view"
                    title="Ver Detalhes e Gerenciar">
                     <FaEye />
@@ -179,7 +198,7 @@ export default function Disciplina() {
           )}
         </div>
       </div>
-
+    
       <Modal 
         isOpen={showCreateModal} 
         onClose={handleCloseModals} 
@@ -208,6 +227,33 @@ export default function Disciplina() {
         )}
         {saving === false && erroApi && showEditModal && <p className="error-message" style={{marginTop: '15px'}}>{erroApi}</p>}
       </Modal>
+      <Modal 
+        isOpen={showDetailModal} 
+        onClose={() => setShowDetailModal(false)} 
+        title={` ${disciplinaDetalhes?.nome || ''}`}
+        className="modal-detail-disciplina"
+      >
+        {disciplinaDetalhes ? (
+          <div className="modal-detail-disciplina-conteudo">
+            <p><strong>Descrição:</strong> {disciplinaDetalhes.descricao || "Sem descrição"}</p>
+      
+            <div style={{ marginTop: "20px" }}>
+              <h3>Professores:</h3>
+              {professoresDaDisciplina.length > 0 ? (
+              <ul>
+            {professoresDaDisciplina && professoresDaDisciplina.map((prof) => (
+              <li key={prof.id}>{prof.nomeUsuario}</li>
+            ))}
+          </ul>
+            ) : (
+              <p style={{ marginLeft: "10px" }}>Nenhum professor associado.</p>
+            )}
+            </div>
+            </div>
+          ) : (
+            <p>Carregando dados...</p>
+          )}
+  </Modal>
     </>
   );
 }

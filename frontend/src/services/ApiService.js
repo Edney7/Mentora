@@ -228,12 +228,13 @@ export const listarDisciplinasDoProfessor = async (professorId) => {
 export const listarProfessoresDaDisciplina = async (disciplinaId) => {
     try{
     const response = await api.get(`professores/disciplinas/${disciplinaId}/professores`);
+    console.log("Response da API:", response.data);
     return response.data;
     } catch (error) {
         console.error("Erro na API ao listar professores da disciplina:", error);
-        throw error; // Re-lança o erro para ser tratado no componente
-    } //nao vou usar ela
-}; ///modifcar essa parte
+        throw error; 
+    } //vou usar ela
+}; 
 
 export const vincularDisciplinaEProfessorNaTurma = async (turmaId, disciplinaId, professorId) => {
     const response = await api.post(`/turma-disciplina-professor`, { // Use a rota do seu novo controller
