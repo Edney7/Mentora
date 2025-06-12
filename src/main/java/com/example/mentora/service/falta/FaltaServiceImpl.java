@@ -1,10 +1,12 @@
-package com.example.mentora.service.falta; // Ou o seu pacote de serviços
+package com.example.mentora.service.falta;
 
+import com.example.mentora.dto.falta.AlunoFaltasResumoDTO; // NOVO IMPORT
+import com.example.mentora.dto.falta.FaltasPorDisciplinaDTO; // NOVO IMPORT
 import com.example.mentora.dto.falta.FaltaCreateDTO;
 import com.example.mentora.dto.falta.FaltaJustificativaDTO;
 import com.example.mentora.dto.falta.FaltaResponseDTO;
-import com.example.mentora.model.*; // Importar Aluno, Disciplina, Professor, Falta, Usuario, Turma
-import com.example.mentora.repository.*; // Importar todos os repositórios necessários
+import com.example.mentora.model.*;
+import com.example.mentora.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,7 +28,6 @@ public class FaltaServiceImpl implements FaltaService {
     private final AlunoRepository alunoRepository;
     private final DisciplinaRepository disciplinaRepository;
     private final ProfessorRepository professorRepository;
-    // Repositórios adicionais para validações de negócio
     private final TurmaDisciplinaRepository turmaDisciplinaRepository;
     private final ProfessorDisciplinaRepository professorDisciplinaRepository;
 
@@ -70,25 +72,21 @@ public class FaltaServiceImpl implements FaltaService {
                 });
 
         // 2. Validações de Negócio
-        // 2.1 Verificar se o aluno (via utilizador) está ativo
         if (aluno.getUsuario() == null || !aluno.getUsuario().getAtivo()) {
             log.warn("Tentativa de registar falta para aluno (Utilizador ID {}) inativo.", aluno.getUsuario() != null ? aluno.getUsuario().getId() : "N/A");
             throw new RuntimeException("Não é possível registar falta para um aluno inativo.");
         }
 
-        // 2.2 Verificar se o professor (via utilizador) está ativo
         if (professor.getUsuario() == null || !professor.getUsuario().getAtivo()) {
             log.warn("Tentativa de registo de falta por professor (Utilizador ID {}) inativo.", professor.getUsuario() != null ? professor.getUsuario().getId() : "N/A");
             throw new RuntimeException("Professor inativo não pode registar faltas.");
         }
 
-        // 2.3 Verificar se já existe uma falta para este aluno, nesta disciplina, nesta data
         if (faltaRepository.existsByAlunoIdAndDisciplinaIdAndDataFalta(aluno.getId(), disciplina.getId(), dto.getDataFalta())) {
             log.warn("Já existe uma falta registada para o aluno ID {}, disciplina ID {} na data {}.", aluno.getId(), disciplina.getId(), dto.getDataFalta());
             throw new RuntimeException("Já existe uma falta registada para este aluno nesta disciplina e data.");
         }
 
-        // 2.4 Verificar se a disciplina está associada à turma do aluno
         Turma turmaDoAluno = aluno.getTurma();
         if (turmaDoAluno == null) {
             log.warn("Aluno ID {} não está associado a nenhuma turma.", aluno.getId());
@@ -104,7 +102,6 @@ public class FaltaServiceImpl implements FaltaService {
                     " não pertence à turma do aluno ID " + aluno.getId() + ".");
         }
 
-        // 2.5 Verificar se o professor está associado a esta disciplina
         boolean professorLecionaDisciplina = professorDisciplinaRepository.findByProfessorId(professor.getId())
                 .stream()
                 .anyMatch(pd -> pd.getDisciplina().getId().equals(disciplina.getId()));
@@ -121,7 +118,7 @@ public class FaltaServiceImpl implements FaltaService {
         falta.setDisciplina(disciplina);
         falta.setProfessor(professor);
         falta.setDataFalta(dto.getDataFalta());
-        falta.setJustificada(false); // Faltas são criadas como não justificadas por defeito
+        falta.setJustificada(false);
 
         Falta faltaSalva = faltaRepository.save(falta);
         log.info("Falta ID {} registada com sucesso para aluno ID {}, disciplina ID {}, data {}, por professor ID {}.",
@@ -139,9 +136,6 @@ public class FaltaServiceImpl implements FaltaService {
                     log.warn("Falta com ID {} não encontrada para justificação.", faltaId);
                     return new RuntimeException("Falta com ID " + faltaId + " não encontrada.");
                 });
-
-        // Validação adicional: Quem pode justificar? (Ex: Professor que lançou, ou Secretaria)
-        // Esta lógica de permissão seria mais complexa e envolveria o utilizador autenticado.
 
         falta.setJustificada(true);
         falta.setDescricaoJustificativa(dto.getDescricaoJustificativa());
@@ -162,6 +156,8 @@ public class FaltaServiceImpl implements FaltaService {
                 });
         return toFaltaResponseDTO(falta);
     }
+
+    @Override
     public List<FaltaResponseDTO> listarTodasFaltas() {
         List<Falta> faltas = faltaRepository.findAll();
         return faltas.stream().map(this::toFaltaResponseDTO).toList();
@@ -176,7 +172,7 @@ public class FaltaServiceImpl implements FaltaService {
 
         if (aluno.getUsuario() == null || !aluno.getUsuario().getAtivo()) {
             log.warn("Tentativa de listar faltas para aluno (Utilizador ID {}) inativo ou sem utilizador.", aluno.getUsuario() != null ? aluno.getUsuario().getId() : "N/A");
-            return Collections.emptyList(); // Ou lançar exceção
+            return Collections.emptyList();
         }
 
         List<Falta> faltas = faltaRepository.findByAlunoId(alunoId);
@@ -191,7 +187,7 @@ public class FaltaServiceImpl implements FaltaService {
                 .orElseThrow(() -> new RuntimeException("Aluno com ID " + alunoId + " não encontrado."));
         if (aluno.getUsuario() == null || !aluno.getUsuario().getAtivo()) {
             log.warn("Tentativa de listar faltas para aluno (Utilizador ID {}) inativo ou sem utilizador.", aluno.getUsuario() != null ? aluno.getUsuario().getId() : "N/A");
-            return Collections.emptyList(); // Ou lançar exceção
+            return Collections.emptyList();
         }
         if (!disciplinaRepository.existsById(disciplinaId)) {
             throw new RuntimeException("Disciplina com ID " + disciplinaId + " não encontrada.");
@@ -209,7 +205,7 @@ public class FaltaServiceImpl implements FaltaService {
                 .orElseThrow(() -> new RuntimeException("Professor com ID " + professorId + " não encontrado."));
         if (professor.getUsuario() == null || !professor.getUsuario().getAtivo()) {
             log.warn("Tentativa de listar faltas para professor (Utilizador ID {}) inativo ou sem utilizador.", professor.getUsuario() != null ? professor.getUsuario().getId() : "N/A");
-            return Collections.emptyList(); // Ou lançar exceção
+            return Collections.emptyList();
         }
 
         List<Falta> faltas = faltaRepository.findByProfessorId(professorId);
@@ -232,10 +228,87 @@ public class FaltaServiceImpl implements FaltaService {
             log.warn("Falta com ID {} não encontrada para exclusão.", faltaId);
             throw new RuntimeException("Falta com ID " + faltaId + " não encontrada para exclusão.");
         }
-        // Adicionar lógica de permissão aqui: Quem pode excluir uma falta?
-        // Ex: apenas o professor que a lançou ou um administrador/secretaria.
         faltaRepository.deleteById(faltaId);
         log.info("Falta ID {} excluída com sucesso.", faltaId);
+    }
+
+    // --- NOVO MÉTODO PARA RESUMO DE FALTAS ---
+    @Override
+    @Transactional(readOnly = true)
+    public AlunoFaltasResumoDTO buscarResumoFaltasPorAluno(Long alunoId) {
+        log.debug("A buscar resumo de faltas para o aluno ID: {}", alunoId);
+        Aluno aluno = alunoRepository.findById(alunoId)
+                .orElseThrow(() -> {
+                    log.warn("Aluno com ID {} não encontrado ao buscar resumo de faltas.", alunoId);
+                    return new RuntimeException("Aluno com ID " + alunoId + " não encontrado.");
+                });
+
+        // Opcional: Verificar se o aluno está ativo
+        if (aluno.getUsuario() == null || !aluno.getUsuario().getAtivo()) {
+            log.warn("Tentativa de buscar resumo de faltas para aluno (Utilizador ID {}) inativo ou sem utilizador.", aluno.getUsuario() != null ? aluno.getUsuario().getId() : "N/A");
+            // Decida se você quer lançar uma exceção ou retornar um resumo vazio/nulo
+            return AlunoFaltasResumoDTO.builder()
+                    .alunoId(alunoId)
+                    .nomeAluno(aluno.getUsuario() != null ? aluno.getUsuario().getNome() : "Desconhecido")
+                    .totalFaltas(0)
+                    .faltasPorDisciplina(Collections.emptyList())
+                    .aulasAssistidas(0) // Ou null
+                    .totalAulas(0)     // Ou null
+                    .build();
+        }
+
+        List<Falta> faltasDoAluno = faltaRepository.findByAlunoId(alunoId);
+
+        // 1. Calcular Total de Faltas
+        int totalFaltas = faltasDoAluno.size();
+
+        // 2. Agrupar Faltas por Disciplina
+        Map<String, Long> faltasPorDisciplinaMap = faltasDoAluno.stream()
+                .filter(falta -> falta.getDisciplina() != null) // Garante que a disciplina não é nula
+                .collect(Collectors.groupingBy(
+                        falta -> falta.getDisciplina().getNome(),
+                        Collectors.counting()
+                ));
+
+        List<FaltasPorDisciplinaDTO> faltasPorDisciplinaDTOs = faltasPorDisciplinaMap.entrySet().stream()
+                .map(entry -> FaltasPorDisciplinaDTO.builder()
+                        // Não temos o disciplinaId diretamente aqui, pois agrupamos pelo nome.
+                        // Se você precisar do ID, precisará ajustar a lógica de agrupamento
+                        // ou fazer uma busca adicional pela disciplina.
+                        .nomeDisciplina(entry.getKey())
+                        .faltas(entry.getValue().intValue())
+                        .build())
+                .collect(Collectors.toList());
+
+        // 3. TODO: Implementar a lógica para 'aulasAssistidas' e 'totalAulas'
+        // Isso dependerá de como você modela as aulas e a presença no seu sistema.
+        // Por agora, eles estão com valores padrão (0 ou null).
+        // Exemplo:
+        // Integer aulasAssistidas = 0; // Busque este valor de algum lugar (ex: tabela de presenças)
+        // Integer totalAulas = 0;     // Busque este valor de algum lugar (ex: tabela de aulas da turma)
+
+        // Se você tiver uma tabela de 'Presenca' ou 'Aula' relacionadas à Turma/Disciplina,
+        // você precisaria injetar os repositórios correspondentes aqui (ex: AulaRepository, PresencaRepository)
+        // e fazer as consultas.
+        // Por exemplo:
+        // long totalAulasDaTurma = aulaRepository.countByTurmaId(aluno.getTurma().getId());
+        // long presencasDoAluno = presencaRepository.countByAlunoId(alunoId);
+        // aulasAssistidas = (int) presencasDoAluno;
+        // totalAulas = (int) totalAulasDaTurma;
+        // Lembre-se de que cada disciplina tem seu próprio total de aulas e presenças.
+        // O "aulasAssistidas" e "totalAulas" no resumo do aluno podem ser um total geral,
+        // ou você pode considerar remover esses campos do AlunoFaltasResumoDTO e tratá-los
+        // por disciplina se a granularidade for necessária.
+        // Para a sua tela, "AULAS ASSISTIDAS" parece ser um total geral.
+
+        return AlunoFaltasResumoDTO.builder()
+                .alunoId(alunoId)
+                .nomeAluno(aluno.getUsuario().getNome()) // Assumindo que Aluno tem um Usuario associado
+                .totalFaltas(totalFaltas)
+                .faltasPorDisciplina(faltasPorDisciplinaDTOs)
+                .aulasAssistidas(0) // Valor padrão
+                .totalAulas(0)     // Valor padrão
+                .build();
     }
 
     // Método auxiliar para converter uma entidade Falta para FaltaResponseDTO.

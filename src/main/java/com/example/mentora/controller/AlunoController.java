@@ -3,6 +3,7 @@ package com.example.mentora.controller;
 import com.example.mentora.dto.aluno.AlunoResponseDTO;
 import com.example.mentora.service.aluno.AlunoService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,9 +50,12 @@ public class AlunoController {
         return ResponseEntity.ok(aluno);
     }
 
-    // Outros endpoints para gerenciamento específico de perfis de Aluno podem ser adicionados aqui,
-    // como por exemplo, para atualizar informações que são exclusivas do perfil Aluno
-    // (e não do Usuário base), ou para obter detalhes específicos de um aluno.
-    // A criação e desativação (soft delete) do aluno agora são gerenciadas através
-    // do UsuarioController e UsuarioService, pois o perfil Aluno está atrelado ao Usuário.
+    @Operation(summary = "Buscar perfil de aluno pelo ID do Usuário associado",
+            description = "Retorna os dados do perfil de aluno (incluindo seu ID) a partir do ID do usuário logado.")
+    @GetMapping("/by-usuario/{usuarioId}") // A rota que o frontend vai chamar
+    public ResponseEntity<AlunoResponseDTO> buscarAlunoByUsuarioId(
+            @Parameter(description = "ID do usuário associado ao aluno") @PathVariable Long usuarioId) {
+        AlunoResponseDTO aluno = alunoService.buscarAlunoByUsuarioId(usuarioId);
+        return ResponseEntity.ok(aluno);
+    }
 }
