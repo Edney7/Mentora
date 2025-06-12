@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import "../../styles/secretaria/ListaUsuario.css";
+import "../../styles/secretaria/Turma.css";
 import Navbar from "../../components/Navbar";
 import Modal from "../../components/Modal";
 import TurmaForm from "../../components/TurmaForm";
@@ -193,7 +193,7 @@ export default function ListaTurmas() {
     return (
       <>
         <Navbar />
-        <div className="usuarios-container">
+        <div className="turmas-container">
           <p>Carregando turmas...</p>
         </div>
       </>
@@ -203,8 +203,8 @@ export default function ListaTurmas() {
   return (
     <>
       <Navbar />
-      <div className="usuarios-container">
-        <div className="usuarios-header">
+      <div className="turmas-container">
+        <div className="turmas-header">
           <div
             className="voltar-seta"
             onClick={() => navigate(-1)}
@@ -213,29 +213,39 @@ export default function ListaTurmas() {
             <FaArrowLeft />
           </div>
           <h2>Gerenciamento de Turmas</h2>
-          <button
-            onClick={handleOpenCreateModal}
-            className="btn-add"
-            title="Adicionar Nova Turma"
-          >
-            <FaPlus /> Cadastrar Turma
-          </button>
         </div>
 
         {erro && !showCreateModal && !showEditModal && (
           <p className="error-message">{erro}</p>
         )}
 
-        <div className="usuarios-filtros">
+        <div className="turmas-filtros">
           <input
             type="text"
             placeholder="Nome da Turma"
             value={nomeFiltro}
             onChange={(e) => setNomeFiltro(e.target.value)}
+            className="turmas-filtro nome"
+          />
+
+          <input
+            type="text"
+            placeholder="Série/Ano"
+            value={serieAnoFiltro}
+            onChange={(e) => setSerieAnoFiltro(e.target.value)}
+            className="turmas-filtro pequeno"
+          />
+          <input
+            type="text"
+            placeholder="Ano Letivo"
+            value={anoLetivoFiltro}
+            onChange={(e) => setAnoLetivoFiltro(e.target.value)}
+            className="turmas-filtro pequeno"
           />
           <select
             value={turnoFiltro}
             onChange={(e) => setTurnoFiltro(e.target.value)}
+            className="turmas-filtro select"
           >
             <option value="">Todos os Turnos</option>
             <option value="Manhã">Manhã</option>
@@ -243,43 +253,39 @@ export default function ListaTurmas() {
             <option value="Noite">Noite</option>
             <option value="Integral">Integral</option>
           </select>
-          <input
-            type="text"
-            placeholder="Série/Ano"
-            value={serieAnoFiltro}
-            onChange={(e) => setSerieAnoFiltro(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Ano Letivo"
-            value={anoLetivoFiltro}
-            onChange={(e) => setAnoLetivoFiltro(e.target.value)}
-          />
           <select
             value={statusFiltro}
             onChange={(e) => setStatusFiltro(e.target.value)}
+            className="turmas-filtro select"
           >
             <option value="ATIVAS">Apenas Ativas</option>
             <option value="INATIVAS">Apenas Inativas</option>
             <option value="TODAS">Todas</option>
           </select>
+          <button
+            onClick={handleOpenCreateModal}
+            className="btn-turmas"
+            title="Adicionar Nova Turma"
+          >
+            <FaPlus />
+          </button>
         </div>
 
-        <div className="usuarios-lista">
+        <div className="turmas-lista">
           {turmasExibidas.length === 0 && !loading ? (
-            <p className="sem-usuarios">
+            <p className="sem-turmas">
               Nenhuma turma encontrada com os filtros aplicados.
             </p>
           ) : (
             turmasExibidas.map((turma) => (
-              <div className="usuario-row" key={turma.id}>
+              <div className="turmas-row" key={turma.id}>
                 <div
-                  className={`usuario-borda ${
+                  className={`turmas-borda ${
                     turma.ativa ? "turma-ativa" : "turma-inativa"
                   }`}
                 ></div>
-                <div className="usuario-conteudo">
-                  <div className="usuario-info">
+                <div className="turmas-conteudo">
+                  <div className="turmas-info">
                     <span>
                       <strong>Nome:</strong> {turma.nome}
                     </span>
@@ -303,7 +309,7 @@ export default function ListaTurmas() {
                       </span>
                     </span>
                   </div>
-                  <div className="usuario-acoes">
+                  <div className="turmas-acoes">
                     <button
                       onClick={() =>
                         navigate(`/secretaria/turmas/detalhes/${turma.id}`)

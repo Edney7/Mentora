@@ -1,0 +1,136 @@
+/* Reset */
+.turmas-container {
+    padding: 20px;
+    font-family: "Segoe UI", sans-serif;
+}
+
+.turmas-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.turmas-header h2 {
+    color: #004e64;
+    margin-bottom: 10px;
+}
+
+.turmas-filtros {
+    display: flex;
+    gap: 10px;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.turmas-filtro {
+    height: 38px;
+    padding: 0 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+.turmas-filtro.nome {
+    width: 300px;
+}
+
+.turmas-filtro.pequeno {
+    width: 130px;
+}
+
+.turmas-filtro.select {
+    width: 165px;
+}
+
+.btn-turmas {
+    background-color: #07718e;
+    color: white;
+    font-size: 20px;
+    border: none;
+    border-radius: 5px;
+    width: 50px;
+    height: 47px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-add:hover {
+    background-color: #00748d;
+}
+
+.turmas-lista {
+     background-color: #eaf3f7;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 0 350px 0 350px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  max-height: 490px;
+}
+
+.turmas-row {
+    display: flex;
+    border-bottom: 1px solid #eee;
+    padding: 2px;
+}
+
+.turmas-borda {
+    width: 8px;
+    border-radius: 4px 0 0 4px;
+}
+
+.turmas-conteudo {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border-radius: 8px;
+    padding: 1rem;
+    flex: 1;
+}
+
+.turmas-info {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 2fr 1fr 1fr;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+}
+
+.turmas-info span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.turmas-acoes {
+    display: flex;
+    gap: 0.75rem;
+    margin: 0 10px;
+}
+
+.turmas-acoes button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: #004e64;
+    transition: 0.2s;
+}
+
+.turmas-acoes button:hover {
+    color: #00bcd4;
+}
+
+.sem-turmas {
+    padding: 1rem;
+    text-align: center;
+    color: #777;
+}

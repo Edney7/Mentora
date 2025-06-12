@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useCallback } from "react";
-import "../../styles/secretaria/Disciplina.css"; 
+import "../../styles/secretaria/Disciplina.css";
 import Navbar from "../../components/Navbar";
 import Modal from "../../components/Modal";
-import DisciplinaForm from "../../components/DisciplinaForm"; 
-import { 
-    buscarDisciplinas, 
-    excluirDisciplina, 
-    cadastrarDisciplina, 
-    atualizarDisciplina,
-    listarProfessoresDaDisciplina 
+import DisciplinaForm from "../../components/DisciplinaForm";
+import {
+  buscarDisciplinas,
+  excluirDisciplina,
+  cadastrarDisciplina,
+  atualizarDisciplina,
+  listarProfessoresDaDisciplina,
 } from "../../services/ApiService";
 import { FaEdit, FaTrash, FaArrowLeft, FaPlus, FaEye } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -24,7 +24,7 @@ export default function Disciplina() {
   const [disciplinaParaEditar, setDisciplinaParaEditar] = useState(null);
   const [saving, setSaving] = useState(false);
   const [disciplinaDetalhes, setDisciplinaDetalhes] = useState(null);
- const [professoresDaDisciplina, setProfessoresDaDisciplina] = useState([]);
+  const [professoresDaDisciplina, setProfessoresDaDisciplina] = useState([]);
 
   const navigate = useNavigate();
 
@@ -36,7 +36,9 @@ export default function Disciplina() {
       setDisciplinas(data || []);
     } catch (error) {
       console.error("Erro ao buscar disciplinas:", error);
-      setErroApi("Falha ao carregar disciplinas. Verifique sua conexão e tente novamente.");
+      setErroApi(
+        "Falha ao carregar disciplinas. Verifique sua conexão e tente novamente."
+      );
       setDisciplinas([]);
     } finally {
       setLoading(false);
@@ -48,7 +50,7 @@ export default function Disciplina() {
   }, [carregarDisciplinas]);
 
   const handleOpenCreateModal = () => {
-    setDisciplinaParaEditar(null); 
+    setDisciplinaParaEditar(null);
     setShowCreateModal(true);
   };
 
@@ -56,15 +58,13 @@ export default function Disciplina() {
     setDisciplinaParaEditar(disciplina);
     setShowEditModal(true);
   };
-  
- const handleOpenDetailModal = async (disciplina) => {
+
+  const handleOpenDetailModal = async (disciplina) => {
     setDisciplinaDetalhes(disciplina);
     try {
       const professores = await listarProfessoresDaDisciplina(disciplina.id);
       console.log("Professores recebidos:", professores);
       setProfessoresDaDisciplina(professores || []);
-       
-
     } catch (error) {
       console.error("Erro ao buscar professores da disciplina:", error);
       setProfessoresDaDisciplina([]);
@@ -72,14 +72,14 @@ export default function Disciplina() {
     setShowDetailModal(true);
   };
 
-const handleCloseModals = () => {
-  setShowCreateModal(false);
-  setShowEditModal(false);
-  setShowDetailModal(false);
-  setDisciplinaParaEditar(null);
-  setErroApi("");
-  setProfessoresDaDisciplina([]); // limpa professores
-};
+  const handleCloseModals = () => {
+    setShowCreateModal(false);
+    setShowEditModal(false);
+    setShowDetailModal(false);
+    setDisciplinaParaEditar(null);
+    setErroApi("");
+    setProfessoresDaDisciplina([]); // limpa professores
+  };
 
   const handleSaveDisciplina = async (disciplinaData) => {
     setSaving(true);
@@ -93,35 +93,43 @@ const handleCloseModals = () => {
         alert("Disciplina cadastrada com sucesso!");
       }
       handleCloseModals();
-      carregarDisciplinas(); 
+      carregarDisciplinas();
     } catch (error) {
       console.error("Erro ao salvar disciplina:", error);
-      const errorMsg = error.response?.data?.message || error.message || "Erro desconhecido.";
-      setErroApi(`Erro ao salvar disciplina: ${errorMsg}`); 
-      return Promise.reject(error); 
+      const errorMsg =
+        error.response?.data?.message || error.message || "Erro desconhecido.";
+      setErroApi(`Erro ao salvar disciplina: ${errorMsg}`);
+      return Promise.reject(error);
     } finally {
       setSaving(false);
     }
   };
 
   const handleExcluir = async (id, nomeDisciplina) => {
-    if (window.confirm(`Tem certeza que deseja excluir a disciplina "${nomeDisciplina}"?`)) {
+    if (
+      window.confirm(
+        `Tem certeza que deseja excluir a disciplina "${nomeDisciplina}"?`
+      )
+    ) {
       try {
         await excluirDisciplina(id);
-        setDisciplinas(prevDisciplinas => prevDisciplinas.filter((d) => d.id !== id));
+        setDisciplinas((prevDisciplinas) =>
+          prevDisciplinas.filter((d) => d.id !== id)
+        );
         alert(`Disciplina "${nomeDisciplina}" excluída com sucesso!`);
       } catch (error) {
         console.error("Erro ao excluir disciplina:", error);
-        const errorMsg = error.response?.data?.message || error.message || "Erro desconhecido.";
+        const errorMsg =
+          error.response?.data?.message ||
+          error.message ||
+          "Erro desconhecido.";
         alert(`Erro ao excluir disciplina: ${errorMsg}`);
       }
     }
   };
 
-  const disciplinasFiltradas = disciplinas.filter(
-    (d) =>
-      (d.nome?.toLowerCase() || "").includes(nomeFiltro.toLowerCase()) 
-      
+  const disciplinasFiltradas = disciplinas.filter((d) =>
+    (d.nome?.toLowerCase() || "").includes(nomeFiltro.toLowerCase())
   );
 
   if (loading && !showCreateModal && !showEditModal) {
@@ -130,7 +138,6 @@ const handleCloseModals = () => {
         <Navbar />
         <div className="disciplina-container">
           <p>Carregando disciplinas...</p>
-          
         </div>
       </>
     );
@@ -141,10 +148,14 @@ const handleCloseModals = () => {
       <Navbar />
       <div className="disciplina-container">
         <div className="disciplina-header">
-          <div className="voltar-seta" onClick={() => navigate(-1)} title="Voltar">
+          <div
+            className="voltar-seta"
+            onClick={() => navigate(-1)}
+            title="Voltar"
+          >
             <FaArrowLeft />
           </div>
-          
+
           <h2>Gerenciamento de Disciplinas</h2>
           <div className="disciplina-filtros">
             <input
@@ -153,42 +164,58 @@ const handleCloseModals = () => {
               value={nomeFiltro}
               onChange={(e) => setNomeFiltro(e.target.value)}
             />
-            
-            <button 
-              onClick={handleOpenCreateModal} 
-              className="btn-disciplina" 
-              title="Adicionar Nova Disciplina">
+
+            <button
+              onClick={handleOpenCreateModal}
+              className="btn-disciplina"
+              title="Adicionar Nova Disciplina"
+            >
               <FaPlus />
             </button>
           </div>
         </div>
 
-        {erroApi && !showCreateModal && !showEditModal &&  <p className="error-message">{erroApi}</p>} 
+        {erroApi && !showCreateModal && !showEditModal && (
+          <p className="error-message">{erroApi}</p>
+        )}
         <div className="disciplina-lista">
-          
           {disciplinasFiltradas.length === 0 && !loading ? (
-            <p className="sem-disciplina">Nenhuma disciplina encontrada com os filtros aplicados.</p>
+            <p className="sem-disciplina">
+              Nenhuma disciplina encontrada com os filtros aplicados.
+            </p>
           ) : (
             disciplinasFiltradas.map((disciplina) => (
               <div className="disciplina-row" key={disciplina.id}>
                 <div className="disciplina-conteudo">
                   <div className="disciplina-info">
-                    <span><strong>Nome:</strong> {disciplina.nome}</span>
-                    <span><strong>Descrição:</strong> {disciplina.descricao || "Sem descrição"}</span>
+                    <span>
+                      <strong>Nome:</strong> {disciplina.nome}
+                    </span>
+                    <span>
+                      <strong>Descrição:</strong>{" "}
+                      {disciplina.descricao || "Sem descrição"}
+                    </span>
                   </div>
                   <div className="disciplina-acoes">
-                  <button onClick={() => handleOpenDetailModal(disciplina)}
-                   className="btn-action btn-view"
-                   title="Ver Detalhes e Gerenciar">
-                    <FaEye />
-                    </button>         
-                    <button 
+                    <button
+                      onClick={() => handleOpenDetailModal(disciplina)}
+                      className="btn-action btn-view"
+                      title="Ver Detalhes e Gerenciar"
+                    >
+                      <FaEye />
+                    </button>
+                    <button
                       onClick={() => handleOpenEditModal(disciplina)}
                       title="Editar Disciplina"
                     >
                       <FaEdit />
                     </button>
-                    <button onClick={() => handleExcluir(disciplina.id, disciplina.nome)} title="Excluir Disciplina">
+                    <button
+                      onClick={() =>
+                        handleExcluir(disciplina.id, disciplina.nome)
+                      }
+                      title="Excluir Disciplina"
+                    >
                       <FaTrash />
                     </button>
                   </div>
@@ -198,62 +225,76 @@ const handleCloseModals = () => {
           )}
         </div>
       </div>
-    
-      <Modal 
-        isOpen={showCreateModal} 
-        onClose={handleCloseModals} 
+
+      <Modal
+        isOpen={showCreateModal}
+        onClose={handleCloseModals}
         title="Cadastrar Nova Disciplina"
       >
-        <DisciplinaForm 
-          onSubmit={handleSaveDisciplina} 
+        <DisciplinaForm
+          onSubmit={handleSaveDisciplina}
           onClose={handleCloseModals}
-          isEditing={false} 
+          isEditing={false}
         />
-        {saving === false && erroApi && showCreateModal && <p className="error-message" style={{marginTop: '15px'}}>{erroApi}</p>}
+        {saving === false && erroApi && showCreateModal && (
+          <p className="error-message" style={{ marginTop: "15px" }}>
+            {erroApi}
+          </p>
+        )}
       </Modal>
 
-      <Modal 
-        isOpen={showEditModal} 
-        onClose={handleCloseModals} 
-        title={`Editar Disciplina: ${disciplinaParaEditar?.nome || ''}`}
+      <Modal
+        isOpen={showEditModal}
+        onClose={handleCloseModals}
+        title={`Editar Disciplina: ${disciplinaParaEditar?.nome || ""}`}
       >
-        {disciplinaParaEditar && ( 
-          <DisciplinaForm 
-            onSubmit={handleSaveDisciplina} 
+        {disciplinaParaEditar && (
+          <DisciplinaForm
+            onSubmit={handleSaveDisciplina}
             onClose={handleCloseModals}
             initialData={disciplinaParaEditar}
             isEditing={true}
           />
         )}
-        {saving === false && erroApi && showEditModal && <p className="error-message" style={{marginTop: '15px'}}>{erroApi}</p>}
+        {saving === false && erroApi && showEditModal && (
+          <p className="error-message" style={{ marginTop: "15px" }}>
+            {erroApi}
+          </p>
+        )}
       </Modal>
-      <Modal 
-        isOpen={showDetailModal} 
-        onClose={() => setShowDetailModal(false)} 
-        title={` ${disciplinaDetalhes?.nome || ''}`}
+      <Modal
+        isOpen={showDetailModal}
+        onClose={() => setShowDetailModal(false)}
+        title={` ${disciplinaDetalhes?.nome || ""}`}
         className="modal-detail-disciplina"
       >
         {disciplinaDetalhes ? (
           <div className="modal-detail-disciplina-conteudo">
-            <p><strong>Descrição:</strong> {disciplinaDetalhes.descricao || "Sem descrição"}</p>
-      
+            <p>
+              <strong>Descrição:</strong>{" "}
+              {disciplinaDetalhes.descricao || "Sem descrição"}
+            </p>
+
             <div style={{ marginTop: "20px" }}>
               <h3>Professores:</h3>
               {professoresDaDisciplina.length > 0 ? (
-              <ul>
-            {professoresDaDisciplina && professoresDaDisciplina.map((prof) => (
-              <li key={prof.id}>{prof.nomeUsuario}</li>
-            ))}
-          </ul>
-            ) : (
-              <p style={{ marginLeft: "10px" }}>Nenhum professor associado.</p>
-            )}
+                <ul>
+                  {professoresDaDisciplina &&
+                    professoresDaDisciplina.map((prof) => (
+                      <li key={prof.id}>{prof.nomeUsuario}</li>
+                    ))}
+                </ul>
+              ) : (
+                <p style={{ marginLeft: "10px" }}>
+                  Nenhum professor associado.
+                </p>
+              )}
             </div>
-            </div>
-          ) : (
-            <p>Carregando dados...</p>
-          )}
-  </Modal>
+          </div>
+        ) : (
+          <p>Carregando dados...</p>
+        )}
+      </Modal>
     </>
   );
 }
