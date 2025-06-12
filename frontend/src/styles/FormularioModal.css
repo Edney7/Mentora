@@ -83,3 +83,113 @@
   border-radius: 4px;
   font-size: 0.9rem;
 }
+
+/* Turma */
+/* FormularioModal.css */
+
+.form-turma {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 600px;
+  margin: auto;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.label-grid {
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+}
+.label-nome{
+ margin-bottom: auto;
+ color: #333;
+ font-weight: 600;
+}
+.form-group input,
+.form-group select {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.grid-turma {
+  display: grid;
+  grid-template-columns: 1fr 4fr;
+  gap: 15px 20px;
+  align-items: end;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espaço entre o texto e o checkbox */
+  font-weight: 500;
+  color: #555;
+  margin-top: 10px;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  margin-top: 15px;
+}
+.checkbox-label input{
+  margin-right: 50px;
+}
+.error-message {
+  color: #c0392b;
+  font-weight: bold;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.form-actions-modal {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn-salvar-modal {
+  padding: 10px 20px;
+  background-color: #007a99;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-salvar-modal:hover {
+  background-color: #005f73;
+}
+
+.btn-cancelar-modal {
+  padding: 10px 20px;
+  background-color: #bdc3c7;
+  color: #2c3e50;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-cancelar-modal:hover {
+  background-color: #95a5a6;
+}

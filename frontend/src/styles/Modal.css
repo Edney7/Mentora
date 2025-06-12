@@ -39,6 +39,7 @@
   margin: 0;
   font-size: 1.5rem;
   color: #333;
+  text-align: center;
 }
 
 .modal-close-btn {
@@ -54,4 +55,24 @@
 
 .modal-body {
   overflow-y: auto;
+}
+/* Turma */
+.modal-turma{
+  display: flex;
+  flex-direction: column;
+}
+.modal-turma-form input{
+  color: #016cdf;
+
+}
+
+/*  Disciplina */
+.modal-detail-disciplina-conteudo h3{
+  color: #016cdf;
+  font-size: 20px;
+}
+.modal-detail-disciplina-conteudo li{
+  color: #383839;
+  font-size: 17px;
+  padding-bottom: 5px;
 }

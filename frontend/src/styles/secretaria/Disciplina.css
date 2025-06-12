@@ -13,7 +13,7 @@
 .disciplina-header h2 {
   color: #004e64;
   margin-bottom: 10px;
-  
+
 }
 
 .disciplina-filtros {
@@ -21,13 +21,13 @@
   gap: 10px;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center; /* <- Alinha o botão com o input */
+  align-items: center;
 }
 
 .disciplina-filtros input {
   padding: 5px 10px;
   width: 500px;
-  height: 45px;
+  height: 35px;
   border-radius: 5px;
   border: 1px solid #ccc;
   font-size: 1rem;
@@ -39,20 +39,25 @@
   font-size: 20px;
   border: none;
   border-radius: 5px;
-  width: 50px;
-  height: 47px;  /* <- Igual ao height do input */
+  width: 45px;
+  height: 40px;
   cursor: pointer;
   transition: 0.3s;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 6px;
+}
+
+.btn-disciplina:hover {
+    background-color: #00bcd4;
 }
 
 .disciplina-lista {
   background-color: #eaf3f7;
   border-radius: 10px;
   padding: 15px;
-  margin: 0 350px 0 350px ;
+  margin: 0 350px 0 350px;
   display: flex;
   flex-direction: column;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
@@ -71,48 +76,36 @@
   border-radius: 4px 0 0 4px;
 }
 
-
-.disciplina-borda.professor {
-  background-color: #4db5ff;
-}
-
-.disciplina-borda.secretaria {
-  background-color: #0062c5;
-}
-
-.disciplina-borda.aluno {
-  background-color: #e6a23c;
-}
-
 .disciplina-conteudo {
   display: flex;
-  align-items:center;
+  align-items: center;
   background-color: white;
   border-radius: 8px;
   align-items: center;
   padding: 1rem;
   flex: 1;
-  
-} 
+
+}
 
 .disciplina-info {
   margin-left: 10px;
   display: grid;
-  grid-template-columns:  1fr 2fr;
+  grid-template-columns: 1fr 2fr;
   color: #004b64;
   gap: 1rem;
   flex: 1;
 }
 
 .disciplina-info span {
-  font-size:15px;
+  font-size: 15px;
   color: #333;
 }
 
 .disciplina-acoes {
   display: flex;
   gap: 0.75rem;
-  margin: 0 10px;;
+  margin: 0 10px;
+  ;
 }
 
 .disciplina-acoes button {

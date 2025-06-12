@@ -1,4 +1,3 @@
-// Sugestão de caminho: src/components/TurmaForm.jsx ou src/views/Secretaria/Turma/components/TurmaForm.jsx
 import React, { useState, useEffect } from 'react';
 import "../styles/FormularioModal.css";
 
@@ -45,25 +44,23 @@ const TurmaForm = ({ onSubmit, onClose, initialData, isEditing }) => {
   };
 
   return (
-    <form onSubmit={handleSubmitForm} className="form-disciplina"> 
+    <form onSubmit={handleSubmitForm} className="form-turma"> 
       {erroInterno && <p className="error-message" style={{marginBottom: '15px'}}>{erroInterno}</p>}
       
       <div className="form-group">
-        <label htmlFor="turma-nome-modal">Nome da Turma:</label>
+        <label htmlFor="turma-nome-modal" className='label-nome'>Nome da Turma:</label>
         <input
           type="text"
           id="turma-nome-modal"
-          placeholder="Ex: 1º Ano A - Matutino"
+          placeholder="Ex: 1º Ano A - Integral"
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           required
           minLength={3}
           maxLength={100}
         />
-      </div>
-      
-      <div className="form-group">
-        <label htmlFor="turma-turno-modal">Turno:</label>
+        <div className='grid-turma'>
+        <label htmlFor="turma-turno-modal" className='label-grid'>Turno:</label>
         <select 
             id="turma-turno-modal" 
             value={turno} 
@@ -75,22 +72,18 @@ const TurmaForm = ({ onSubmit, onClose, initialData, isEditing }) => {
           <option value="Noite">Noite</option>
           <option value="Integral">Integral</option>
         </select>
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="turma-serieAno-modal">Série/Ano:</label>
+    
+        <label htmlFor="turma-serieAno-modal" className='label-grid'>Série/Ano:</label>
         <input
           type="text"
           id="turma-serieAno-modal"
-          placeholder="Ex: 1º Ano, 9ª Série"
+          placeholder="Ex: 1º Ano"
           value={serieAno}
           onChange={(e) => setSerieAno(e.target.value)}
           required
         />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="turma-anoLetivo-modal">Ano Letivo:</label>
+      
+        <label htmlFor="turma-anoLetivo-modal" className='label-grid'>Ano Letivo:</label>
         <input
           type="number"
           id="turma-anoLetivo-modal"
@@ -99,19 +92,17 @@ const TurmaForm = ({ onSubmit, onClose, initialData, isEditing }) => {
           onChange={(e) => setAnoLetivo(e.target.value)}
           required
         />
-      </div>
-      
-      <div className="form-group">
+        </div>
         <label htmlFor="turma-ativa-modal" className="checkbox-label">
+          Turma Ativa
           <input
             type="checkbox"
             id="turma-ativa-modal"
             checked={ativa}
             onChange={(e) => setAtiva(e.target.checked)}
           />
-          Turma Ativa
+          
         </label>
-      </div>
       
       <div className="form-actions-modal" style={{marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '10px'}}>
         <button type="submit" className="btn-salvar-modal">
@@ -120,6 +111,7 @@ const TurmaForm = ({ onSubmit, onClose, initialData, isEditing }) => {
         <button type="button" onClick={onClose} className="btn-cancelar-modal secondary">
           Cancelar
         </button>
+      </div>
       </div>
     </form>
   );
