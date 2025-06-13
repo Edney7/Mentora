@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../styles/Login.css";
-import animacaoLogin from "../assets/animacaoLogin.png"; 
-import logo from "../assets/logo.png"; 
+import animacaoLogin from "../assets/animacaoLogin.png";
+import logo from "../assets/logo.png";
 import { loginUsuario } from "../services/ApiService";
 import { useNavigate } from "react-router-dom";
 //implementar o toast e verificar o regex
@@ -19,73 +19,78 @@ export default function Login() {
     return regex.test(email);
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  setErroEmail(null);
-  setErroSenha(null);
-  setErroLogin(null);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErroEmail(null);
+    setErroSenha(null);
+    setErroLogin(null);
 
-  let validar = true;
+    let validar = true;
 
-  if (!validarEmail(email)) {
-    setErroEmail("Email inválido");
-    validar = false;
-  }
-  if (senha.length < 6) {
-    setErroSenha("Senha deve ter no mínimo 6 caracteres");
-    validar = false;
-  }
-
-  if (!validar) return;
-
-  try {
-    const data = await loginUsuario(email, senha);
-
-    alert("Login efetuado com sucesso!");
-
-    switch (data.tipoUsuario.toUpperCase()) {
-      case "SECRETARIA":
-        navigate("/homeSecretaria");
-        break;
-      case "ALUNO":
-        navigate("/homeAluno");
-        break;
-      case "PROFESSOR":
-        navigate("/homeProfessor");
-        break;
-      default:
-        alert("Tipo de usuário inválido.");
-        break;
+    if (!validarEmail(email)) {
+      setErroEmail("Email inválido");
+      validar = false;
+    }
+    if (senha.length < 6) {
+      setErroSenha("Senha deve ter no mínimo 6 caracteres");
+      validar = false;
     }
 
-  } catch (error) {
-  console.error("Erro ao fazer login:", error);
+    if (!validar) return;
 
-  let mensagemErro = "Erro no login";
+    try {
+      const data = await loginUsuario(email, senha);
 
-  // Se a mensagem estiver dentro de error.response.data.message
-  if (typeof error.response?.data?.message === "string") {
-    mensagemErro = error.response.data.message;
-  }
+      alert("Login efetuado com sucesso!");
+      localStorage.setItem("idUsuario", data.id);
+      localStorage.setItem("tipoUsuario", data.tipoUsuario);
+      localStorage.setItem("usuario", JSON.stringify(data));
+      
+      switch (data.tipoUsuario.toUpperCase()) {
+        case "SECRETARIA":
+          navigate("/homeSecretaria");
+          break;
+        case "ALUNO":
+          navigate("/homeAluno");
+          break;
+        case "PROFESSOR":
+          navigate("/homeProfessor");
+          break;
+        default:
+          alert("Tipo de usuário inválido.");
+          break;
+      }
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
 
-  // Se error.response.data for uma string diretamente
-  else if (typeof error.response?.data === "string") {
-    mensagemErro = error.response.data;
-  }
+      let mensagemErro = "Erro no login";
 
-  // Se não encontrar nenhuma string, força string com JSON.stringify
-  else if (error.response?.data) {
-    mensagemErro = JSON.stringify(error.response.data);
-  }
+      // Se a mensagem estiver dentro de error.response.data.message
+      if (typeof error.response?.data?.message === "string") {
+        mensagemErro = error.response.data.message;
+      }
 
-  setErroLogin(mensagemErro);
-}
-};
+      // Se error.response.data for uma string diretamente
+      else if (typeof error.response?.data === "string") {
+        mensagemErro = error.response.data;
+      }
 
+      // Se não encontrar nenhuma string, força string com JSON.stringify
+      else if (error.response?.data) {
+        mensagemErro = JSON.stringify(error.response.data);
+      }
+
+      setErroLogin(mensagemErro);
+    }
+  };
 
   return (
     <div className="login-container">
-      <img src={animacaoLogin} alt="Estudante com livros" className="animacaoLogin" />
+      <img
+        src={animacaoLogin}
+        alt="Estudante com livros"
+        className="animacaoLogin"
+      />
 
       <div className="login-left"></div>
       <div className="login-right">
@@ -107,7 +112,8 @@ export default function Login() {
               placeholder="Senha"
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
-              required minLength={6}
+              required
+              minLength={6}
             />
             {erroSenha && <p style={{ color: "red" }}>{erroSenha}</p>}
 
@@ -117,10 +123,10 @@ export default function Login() {
 
             <button type="submit">ENTRAR</button>
             {erroLogin && (
-  <p style={{ color: "red", marginTop: "10px" }}>
-    {String(erroLogin)}
-  </p>
-)}
+              <p style={{ color: "red", marginTop: "10px" }}>
+                {String(erroLogin)}
+              </p>
+            )}
           </form>
         </div>
       </div>

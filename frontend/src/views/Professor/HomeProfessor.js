@@ -1,25 +1,17 @@
 import React, { useState } from "react";
-import "../../styles/professor/HomeProfessor.css"
+import "../../styles/professor/HomeProfessor.css";
 import Calendar from "../../components/Calendario";
 import { useNavigate } from "react-router-dom";
 
-import Navbar from "../../components/Navbar"; 
-
+import Navbar from "../../components/Navbar";
 
 export default function HomeProfessor() {
   const navigate = useNavigate();
 
-  const turmas = [
-    { id: 1, nome: "Turma 1", turno: "MANHÃ", serie: "3° SÉRIE" },
-    { id: 2, nome: "Turma 1", turno: "MANHÃ", serie: "3° SÉRIE" },
-    { id: 3, nome: "Turma 1", turno: "MANHÃ", serie: "3° SÉRIE" },
-    { id: 4, nome: "Turma 1", turno: "MANHÃ", serie: "3° SÉRIE" },
-  ];
-
   const [modalAberto, setModalAberto] = useState(false);
   const [descricao, setDescricao] = useState("");
   const [data, setData] = useState("");
-
+ const idUsuario = localStorage.getItem("idUsuario");
   const abrirModal = () => {
     setDescricao("");
     setData("");
@@ -37,6 +29,13 @@ export default function HomeProfessor() {
       <Navbar onLogout={() => console.log("Logout clicado")} />
       <div className="home-secretaria-container">
         <main className="main-content-turmas">
+          <div
+            className="ausencia-card"
+            onClick={abrirModal}
+            style={{ cursor: "pointer" }}
+          >
+            <h2>Ausência Planejada</h2>
+          </div>
           <div className="turmas-grid">
             {turmas.map((turma) => (
               <div
@@ -59,25 +58,26 @@ export default function HomeProfessor() {
               </div>
             ))}
           </div>
-
-          <div className="ausencia-card" onClick={abrirModal} style={{ cursor: "pointer" }}>
-            <h2>Ausência Planejada</h2>
-          </div>
         </main>
 
-        <section className="event-panel"> 
-          <div className="event-card branco"> 
-            <div className="calendar-container"> 
+        <section className="event-panel">
+          <div className="event-card branco">
+            <div className="calendar-container">
               <Calendar />
             </div>
           </div>
-          
+
           <div className="event-group">
             <div className="event-card verde">
               <span>Próximo Feriado</span>
               <span className="hora">xx/xx</span>
             </div>
-            <button className="event-card laranja" onClick={() => navigate("/secretaria/calendario/eventos/cadastrar")}>
+            <button
+              className="event-card laranja"
+              onClick={() =>
+                navigate("/secretaria/calendario/eventos/cadastrar")
+              }
+            >
               <h2>Cadastrar Eventos</h2>
             </button>
           </div>
@@ -86,14 +86,18 @@ export default function HomeProfessor() {
         {modalAberto && (
           <div className="modal-backdrop">
             <div className="modal">
-              <label><strong>Descrição</strong></label>
+              <label>
+                <strong>Descrição</strong>
+              </label>
               <textarea
                 rows={4}
                 value={descricao}
                 onChange={(e) => setDescricao(e.target.value)}
               />
 
-              <label><strong>Data</strong></label>
+              <label>
+                <strong>Data</strong>
+              </label>
               <input
                 type="date"
                 value={data}
