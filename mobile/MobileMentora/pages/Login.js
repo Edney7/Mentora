@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityInd
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // BASE_URL da sua API (Certifique-se de que esta URL está correta!)
-const API_BASE_URL = 'http://192.168.248.47:8080';
+const API_BASE_URL = 'http://192.168.226.113:8080';
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState('');

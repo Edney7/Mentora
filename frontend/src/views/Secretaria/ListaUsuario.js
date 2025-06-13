@@ -5,6 +5,7 @@ import {
   desativarUsuario,
   reativarUsuario,
 } from "../../services/ApiService";
+import "../../styles/secretaria/ListaUsuario.css"
 import { FaEdit, FaTrash, FaArrowLeft, FaPlus, FaRedo } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 

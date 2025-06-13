@@ -36,9 +36,13 @@
   color: #007bff;
   font-size: 20px;
 }
+.titulo-turma {/*usando*/
+  color: #1a1a1b;
+  font-size: 25px;
+}
 
 .item { /* input com dados usuarios*/
-  background: white;
+  background: rgb(255, 255, 255);
   border-radius: 6px;
   padding: 10px 12px;
   margin-top: 10px;
@@ -47,6 +51,33 @@
   justify-content: space-between;
   box-shadow: 0 1px 4px rgba(0,0,0,0.1);
   position: relative;
+}
+.tabela-disciplina {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.linha-cabecalho {
+  display: grid;
+  grid-template-columns: 1fr 1fr; 
+  align-items: center; 
+  font-weight: bold;
+  background-color: #2267e7;
+  color: #ffffff;
+  padding: 12px 16px;
+  border-radius: 8px;
+}
+
+.linha-disciplina {
+  display: grid;
+  grid-template-columns: 1fr 1fr; 
+  align-items: center;
+  background-color: #ffffff;
+  border: 1px solid #dbe9f5;
+  padding: 12px 16px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease-in-out;
 }
 
 .btn-trash {
