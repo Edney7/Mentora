@@ -83,8 +83,8 @@ public class TurmaServiceImpl implements TurmaService {
         return toTurmaResponseDTO(turma);
     }
 
-    @Override
     @Transactional(readOnly = true)
+    @Override
     public List<TurmaResponseDTO> listarTodasAsTurmas() {
         log.info("Listando TODAS as turmas (ativas e inativas)");
         // O método findAll() do JpaRepository busca todos os registros da tabela

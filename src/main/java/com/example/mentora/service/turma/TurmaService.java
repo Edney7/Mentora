@@ -4,6 +4,7 @@ import com.example.mentora.dto.turma.TurmaCreateDTO;
 import com.example.mentora.dto.turma.TurmaDetalhadaDTO;
 import com.example.mentora.dto.turma.TurmaResponseDTO;
 import com.example.mentora.dto.turma.TurmaUpdateDTO;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -13,6 +14,9 @@ public interface TurmaService {
 
     List<TurmaResponseDTO> listarTurmasAtivas();
     TurmaResponseDTO buscarTurmaAtivaPorId(Long id);
+
+    @Transactional(readOnly = true)
+    List<TurmaResponseDTO> listarTodasAsTurmas();
 
     TurmaResponseDTO atualizar(Long id, TurmaUpdateDTO dto); // MÉTODO QUE VAMOS IMPLEMENTAR/REVISAR
 
