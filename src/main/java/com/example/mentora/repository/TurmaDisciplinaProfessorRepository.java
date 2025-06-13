@@ -15,5 +15,5 @@ public interface TurmaDisciplinaProfessorRepository extends JpaRepository<TurmaD
 
     // Método para verificar se já existe uma disciplina vinculada a um professor em uma turma (opcional, mas bom)
     Optional<TurmaDisciplinaProfessor> findByTurmaIdAndDisciplinaId(Long turmaId, Long disciplinaId);
-
+    List<TurmaDisciplinaProfessor> findByProfessorId(Long professorId);
 }

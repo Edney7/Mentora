@@ -1,6 +1,7 @@
 package com.example.mentora.service.turmadisciplinaprofessor;
 
 import com.example.mentora.dto.ofertadisciplinaturma.OfertaDisciplinaTurmaResponseDTO;
+import com.example.mentora.dto.turma.TurmaResponseDTO;
 import com.example.mentora.model.Disciplina;
 import com.example.mentora.model.Professor;
 import com.example.mentora.model.Turma;
@@ -78,5 +79,24 @@ public class OfertaDisciplinaTurmaServiceImpl implements OfertaDisciplinaTurmaSe
         dto.setProfessorId(entity.getProfessor().getId());
         dto.setNomeProfessor(entity.getProfessor().getUsuario().getNome()); // ou getNome(), dependendo do campo do professor
         return dto;
+    }
+    @Override
+    public List<TurmaResponseDTO> listarTurmasPorProfessor(Long professorId) {
+        List<TurmaDisciplinaProfessor> vinculacoes =
+                turmaDisciplinaProfessorRepository.findByProfessorId(professorId);
+
+        return vinculacoes.stream()
+                .map(v -> {
+                    var turma = v.getTurma();
+                    return TurmaResponseDTO.builder()
+                            .id(turma.getId())
+                            .nome(turma.getNome())
+                            .turno(turma.getTurno())
+                            .serieAno(turma.getSerieAno())
+                            .anoLetivo(turma.getAnoLetivo())
+                            .build();
+                })
+                .distinct() // para evitar turmas duplicadas
+                .collect(Collectors.toList());
     }
 }
