@@ -24,11 +24,6 @@ public class SecretariaController {
         this.secretariaService = secretariaService;
     }
 
-    /**
-     * Endpoint para listar todos os perfis de secretarias ativos.
-     * Um perfil de secretaria é considerado ativo se o seu Utilizador associado estiver ativo.
-     * @return ResponseEntity contendo uma lista de SecretariaResponseDTO e estado HTTP OK.
-     */
     @Operation(summary = "Listar todos os perfis de secretarias ativos")
     @GetMapping
     public ResponseEntity<List<SecretariaResponseDTO>> listarSecretariasAtivas() { // Nome do método atualizado
@@ -36,12 +31,6 @@ public class SecretariaController {
         return ResponseEntity.ok(secretarias);
     }
 
-    /**
-     * Endpoint para buscar um perfil de secretaria ativo pelo seu ID.
-     * Retorna o perfil se encontrado e se o Utilizador associado estiver ativo.
-     * @param id O ID do perfil da secretaria a ser buscado.
-     * @return ResponseEntity contendo o SecretariaResponseDTO e estado HTTP OK, ou erro se não encontrado/inativo.
-     */
     @Operation(summary = "Buscar perfil de secretaria ativo por ID")
     @GetMapping("/{id}")
     public ResponseEntity<SecretariaResponseDTO> buscarSecretariaAtivaPorId(@PathVariable Long id) { // Nome do método atualizado

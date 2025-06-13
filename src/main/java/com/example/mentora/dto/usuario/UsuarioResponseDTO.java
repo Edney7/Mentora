@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Getter
-@Setter // Adicionado para consistência, ou pode ser removido se não precisar de setters diretos
+@Setter
 @Builder
 public class UsuarioResponseDTO {
     private Long id;
@@ -14,7 +14,7 @@ public class UsuarioResponseDTO {
     private String cpf;
     private String email;
     private String sexo;
-    private LocalDate dtNascimento; // Ou dataNascimento se você padronizou os nomes dos campos no DTO
+    private LocalDate dtNascimento;
     private TipoUsuario tipoUsuario;
-    private Boolean ativo; // GARANTA QUE ESTE CAMPO EXISTE E ESTÁ CORRETO
+    private Boolean ativo;
 }

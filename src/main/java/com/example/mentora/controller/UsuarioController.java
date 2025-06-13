@@ -46,7 +46,6 @@ public class UsuarioController {
         return ResponseEntity.ok(usuario);
     }
 
-    // --- NOVOS ENDPOINTS ---
     @Operation(summary = "Listar TODOS os usuários (ativos e inativos) - Acesso restrito (ex: Admin)")
     @GetMapping("/todos") // Novo endpoint
     public ResponseEntity<List<UsuarioResponseDTO>> listarTodosOsUsuarios() {
@@ -60,7 +59,6 @@ public class UsuarioController {
         UsuarioResponseDTO usuario = usuarioService.buscarUsuarioPorIdIncluindoInativos(id);
         return ResponseEntity.ok(usuario);
     }
-    // --- FIM DOS NOVOS ENDPOINTS ---
 
 
     @Operation(summary = "Autenticar um usuário")

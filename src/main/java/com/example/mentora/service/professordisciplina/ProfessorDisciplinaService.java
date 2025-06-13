@@ -17,6 +17,5 @@ public interface ProfessorDisciplinaService {
 
     List<DisciplinaResponseDTO> listarDisciplinasPorProfessor(Long professorId);
 
-    // Tipo de retorno atualizado para usar ProfessorResponseDTO
     List<ProfessorResponseDTO> listarProfessoresPorDisciplina(Long disciplinaId);
 }

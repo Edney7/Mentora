@@ -10,10 +10,6 @@ import com.example.mentora.dto.turma.TurmaUpdateDTO;
 import com.example.mentora.model.Professor;
 import com.example.mentora.model.Turma;
 import com.example.mentora.repository.TurmaRepository;
-// Importar AlunoRepository se for verificar alunos vinculados antes de desativar
-// import com.example.mentora.repository.AlunoRepository;
-// Importar TurmaDisciplinaRepository se for desvincular disciplinas ao desativar turma
-// import com.example.mentora.repository.TurmaDisciplinaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,15 +26,10 @@ public class TurmaServiceImpl implements TurmaService {
     private static final Logger log = LoggerFactory.getLogger(TurmaServiceImpl.class);
 
     private final TurmaRepository turmaRepository;
-    // private final AlunoRepository alunoRepository;
-    // private final TurmaDisciplinaRepository turmaDisciplinaRepository;
 
     @Autowired
-    public TurmaServiceImpl(TurmaRepository turmaRepository
-            /*, AlunoRepository alunoRepository, TurmaDisciplinaRepository turmaDisciplinaRepository */) {
+    public TurmaServiceImpl(TurmaRepository turmaRepository) {
         this.turmaRepository = turmaRepository;
-        // this.alunoRepository = alunoRepository;
-        // this.turmaDisciplinaRepository = turmaDisciplinaRepository;
     }
 
     private TurmaResponseDTO toTurmaResponseDTO(Turma turma) {
@@ -87,28 +78,32 @@ public class TurmaServiceImpl implements TurmaService {
         Turma turma = turmaRepository.findByIdAndAtivaTrue(id)
                 .orElseThrow(() -> {
                     log.warn("Turma ativa com ID: {} não encontrada.", id);
-                    // Considere usar uma exceção customizada como ResourceNotFoundException
                     return new RuntimeException("Turma ativa com ID " + id + " não encontrada.");
                 });
         return toTurmaResponseDTO(turma);
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<TurmaResponseDTO> listarTodasAsTurmas() {
+        log.info("Listando TODAS as turmas (ativas e inativas)");
+        // O método findAll() do JpaRepository busca todos os registros da tabela
+        return turmaRepository.findAll().stream()
+                .map(this::toTurmaResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     public TurmaResponseDTO atualizar(Long id, TurmaUpdateDTO dto) {
         log.info("Atualizando turma com ID: {}", id);
-        // Busca a turma pelo ID, independentemente do status 'ativa',
-        // pois podemos querer atualizar uma turma inativa (ex: reativá-la ou corrigir dados).
         Turma turmaExistente = turmaRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Turma com ID: {} não encontrada para atualização.", id);
-                    // Considere usar uma exceção customizada como ResourceNotFoundException
                     return new RuntimeException("Turma com ID " + id + " não encontrada para atualização.");
                 });
 
         boolean modificado = false;
-
-        // Atualiza apenas os campos que foram fornecidos no DTO (não são nulos)
         if (dto.getNome() != null && !dto.getNome().isBlank() && !dto.getNome().equals(turmaExistente.getNome())) {
             turmaExistente.setNome(dto.getNome());
             modificado = true;
@@ -136,7 +131,7 @@ public class TurmaServiceImpl implements TurmaService {
             return toTurmaResponseDTO(turmaAtualizada);
         } else {
             log.info("Nenhuma alteração detectada para a turma com ID: {}. Retornando dados existentes.", id);
-            return toTurmaResponseDTO(turmaExistente); // Retorna os dados existentes se nada mudou
+            return toTurmaResponseDTO(turmaExistente);
         }
     }
 

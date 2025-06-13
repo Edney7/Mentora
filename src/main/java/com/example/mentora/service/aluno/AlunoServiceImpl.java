@@ -18,11 +18,11 @@ public class AlunoServiceImpl implements AlunoService {
     private static final Logger log = LoggerFactory.getLogger(AlunoServiceImpl.class);
 
     private final AlunoRepository alunoRepository;
-    private final TurmaRepository turmaRepository; // Injetar TurmaRepository
+    private final TurmaRepository turmaRepository;
 
     public AlunoServiceImpl(AlunoRepository alunoRepository, TurmaRepository turmaRepository) {
         this.alunoRepository = alunoRepository;
-        this.turmaRepository = turmaRepository; // Atribuir
+        this.turmaRepository = turmaRepository;
     }
 
     private AlunoResponseDTO toAlunoResponseDTO(Aluno aluno) {
@@ -36,7 +36,6 @@ public class AlunoServiceImpl implements AlunoService {
                 .emailUsuario(aluno.getUsuario() != null ? aluno.getUsuario().getEmail() : "N/A")
                 .turmaId(aluno.getTurma() != null ? aluno.getTurma().getId() : null)
                 .nomeTurma(aluno.getTurma() != null ? aluno.getTurma().getNome() : "N/A")
-                // .ativo(aluno.getUsuario() != null ? aluno.getUsuario().getAtivo() : false) // Se o DTO tiver campo ativo
                 .build();
     }
 
@@ -62,19 +61,17 @@ public class AlunoServiceImpl implements AlunoService {
         return toAlunoResponseDTO(aluno);
     }
 
-    // --- NOVO MÉTODO IMPLEMENTADO ---
+
     @Override
     @Transactional(readOnly = true)
     public List<AlunoResponseDTO> listarAlunosPorTurma(Long turmaId) {
         log.debug("Listando alunos para a turma ID: {}", turmaId);
-        // 1. Verificar se a turma existe e está ativa (opcional, mas bom)
-        if (!turmaRepository.existsByIdAndAtivaTrue(turmaId)) { // Assume que TurmaRepository tem existsByIdAndAtivaTrue
+
+        if (!turmaRepository.existsByIdAndAtivaTrue(turmaId)) {
             log.warn("Tentativa de listar alunos de uma turma ID {} inexistente ou inativa.", turmaId);
-            // Pode retornar lista vazia ou lançar exceção
             throw new RuntimeException("Turma com ID " + turmaId + " não encontrada ou está inativa.");
         }
 
-        // 2. Buscar os alunos da turma que têm usuários ativos
         List<Aluno> alunosDaTurma = alunoRepository.findByTurmaIdAndUsuarioAtivoTrue(turmaId);
         log.info("Encontrados {} alunos ativos para a turma ID: {}", alunosDaTurma.size(), turmaId);
 

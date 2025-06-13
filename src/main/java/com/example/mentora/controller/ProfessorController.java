@@ -24,11 +24,6 @@ public class ProfessorController {
         this.professorService = professorService;
     }
 
-    /**
-     * Endpoint para listar todos os perfis de professores ativos.
-     * Um professor é considerado ativo se o seu Usuário associado estiver ativo.
-     * @return ResponseEntity contendo uma lista de ProfessorResponseDTO e status HTTP OK.
-     */
     @Operation(summary = "Listar todos os perfis de professores ativos")
     @GetMapping
     public ResponseEntity<List<ProfessorResponseDTO>> listarProfessoresAtivos() { // Nome do método atualizado
@@ -36,12 +31,6 @@ public class ProfessorController {
         return ResponseEntity.ok(professores);
     }
 
-    /**
-     * Endpoint para buscar um perfil de professor ativo pelo seu ID.
-     * Retorna o professor se encontrado e se o Usuário associado estiver ativo.
-     * @param id O ID do perfil do professor a ser buscado.
-     * @return ResponseEntity contendo o ProfessorResponseDTO e status HTTP OK, ou erro se não encontrado/inativo.
-     */
     @Operation(summary = "Buscar perfil de professor ativo por ID")
     @GetMapping("/{id}")
     public ResponseEntity<ProfessorResponseDTO> buscarProfessorAtivoPorId(@PathVariable Long id) { // Nome do método atualizado

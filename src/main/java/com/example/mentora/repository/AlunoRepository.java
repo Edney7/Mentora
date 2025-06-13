@@ -21,10 +21,7 @@ public interface AlunoRepository extends JpaRepository<Aluno, Long> {
     @Query("SELECT a FROM Aluno a WHERE a.usuario.ativo = true")
     List<Aluno> findAllWhereUsuarioAtivoTrue();
 
-    // NOVO MÉTODO: Encontrar todos os alunos de uma turma específica com usuário ativo
     @Query("SELECT a FROM Aluno a WHERE a.turma.id = :turmaId AND a.usuario.ativo = true ORDER BY a.usuario.nome ASC")
     List<Aluno> findByTurmaIdAndUsuarioAtivoTrue(@Param("turmaId") Long turmaId);
 
-    // Opcional: Contar alunos ativos em uma turma (pode ser útil)
-    // Long countByTurmaIdAndUsuarioAtivoTrue(Long turmaId);
 }

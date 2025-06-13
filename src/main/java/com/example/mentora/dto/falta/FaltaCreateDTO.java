@@ -21,5 +21,5 @@ public class FaltaCreateDTO {
 
     @NotNull(message = "A data da falta é obrigatória.")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", locale = "pt-BR", timezone = "America/Sao_Paulo")
-    private LocalDate dataFalta; // Para entrada: aceita "dd-MM-yyyy"
+    private LocalDate dataFalta;
 }

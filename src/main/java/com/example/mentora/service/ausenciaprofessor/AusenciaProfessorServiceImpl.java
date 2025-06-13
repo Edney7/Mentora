@@ -27,7 +27,7 @@ public class AusenciaProfessorServiceImpl implements AusenciaProfessorService {
 
     private final AusenciaProfessorRepository ausenciaProfessorRepository;
     private final ProfessorRepository professorRepository;
-    private final UsuarioRepository usuarioRepository; // Para verificações de papel/permissão
+    private final UsuarioRepository usuarioRepository;
 
     @Autowired
     public AusenciaProfessorServiceImpl(AusenciaProfessorRepository ausenciaProfessorRepository,
@@ -44,16 +44,12 @@ public class AusenciaProfessorServiceImpl implements AusenciaProfessorService {
         log.info("A registar ausência para professor ID {} na data {}, por utilizador logado ID {}",
                 dto.getProfessorId(), dto.getDataAusencia(), professorLogadoUsuarioId);
 
-        // Determinar o professor alvo da ausência
         Professor professorAlvo = professorRepository.findById(dto.getProfessorId())
                 .orElseThrow(() -> {
                     log.warn("Professor alvo com ID {} não encontrado ao registar ausência.", dto.getProfessorId());
                     return new RuntimeException("Professor alvo com ID " + dto.getProfessorId() + " não encontrado.");
                 });
 
-        // Validação de permissão:
-        // Se professorLogadoUsuarioId é fornecido, significa que um professor está a tentar registar.
-        // Ele só pode registar para si mesmo.
         if (professorLogadoUsuarioId != null) {
             Professor professorLogado = professorRepository.findByUsuarioId(professorLogadoUsuarioId)
                     .orElseThrow(() -> {
@@ -65,18 +61,12 @@ public class AusenciaProfessorServiceImpl implements AusenciaProfessorService {
                 throw new RuntimeException("Professores só podem registar as suas próprias ausências."); // Usar exceção de Acesso Negado
             }
         }
-        // Se professorLogadoUsuarioId for null, assume-se que é uma Secretaria a registar (requer verificação de papel, não implementada aqui)
-        // ou o professorId do DTO é o do professor logado (se a lógica do controller já tratar disso).
-        // Para simplificar, vamos assumir que se professorLogadoUsuarioId é null, a permissão já foi validada (ex: Secretaria).
-
-        // Verificar se o professor alvo (via utilizador) está ativo
         if (professorAlvo.getUsuario() == null || !professorAlvo.getUsuario().getAtivo()) {
             log.warn("Tentativa de registar ausência para professor (Utilizador ID {}) inativo.",
                     professorAlvo.getUsuario() != null ? professorAlvo.getUsuario().getId() : "N/A");
             throw new RuntimeException("Não é possível registar ausência para um professor inativo.");
         }
 
-        // Verificar se já existe uma ausência para este professor nesta data
         if (ausenciaProfessorRepository.existsByProfessorIdAndDataAusencia(professorAlvo.getId(), dto.getDataAusencia())) {
             log.warn("Já existe uma ausência registada para o professor ID {} na data {}.", professorAlvo.getId(), dto.getDataAusencia());
             throw new RuntimeException("Já existe uma ausência registada para este professor nesta data.");
@@ -87,7 +77,6 @@ public class AusenciaProfessorServiceImpl implements AusenciaProfessorService {
         ausencia.setProfessor(professorAlvo);
         ausencia.setDataAusencia(dto.getDataAusencia());
         ausencia.setMotivo(dto.getMotivo());
-        // dataRegistro é definida via @PrePersist
 
         AusenciaProfessor ausenciaSalva = ausenciaProfessorRepository.save(ausencia);
         log.info("Ausência ID {} registada com sucesso para professor ID {} na data {}.",
@@ -125,13 +114,6 @@ public class AusenciaProfessorServiceImpl implements AusenciaProfessorService {
         Professor professor = professorRepository.findById(professorId)
                 .orElseThrow(() -> new RuntimeException("Professor com ID " + professorId + " não encontrado."));
 
-        // Opcional: Filtrar apenas se o utilizador do professor estiver ativo
-        // if (professor.getUsuario() == null || !professor.getUsuario().getAtivo()) {
-        //     log.warn("Tentativa de listar ausências para professor (Utilizador ID {}) inativo ou sem utilizador.",
-        //              professor.getUsuario() != null ? professor.getUsuario().getId() : "N/A");
-        //     return Collections.emptyList();
-        // }
-
         List<AusenciaProfessor> ausencias = ausenciaProfessorRepository.findByProfessorIdOrderByDataAusenciaDesc(professorId);
         return ausencias.stream().map(this::toAusenciaProfessorResponseDTO).collect(Collectors.toList());
     }
@@ -141,7 +123,6 @@ public class AusenciaProfessorServiceImpl implements AusenciaProfessorService {
     public List<AusenciaProfessorResponseDTO> listarAusenciasPorData(LocalDate dataAusencia) {
         log.debug("A listar ausências de professor para a data: {}", dataAusencia);
         List<AusenciaProfessor> ausencias = ausenciaProfessorRepository.findByDataAusencia(dataAusencia);
-        // Filtrar para mostrar apenas de professores ativos
         return ausencias.stream()
                 .filter(a -> a.getProfessor() != null && a.getProfessor().getUsuario() != null && a.getProfessor().getUsuario().getAtivo())
                 .map(this::toAusenciaProfessorResponseDTO)
@@ -153,7 +134,6 @@ public class AusenciaProfessorServiceImpl implements AusenciaProfessorService {
     public List<AusenciaProfessorResponseDTO> listarTodasAusencias() {
         log.debug("A listar todas as ausências de professores.");
         List<AusenciaProfessor> ausencias = ausenciaProfessorRepository.findAllByOrderByDataAusenciaDesc();
-        // Filtrar para mostrar apenas de professores ativos
         return ausencias.stream()
                 .filter(a -> a.getProfessor() != null && a.getProfessor().getUsuario() != null && a.getProfessor().getUsuario().getAtivo())
                 .map(this::toAusenciaProfessorResponseDTO)
@@ -170,31 +150,26 @@ public class AusenciaProfessorServiceImpl implements AusenciaProfessorService {
                     return new RuntimeException("Ausência com ID " + ausenciaId + " não encontrada.");
                 });
 
-        // Validação de Permissão:
-        // 1. Obter o perfil do utilizador logado.
         Usuario utilizadorLogado = usuarioRepository.findById(usuarioLogadoId)
                 .orElseThrow(() -> new RuntimeException("Utilizador autenticado não encontrado."));
 
         boolean podeCancelar = false;
-        // 2. Se for um professor, verificar se é o professor da ausência.
-        if ("PROFESSOR".equals(utilizadorLogado.getTipoUsuario().name())) { // Assumindo que TipoUsuario é um enum
+        if ("PROFESSOR".equals(utilizadorLogado.getTipoUsuario().name())) {
             Professor professorLogado = professorRepository.findByUsuarioId(utilizadorLogado.getId())
-                    .orElse(null); // Pode não ter perfil de professor se for outro tipo de utilizador
+                    .orElse(null);
             if (professorLogado != null && professorLogado.getId().equals(ausencia.getProfessor().getId())) {
                 podeCancelar = true;
             }
         }
-        // 3. Se for Secretaria, permitir o cancelamento.
         else if ("SECRETARIA".equals(utilizadorLogado.getTipoUsuario().name())) {
             podeCancelar = true;
         }
 
         if (!podeCancelar) {
             log.warn("Utilizador ID {} não tem permissão para cancelar a ausência ID {}.", usuarioLogadoId, ausenciaId);
-            throw new RuntimeException("Você não tem permissão para cancelar esta ausência."); // Usar AccessDeniedException
+            throw new RuntimeException("Você não tem permissão para cancelar esta ausência.");
         }
 
-        // Adicional: Verificar se a data da ausência já passou (não pode cancelar ausências passadas)
         if (ausencia.getDataAusencia().isBefore(LocalDate.now())) {
             log.warn("Tentativa de cancelar ausência ID {} que já ocorreu (data: {}).", ausenciaId, ausencia.getDataAusencia());
             throw new RuntimeException("Não é possível cancelar ausências que já ocorreram.");
@@ -204,7 +179,6 @@ public class AusenciaProfessorServiceImpl implements AusenciaProfessorService {
         log.info("Ausência ID {} cancelada com sucesso pelo utilizador ID {}.", ausenciaId, usuarioLogadoId);
     }
 
-    // Método auxiliar para converter uma entidade AusenciaProfessor para AusenciaProfessorResponseDTO.
     private AusenciaProfessorResponseDTO toAusenciaProfessorResponseDTO(AusenciaProfessor ausencia) {
         Professor professor = ausencia.getProfessor();
         String nomeProfessor = (professor != null && professor.getUsuario() != null) ? professor.getUsuario().getNome() : "Professor não disponível";
@@ -216,7 +190,6 @@ public class AusenciaProfessorServiceImpl implements AusenciaProfessorService {
                 .dataRegistro(ausencia.getDataRegistro())
                 .professorId(professor != null ? professor.getId() : null)
                 .nomeProfessor(nomeProfessor)
-                // .status(ausencia.getStatus() != null ? ausencia.getStatus().name() : null) // Se tiver status
                 .build();
     }
 }

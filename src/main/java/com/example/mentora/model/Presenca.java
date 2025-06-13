@@ -7,28 +7,27 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-@Entity // Added
+@Entity
 @Table(name = "presenca") // Added
 public class Presenca {
 
-    @Id // Added new PK field
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "data_aula", nullable = false) // Was: dt_lancamento, renamed to data_aula for clarity
-    private LocalDate dataAula; // Field name updated
+    @Column(name = "data_aula", nullable = false)
+    private LocalDate dataAula;
 
-    @Column(name = "presente", nullable = false) // This field indicates presence status
+    @Column(name = "presente", nullable = false)
     private Boolean presente;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "aluno_id", referencedColumnName = "id", nullable = false) // Was: idAluno
+    @JoinColumn(name = "aluno_id", referencedColumnName = "id", nullable = false)
     private Aluno aluno;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "disciplina_id", referencedColumnName = "id", nullable = false) // Was: idDisciplina
+    @JoinColumn(name = "disciplina_id", referencedColumnName = "id", nullable = false)
     private Disciplina disciplina;
 
-    // Consider adding UNIQUE constraint for (aluno_id, disciplina_id, data_aula) using @Table(uniqueConstraints=...)
 }

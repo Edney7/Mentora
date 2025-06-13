@@ -8,12 +8,11 @@ import lombok.Setter;
 @Setter
 @Builder
 public class AlunoResponseDTO {
-    private Long id; // ID do perfil Aluno
+    private Long id;
     private Long usuarioId;
-    private String nomeUsuario; // Informação adicional
-    private String emailUsuario; // Informação adicional
+    private String nomeUsuario;
+    private String emailUsuario;
     private Long turmaId;
-    private String nomeTurma; // Informação adicional
+    private String nomeTurma;
 
-    // Adicione outros campos do Aluno ou do Usuário/Turma que sejam úteis na resposta
 }

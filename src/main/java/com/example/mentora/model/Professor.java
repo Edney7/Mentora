@@ -10,15 +10,15 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "professor") // Was: Professor
+@Table(name = "professor")
 public class Professor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id") // Explicitly set for clarity, was defaulting to 'id'
+    @Column(name = "id")
     private Long id;
 
-    @OneToOne(optional = false) // Assuming Professor must have a Usuario profile
+    @OneToOne(optional = false)
     @JoinColumn(name = "usuario_id", referencedColumnName = "id", nullable = false, unique = true) // Was: id_usuario, referenced id_usuario
     private Usuario usuario;
 

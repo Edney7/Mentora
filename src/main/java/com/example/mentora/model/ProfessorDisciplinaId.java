@@ -1,4 +1,4 @@
-package com.example.mentora.model; // Ou o seu pacote de modelo
+package com.example.mentora.model;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -10,11 +10,9 @@ import java.util.Objects;
 @Getter
 public class ProfessorDisciplinaId implements Serializable {
 
-    // Getters, Setters (Lombok @Getter @Setter também funcionaria aqui)
-    private Long professor; // Corresponde ao tipo do ID em Professor e ao nome do campo na entidade ProfessorDisciplina
-    private Long disciplina; // Corresponde ao tipo do ID em Disciplina e ao nome do campo na entidade ProfessorDisciplina
 
-    // Construtor padrão é necessário para JPA
+    private Long professor;
+    private Long disciplina;
     public ProfessorDisciplinaId() {
     }
 
@@ -23,7 +21,6 @@ public class ProfessorDisciplinaId implements Serializable {
         this.disciplina = disciplinaId;
     }
 
-    // Métodos equals() e hashCode() são cruciais para chaves compostas
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -20,7 +20,6 @@ public class ProfessorServiceImpl implements ProfessorService {
         this.professorRepository = professorRepository;
     }
 
-    // Método auxiliar para mapear Professor para ProfessorResponseDTO
     private ProfessorResponseDTO toProfessorResponseDTO(Professor professor) {
         if (professor == null) {
             return null;
@@ -29,16 +28,12 @@ public class ProfessorServiceImpl implements ProfessorService {
                 .id(professor.getId())
                 .idUsuario(professor.getUsuario() != null ? professor.getUsuario().getId() : null)
                 .nomeUsuario(professor.getUsuario() != null ? professor.getUsuario().getNome() : "N/A")
-                // Adicionar outros campos relevantes, como email ou status ativo do usuário, se necessário no DTO
-                // .emailUsuario(professor.getUsuario() != null ? professor.getUsuario().getEmail() : "N/A")
-                // .ativo(professor.getUsuario() != null ? professor.getUsuario().getAtivo() : false)
                 .build();
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ProfessorResponseDTO> listarProfessoresAtivos() {
-        // Utiliza o novo método do repositório que já filtra por usuário ativo
         return professorRepository.findAllWhereUsuarioAtivoTrue()
                 .stream()
                 .map(this::toProfessorResponseDTO)
@@ -48,12 +43,9 @@ public class ProfessorServiceImpl implements ProfessorService {
     @Override
     @Transactional(readOnly = true)
     public ProfessorResponseDTO buscarProfessorAtivoPorId(Long id) {
-        // Utiliza o novo método do repositório que busca por ID do Professor e verifica se o usuário está ativo
         Professor professor = professorRepository.findByIdAndUsuarioAtivoTrue(id)
                 .orElseThrow(() -> new RuntimeException("Perfil de Professor ativo com ID " + id + " não encontrado, ou o usuário associado está inativo."));
-        // Considere usar uma exceção mais específica, como ResourceNotFoundException
         return toProfessorResponseDTO(professor);
     }
 
-    // Implementar outros métodos da interface ProfessorService se adicionados
 }

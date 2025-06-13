@@ -1,15 +1,13 @@
-package com.example.mentora.model; // Ou o seu pacote de modelo
+package com.example.mentora.model; // Ou seu pacote de modelo
 
 import java.io.Serializable;
 import java.util.Objects;
 
-// Não precisa de @Embeddable se usada com @IdClass
 public class TurmaDisciplinaId implements Serializable {
 
-    private Long turma; // Corresponde ao tipo do ID em Turma e ao nome do campo na entidade TurmaDisciplina
-    private Long disciplina; // Corresponde ao tipo do ID em Disciplina e ao nome do campo na entidade TurmaDisciplina
+    private Long turma;
+    private Long disciplina;
 
-    // Construtor padrão é necessário para JPA
     public TurmaDisciplinaId() {
     }
 
@@ -18,7 +16,6 @@ public class TurmaDisciplinaId implements Serializable {
         this.disciplina = disciplinaId;
     }
 
-    // Getters e Setters (Lombok @Getter @Setter também funcionaria aqui)
     public Long getTurma() {
         return turma;
     }
@@ -35,7 +32,6 @@ public class TurmaDisciplinaId implements Serializable {
         this.disciplina = disciplina;
     }
 
-    // Métodos equals() e hashCode() são cruciais para chaves compostas
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
