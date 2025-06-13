@@ -1,5 +1,6 @@
 package com.example.mentora.service.falta; // Ou o seu pacote de serviços
 
+import com.example.mentora.dto.falta.AlunoFaltasResumoDTO;
 import com.example.mentora.dto.falta.FaltaCreateDTO;
 import com.example.mentora.dto.falta.FaltaJustificativaDTO;
 import com.example.mentora.dto.falta.FaltaResponseDTO;
@@ -26,4 +27,6 @@ public interface FaltaService {
     void excluirFalta(Long faltaId);
 
     List<FaltaResponseDTO> listarTodasFaltas();
+
+    AlunoFaltasResumoDTO buscarResumoFaltasPorAluno(Long alunoId);
 }

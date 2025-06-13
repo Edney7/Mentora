@@ -1,5 +1,6 @@
-package com.example.mentora.controller; // Ou o seu pacote de controllers
+package com.example.mentora.controller;
 
+import com.example.mentora.dto.falta.AlunoFaltasResumoDTO; // NOVO IMPORT
 import com.example.mentora.dto.falta.FaltaCreateDTO;
 import com.example.mentora.dto.falta.FaltaJustificativaDTO;
 import com.example.mentora.dto.falta.FaltaResponseDTO;
@@ -37,7 +38,7 @@ public class FaltaController {
     }
 
     @Operation(summary = "Justificar uma falta existente")
-    @PutMapping("/{faltaId}/justificar") // Pode ser PATCH também, dependendo da semântica desejada
+    @PutMapping("/{faltaId}/justificar")
     public ResponseEntity<FaltaResponseDTO> justificarFalta(
             @Parameter(description = "ID da falta a ser justificada") @PathVariable Long faltaId,
             @Valid @RequestBody FaltaJustificativaDTO faltaJustificativaDTO) {
@@ -53,10 +54,9 @@ public class FaltaController {
         return ResponseEntity.ok(falta);
     }
 
-    @Operation(summary = "Listar todas as faltas")
     @GetMapping
     public List<FaltaResponseDTO> listarTodasFaltas() {
-        return faltaService.listarTodasFaltas(); // método no service
+        return faltaService.listarTodasFaltas();
     }
 
     @Operation(summary = "Listar todas as faltas de um aluno específico")
@@ -65,6 +65,15 @@ public class FaltaController {
             @Parameter(description = "ID do aluno para buscar as faltas") @PathVariable Long alunoId) {
         List<FaltaResponseDTO> faltas = faltaService.listarFaltasPorAluno(alunoId);
         return ResponseEntity.ok(faltas);
+    }
+
+    // NOVO ENDPOINT PARA RESUMO DE FALTAS
+    @Operation(summary = "Obter resumo de faltas para um aluno (total e por disciplina)")
+    @GetMapping("/resumo-aluno/{alunoId}")
+    public ResponseEntity<AlunoFaltasResumoDTO> getResumoFaltasAluno(
+            @Parameter(description = "ID do aluno para obter o resumo de faltas") @PathVariable Long alunoId) {
+        AlunoFaltasResumoDTO resumo = faltaService.buscarResumoFaltasPorAluno(alunoId);
+        return ResponseEntity.ok(resumo);
     }
 
     @Operation(summary = "Listar todas as faltas de um aluno para uma disciplina específica")
@@ -98,6 +107,6 @@ public class FaltaController {
     public ResponseEntity<Void> excluirFalta(
             @Parameter(description = "ID da falta a ser excluída") @PathVariable Long faltaId) {
         faltaService.excluirFalta(faltaId);
-        return ResponseEntity.noContent().build(); // Retorna 204 No Content
+        return ResponseEntity.noContent().build();
     }
 }

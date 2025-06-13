@@ -79,4 +79,16 @@ public class AlunoServiceImpl implements AlunoService {
                 .map(this::toAlunoResponseDTO)
                 .collect(Collectors.toList());
     }
+    @Override
+    @Transactional(readOnly = true)
+    public AlunoResponseDTO buscarAlunoByUsuarioId(Long usuarioId) {
+        log.debug("Buscando perfil de Aluno associado ao usuário ID: {}", usuarioId);
+        // Usamos o método findByUsuarioId do AlunoRepository que você já tem
+        Aluno aluno = alunoRepository.findByUsuarioId(usuarioId)
+                .orElseThrow(() -> {
+                    log.warn("Perfil de Aluno não encontrado para o usuário ID: {}", usuarioId);
+                    return new RuntimeException("Perfil de Aluno não encontrado para o usuário com ID " + usuarioId);
+                });
+        return toAlunoResponseDTO(aluno);
+    }
 }
