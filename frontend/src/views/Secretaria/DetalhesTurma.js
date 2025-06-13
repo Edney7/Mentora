@@ -88,7 +88,7 @@ export default function DetalhesTurma() {
               </button>
             </div>
             <div className="tabela-disciplina">
-              <div className="linha-cabecalho">
+              <div className="linha-cabecalho-disciplina">
                 <span>Disciplina</span>
                 <span>Professor</span>
               </div>

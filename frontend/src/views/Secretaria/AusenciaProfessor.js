@@ -76,7 +76,7 @@ export default function AusenciaProfessor() {
         <p className="sem-ausencias">Nenhuma ausência registrada.</p>
       ) : (
         <div className="tabela-ausencias">
-          <div className="linha-cabecalho">
+          <div className="linha-cabecalho-ausencia">
             <span>Professor</span>
             <span>Motivo</span>
             <span>Data da ausência</span>
