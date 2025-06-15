@@ -83,7 +83,7 @@ public class OfertaDisciplinaTurmaServiceImpl implements OfertaDisciplinaTurmaSe
     @Override
     public List<TurmaResponseDTO> listarTurmasPorProfessor(Long professorId) {
         List<TurmaDisciplinaProfessor> vinculacoes =
-                turmaDisciplinaProfessorRepository.findByProfessorId(professorId);
+                ofertaRepository.findByProfessorId(professorId);
 
         return vinculacoes.stream()
                 .map(v -> {
