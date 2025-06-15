@@ -10,9 +10,8 @@ import {
     buscarTurmasAtivas, listarEventos, cadastrarEvento       
 } from "../../services/ApiService"; 
 import animacaoHomeSecretaria from "../../assets/animacaoHomeSecretaria.png";
-import Modal from "react-modal";
+import Modal from "../../components/Modal";
 
-Modal.setAppElement("#root"); // Define o elemento raiz para acessibilidade
 export default function HomeSecretaria() {
  
   const [totalUsuarios, setTotalUsuarios] = useState(0);

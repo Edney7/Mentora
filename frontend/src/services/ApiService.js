@@ -97,6 +97,11 @@ export const listarProfessoresAtivos = async () => {
     const response = await api.get("/professores");
     return response.data;
 };
+export const listarTurmasDoProfessor = async (professorId) => {
+  const response = await api.get(`/turma-disciplina-professor/professor/${professorId}`);
+  return response.data;
+};
+
 
 export const buscarProfessorAtivoPorId = async (professorId) => {
     const response = await api.get(`/professores/${professorId}`);

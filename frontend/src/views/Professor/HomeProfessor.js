@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../../styles/professor/HomeProfessor.css";
 import Calendar from "../../components/Calendario";
 import { useNavigate } from "react-router-dom";
-
+import { listarTurmasDoProfessor } from "../../services/ApiService";
 import Navbar from "../../components/Navbar";
 
 export default function HomeProfessor() {
@@ -11,6 +11,8 @@ export default function HomeProfessor() {
   const [modalAberto, setModalAberto] = useState(false);
   const [descricao, setDescricao] = useState("");
   const [data, setData] = useState("");
+  const [turmas, setTurmas] = useState([]);
+
  const idUsuario = localStorage.getItem("idUsuario");
   const abrirModal = () => {
     setDescricao("");
@@ -23,7 +25,21 @@ export default function HomeProfessor() {
     console.log("Ausência planejada:", { descricao, data });
     setModalAberto(false);
   };
+useEffect(() => {
+  const carregarTurmas = async () => {
+    try {
+      const resposta = await listarTurmasDoProfessor(idUsuario);
+      setTurmas(resposta);
+    } catch (error) {
+      console.error("Erro ao buscar turmas do professor:", error);
+      alert("Erro ao carregar turmas.");
+    }
+  };
 
+  if (idUsuario) {
+    carregarTurmas();
+  }
+}, [idUsuario]);
   return (
     <>
       <Navbar onLogout={() => console.log("Logout clicado")} />
