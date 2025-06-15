@@ -45,7 +45,10 @@ export default function Login() {
       localStorage.setItem("idUsuario", data.id);
       localStorage.setItem("tipoUsuario", data.tipoUsuario);
       localStorage.setItem("usuario", JSON.stringify(data));
-      
+        // Armazena idProfessor se existir (para uso em telas do professor)
+    if (data.professorId) {
+      localStorage.setItem("idProfessor", data.professorId);
+    }
       switch (data.tipoUsuario.toUpperCase()) {
         case "SECRETARIA":
           navigate("/homeSecretaria");

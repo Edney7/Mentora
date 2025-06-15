@@ -100,7 +100,7 @@ export const listarProfessoresAtivos = async () => {
 export const listarTurmasDoProfessor = async (professorId) => {
   const response = await api.get(`/turma-disciplina-professor/professor/${professorId}`);
   return response.data;
-};
+};// estou usando
 
 
 export const buscarProfessorAtivoPorId = async (professorId) => {
