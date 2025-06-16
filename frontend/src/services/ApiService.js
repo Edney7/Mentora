@@ -287,7 +287,7 @@ export const buscarNotaPorId = async (id) => {
 
 export const listarNotasDoAlunoPorDisciplina = async (alunoId, disciplinaId) => {
     const response = await api.get(`/notas/aluno/${alunoId}/disciplina/${disciplinaId}`);
-    return response.data;
+    return response.data; //usar
 };
 
 // --- Faltas ---
