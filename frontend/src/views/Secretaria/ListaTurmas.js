@@ -42,16 +42,13 @@ export default function ListaTurmas() {
 
   const navigate = useNavigate();
 
+  // ==================== CÓDIGO CORRIGIDO ABAIXO ====================
   const carregarTurmasAPI = useCallback(async () => {
     setLoading(true);
     setErro("");
     try {
-      let data;
-      if (statusFiltro === "ATIVAS") {
-        data = await buscarTurmasAtivas();
-      } else {
-        data = await buscarTodasAsTurmas();
-      }
+      // Simplificado: Sempre busca TODAS as turmas, uma única vez.
+      const data = await buscarTodasAsTurmas();
       setTodasAsTurmasDoBackend(data || []);
     } catch (error) {
       console.error("Erro ao buscar turmas:", error);
@@ -62,7 +59,9 @@ export default function ListaTurmas() {
     } finally {
       setLoading(false);
     }
-  }, [statusFiltro]);
+    // A dependência agora é vazia `[]` para que a função execute apenas uma vez.
+  }, []);
+  // ==================== FIM DO CÓDIGO CORRIGIDO ====================
 
   useEffect(() => {
     carregarTurmasAPI();
@@ -71,6 +70,8 @@ export default function ListaTurmas() {
   useEffect(() => {
     let turmasProcessadas = [...todasAsTurmasDoBackend];
 
+    // Esta lógica de filtro agora funciona perfeitamente pois sempre
+    // opera sobre a lista completa de turmas (ativas e inativas).
     if (statusFiltro === "ATIVAS") {
       turmasProcessadas = turmasProcessadas.filter(
         (turma) => turma.ativa === true
@@ -135,7 +136,7 @@ export default function ListaTurmas() {
         alert("Turma cadastrada com sucesso!");
       }
       handleCloseModals();
-      carregarTurmasAPI();
+      carregarTurmasAPI(); // Recarrega a lista após salvar
     } catch (error) {
       console.error("Erro ao salvar turma:", error);
       const errorMsg =

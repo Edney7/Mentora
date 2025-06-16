@@ -25,12 +25,7 @@ export default function ListaUsuario() {
     setLoading(true);
     setErroApi("");
     try {
-      const filtros = {};
-      if (nomeFiltro) filtros.nome = nomeFiltro;
-      if (tipoUsuarioFiltro) filtros.tipoUsuario = tipoUsuarioFiltro;
-      if (sexoFiltro) filtros.sexo = sexoFiltro;
-
-      const data = await listarTodosOsUsuarios(filtros);
+      const data = await listarTodosOsUsuarios();
       setUsuarios(data || []);
     } catch (error) {
       console.error("Erro ao carregar usuários:", error);
@@ -41,7 +36,8 @@ export default function ListaUsuario() {
     } finally {
       setLoading(false);
     }
-  }, [nomeFiltro, tipoUsuarioFiltro, sexoFiltro]);
+  }, []);
+
 
   useEffect(() => {
     carregarUsuarios();
