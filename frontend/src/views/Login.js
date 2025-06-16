@@ -4,7 +4,7 @@ import animacaoLogin from "../assets/animacaoLogin.png";
 import logo from "../assets/logo.png";
 import { loginUsuario } from "../services/ApiService";
 import { useNavigate } from "react-router-dom";
-//implementar o toast e verificar o regex
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -42,13 +42,18 @@ export default function Login() {
       const data = await loginUsuario(email, senha);
 
       alert("Login efetuado com sucesso!");
-      localStorage.setItem("idUsuario", data.id);
+
+      // --- CORREÇÃO AQUI ---
+      // O nome da chave foi alterado de "idUsuario" para "userId"
+      localStorage.setItem("userId", data.id);
+      // ---------------------
+
       localStorage.setItem("tipoUsuario", data.tipoUsuario);
       localStorage.setItem("usuario", JSON.stringify(data));
         // Armazena idProfessor se existir (para uso em telas do professor)
-    if (data.professorId) {
-      localStorage.setItem("idProfessor", data.professorId);
-    }
+      if (data.professorId) {
+        localStorage.setItem("idProfessor", data.professorId);
+      }
       switch (data.tipoUsuario.toUpperCase()) {
         case "SECRETARIA":
           navigate("/homeSecretaria");
@@ -68,17 +73,12 @@ export default function Login() {
 
       let mensagemErro = "Erro no login";
 
-      // Se a mensagem estiver dentro de error.response.data.message
       if (typeof error.response?.data?.message === "string") {
         mensagemErro = error.response.data.message;
       }
-
-      // Se error.response.data for uma string diretamente
       else if (typeof error.response?.data === "string") {
         mensagemErro = error.response.data;
       }
-
-      // Se não encontrar nenhuma string, força string com JSON.stringify
       else if (error.response?.data) {
         mensagemErro = JSON.stringify(error.response.data);
       }

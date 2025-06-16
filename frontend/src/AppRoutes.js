@@ -1,5 +1,10 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+
+// Importe a nova página
+import Perfil from './views/Perfil';
+
+// Suas outras views
 import Login from './views/Login';
 import Cadastro from './views/Secretaria/Cadastro';
 import HomeSecretaria from './views/Secretaria/HomeSecretaria';
@@ -16,6 +21,10 @@ import TurmaDetalhe from './views/Professor/TurmaDetalhe';
 export default function AppRoutes() {
   return (
     <Routes>
+      {/* --- ROTA ADICIONADA --- */}
+      <Route path="/perfil" element={<Perfil />} />
+
+      {/* --- SUAS ROTAS EXISTENTES --- */}
       <Route path="/" element={<Login />} />
       <Route path="/cadastro" element={<Cadastro />} />
       <Route path="/homeSecretaria" element={<HomeSecretaria/>} />
