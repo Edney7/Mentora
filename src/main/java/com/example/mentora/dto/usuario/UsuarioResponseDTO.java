@@ -17,4 +17,5 @@ public class UsuarioResponseDTO {
     private LocalDate dtNascimento;
     private TipoUsuario tipoUsuario;
     private Boolean ativo;
+    private Long professorId;
 }

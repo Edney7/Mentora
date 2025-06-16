@@ -135,7 +135,27 @@ public class UsuarioServiceImpl implements UsuarioService {
         if (!passwordEncoder.matches(loginDTO.getSenha(), usuario.getSenha())) {
             throw new RuntimeException("Email ou Senha inválida");
         }
-        return toResponseDTO(usuario);
+
+        Long professorId = null;
+        if (usuario.getTipoUsuario() == TipoUsuario.PROFESSOR) {
+            Professor professor = professorRepository.findByUsuarioId(usuario.getId())
+                    .orElse(null);
+            if (professor != null) {
+                professorId = professor.getId();
+            }
+        }
+
+        return UsuarioResponseDTO.builder()
+                .id(usuario.getId())
+                .nome(usuario.getNome())
+                .cpf(usuario.getCpf())
+                .email(usuario.getEmail())
+                .sexo(usuario.getSexo())
+                .dtNascimento(usuario.getDataNascimento())
+                .tipoUsuario(usuario.getTipoUsuario())
+                .ativo(usuario.getAtivo())
+                .professorId(professorId)
+                .build();
     }
 
     @Override

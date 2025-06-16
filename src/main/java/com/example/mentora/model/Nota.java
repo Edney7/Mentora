@@ -19,8 +19,8 @@ public class Nota {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "valor", nullable = false, scale = 2)
-    private Double valor;
+    @Column(name = "media", nullable = false, scale = 2)
+    private Double media;
 
     @Column(name = "data_lancamento")
     private LocalDate dataLancamento;
@@ -37,6 +37,13 @@ public class Nota {
     @JoinColumn(name = "professor_id", referencedColumnName = "id", nullable = false)
     private Professor professor;
 
+    @Column(nullable = false)
+    private int bimestre;
+
+    @Column
+    private Double prova1;
+    @Column
+    private Double prova2;
     @PrePersist
     protected void onCreate() {
         if (dataLancamento == null) {
@@ -44,8 +51,7 @@ public class Nota {
         }
     }
 
-    public Nota(Double valor, Aluno aluno, Disciplina disciplina, Professor professor) {
-        this.valor = valor;
+    public Nota( Aluno aluno, Disciplina disciplina, Professor professor) {
         this.aluno = aluno;
         this.disciplina = disciplina;
         this.professor = professor;

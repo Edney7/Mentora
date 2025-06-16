@@ -117,7 +117,10 @@ public class NotaServiceImpl implements NotaService {
         nota.setAluno(aluno);
         nota.setDisciplina(disciplina);
         nota.setProfessor(professor); // Associar o professor
-        nota.setValor(dto.getValor());
+        nota.setBimestre(dto.getBimestre());
+        nota.setProva1(dto.getProva1());
+        nota.setProva2(dto.getProva2());
+        nota.setMedia((dto.getProva1() + dto.getProva2()) / 2);
 
         Nota notaSalva = notaRepository.save(nota);
         log.info("Nota ID {} lançada com sucesso para aluno ID {}, disciplina ID {}, por professor ID {}.",
@@ -190,7 +193,6 @@ public class NotaServiceImpl implements NotaService {
 
         return NotaResponseDTO.builder()
                 .id(nota.getId())
-                .valor(nota.getValor())
                 .dataLancamento(nota.getDataLancamento())
                 .alunoId(aluno != null ? aluno.getId() : null)
                 .nomeAluno(nomeAluno)

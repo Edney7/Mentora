@@ -37,6 +37,7 @@ public class TurmaDisciplinaProfessorController {
         List<OfertaDisciplinaTurmaResponseDTO> ofertas = service.listarPorTurma(turmaId);
         return ResponseEntity.ok(ofertas);
     }
+    @Operation(summary = "listar as turmas do professor")
     @GetMapping("/professor/{professorId}")
     public List<TurmaResponseDTO> listarTurmasDoProfessor(@PathVariable Long professorId) {
         return service.listarTurmasPorProfessor(professorId);
