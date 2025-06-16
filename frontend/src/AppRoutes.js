@@ -16,6 +16,7 @@ import SecretariaNotasPresencasAlunos from './views/Secretaria/NotasPresençasAl
 import SecretariaEditarUsuario from './views/Secretaria/EditarUsuario';
 import DetalhesTurmas from './views/Secretaria/DetalhesTurma';
 import TurmaDetalhe from './views/Professor/TurmaDetalhe';
+import MeuPerfil from './views/Professor/MeuPerfil';
 
 export default function AppRoutes() {
   return (
@@ -46,6 +47,7 @@ export default function AppRoutes() {
       <Route element={<ProtectedRoute roles={['PROFESSOR']} />}>
         <Route path="/homeProfessor" element={<HomeProfessor/>} />
         <Route path="/turmaDetalhe/:id" element={<TurmaDetalhe />} />
+        <Route path="/professor/perfil" element={<MeuPerfil />} />
       </Route>
     </Routes>
   );

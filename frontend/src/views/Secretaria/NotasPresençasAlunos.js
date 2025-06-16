@@ -3,6 +3,7 @@ import { listarTodasNotas, listarTodasFaltas } from "../../services/ApiService";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import "../../styles/secretaria/NotasPresencasAlunos.css";
+import { toast } from 'react-toastify'; // 1. Importa o toast
 
 export default function NotasPresencasAluno() {
   const [todasAsNotas, setTodasAsNotas] = useState([]);
@@ -26,7 +27,9 @@ export default function NotasPresencasAluno() {
         setTodasAsFaltas(faltasData || []);
       } catch (error) {
         console.error("Erro ao carregar dados:", error);
-        setErro("Erro ao carregar notas ou faltas. Verifique a conexão.");
+        const errorMsg = "Erro ao carregar notas ou faltas. Verifique a conexão.";
+        toast.error(errorMsg); // 2. Adiciona a notificação de erro
+        setErro(errorMsg);
       } finally {
         setLoading(false);
       }
@@ -51,7 +54,12 @@ export default function NotasPresencasAluno() {
   }
 
   if (erro) {
-    return <div className="pagina-notas-faltas"><p className="error-message">{erro}</p></div>;
+    return (
+      <div className="pagina-notas-faltas">
+        <div className="voltar-seta" onClick={() => navigate(-1)} title="Voltar"><FaArrowLeft /></div>
+        <p className="error-message">{erro}</p>
+      </div>
+    );
   }
 
   return (
@@ -59,8 +67,20 @@ export default function NotasPresencasAluno() {
       <div className="voltar-seta" onClick={() => navigate(-1)} title="Voltar"><FaArrowLeft /></div>
       <h2>Notas e Presenças dos Alunos</h2>
       <div className="filtros-container">
-        <input type="text" className="filtro-input" placeholder="Filtrar por nome do aluno..." value={filtroAluno} onChange={(e) => setFiltroAluno(e.target.value)} />
-        <input type="text" className="filtro-input" placeholder="Filtrar por disciplina..." value={filtroDisciplina} onChange={(e) => setFiltroDisciplina(e.target.value)} />
+        <input 
+          type="text"
+          className="filtro-input"
+          placeholder="Filtrar por nome do aluno..."
+          value={filtroAluno}
+          onChange={(e) => setFiltroAluno(e.target.value)}
+        />
+        <input 
+          type="text"
+          className="filtro-input"
+          placeholder="Filtrar por disciplina..."
+          value={filtroDisciplina}
+          onChange={(e) => setFiltroDisciplina(e.target.value)}
+        />
       </div>
       <div className="secoes-container">
         <div className="secao">

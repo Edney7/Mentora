@@ -3,6 +3,7 @@ import { buscarAusencias } from "../../services/ApiService";
 import "../../styles/secretaria/AusenciaProfessor.css";
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify'; // 1. Importa o toast
 
 const parseDate = (dataString) => {
     if (!dataString) return null;
@@ -39,7 +40,9 @@ export default function AusenciaProfessor() {
         setAusenciasFiltradas(resultado || []);
       } catch (error) {
         console.error("Erro ao carregar ausências:", error);
-        setErro("Falha ao carregar a lista de ausências.");
+        const errorMsg = "Falha ao carregar a lista de ausências.";
+        toast.error(errorMsg); // 2. Notificação de erro adicionada
+        setErro(errorMsg);
       } finally {
         setLoading(false);
       }
