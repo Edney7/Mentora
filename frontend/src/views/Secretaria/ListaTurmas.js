@@ -1,11 +1,9 @@
 import React, { useEffect, useState, useCallback } from "react";
 import "../../styles/secretaria/Turma.css";
-import Navbar from "../../components/Navbar";
+// REMOVIDO: A importação do Navbar não é mais necessária aqui.
 import Modal from "../../components/Modal";
 import TurmaForm from "../../components/TurmaForm";
-
 import {
-  buscarTurmasAtivas,
   buscarTodasAsTurmas,
   desativarTurma,
   reativarTurma,
@@ -42,12 +40,10 @@ export default function ListaTurmas() {
 
   const navigate = useNavigate();
 
-  // ==================== CÓDIGO CORRIGIDO ABAIXO ====================
   const carregarTurmasAPI = useCallback(async () => {
     setLoading(true);
     setErro("");
     try {
-      // Simplificado: Sempre busca TODAS as turmas, uma única vez.
       const data = await buscarTodasAsTurmas();
       setTodasAsTurmasDoBackend(data || []);
     } catch (error) {
@@ -59,9 +55,7 @@ export default function ListaTurmas() {
     } finally {
       setLoading(false);
     }
-    // A dependência agora é vazia `[]` para que a função execute apenas uma vez.
   }, []);
-  // ==================== FIM DO CÓDIGO CORRIGIDO ====================
 
   useEffect(() => {
     carregarTurmasAPI();
@@ -70,8 +64,6 @@ export default function ListaTurmas() {
   useEffect(() => {
     let turmasProcessadas = [...todasAsTurmasDoBackend];
 
-    // Esta lógica de filtro agora funciona perfeitamente pois sempre
-    // opera sobre a lista completa de turmas (ativas e inativas).
     if (statusFiltro === "ATIVAS") {
       turmasProcessadas = turmasProcessadas.filter(
         (turma) => turma.ativa === true
@@ -129,14 +121,28 @@ export default function ListaTurmas() {
     setErro("");
     try {
       if (turmaSelecionada && turmaSelecionada.id) {
-        await atualizarTurma(turmaSelecionada.id, turmaData);
+        // --- ATUALIZAÇÃO DE TURMA ---
+        const turmaAtualizada = await atualizarTurma(
+          turmaSelecionada.id,
+          turmaData
+        );
+        // Atualiza a lista localmente para uma resposta visual instantânea
+        setTodasAsTurmasDoBackend((prevTurmas) =>
+          prevTurmas.map((t) =>
+            t.id === turmaAtualizada.id ? turmaAtualizada : t
+          )
+        );
         alert("Turma atualizada com sucesso!");
       } else {
-        await cadastrarTurma(turmaData);
+        // --- CRIAÇÃO DE NOVA TURMA ---
+        const novaTurma = await cadastrarTurma(turmaData);
+        // Adiciona a nova turma na lista local instantaneamente
+        setTodasAsTurmasDoBackend((prevTurmas) => [novaTurma, ...prevTurmas]);
         alert("Turma cadastrada com sucesso!");
       }
       handleCloseModals();
-      carregarTurmasAPI(); // Recarrega a lista após salvar
+      // REMOVIDO: A chamada carregarTurmasAPI() não é mais necessária aqui,
+      // pois a atualização já foi feita localmente.
     } catch (error) {
       console.error("Erro ao salvar turma:", error);
       const errorMsg =
@@ -190,166 +196,161 @@ export default function ListaTurmas() {
     }
   };
 
+  // Condição de loading alterada para não mostrar o Navbar
   if (loading && !showCreateModal && !showEditModal) {
     return (
-      <>
-        <Navbar />
-        <div className="turmas-container">
-          <p>Carregando turmas...</p>
-        </div>
-      </>
+      <div className="turmas-container">
+        <p>Carregando turmas...</p>
+      </div>
     );
   }
 
   return (
-    <>
-      <Navbar />
-      <div className="turmas-container">
-        <div className="turmas-header">
-          <div
-            className="voltar-seta"
-            onClick={() => navigate(-1)}
-            title="Voltar"
-          >
-            <FaArrowLeft />
-          </div>
-          <h2>Gerenciamento de Turmas</h2>
+    // Navbar removido daqui
+    <div className="turmas-container">
+      <div className="turmas-header">
+        <div
+          className="voltar-seta"
+          onClick={() => navigate(-1)}
+          title="Voltar"
+        >
+          <FaArrowLeft />
         </div>
+        <h2>Gerenciamento de Turmas</h2>
+      </div>
 
-        {erro && !showCreateModal && !showEditModal && (
-          <p className="error-message">{erro}</p>
-        )}
+      {erro && !showCreateModal && !showEditModal && (
+        <p className="error-message">{erro}</p>
+      )}
 
-        <div className="turmas-filtros">
-          <input
-            type="text"
-            placeholder="Nome da Turma"
-            value={nomeFiltro}
-            onChange={(e) => setNomeFiltro(e.target.value)}
-            className="turmas-filtro nome"
-          />
+      <div className="turmas-filtros">
+        <input
+          type="text"
+          placeholder="Nome da Turma"
+          value={nomeFiltro}
+          onChange={(e) => setNomeFiltro(e.target.value)}
+          className="turmas-filtro nome"
+        />
+        <input
+          type="text"
+          placeholder="Série/Ano"
+          value={serieAnoFiltro}
+          onChange={(e) => setSerieAnoFiltro(e.target.value)}
+          className="turmas-filtro pequeno"
+        />
+        <input
+          type="text"
+          placeholder="Ano Letivo"
+          value={anoLetivoFiltro}
+          onChange={(e) => setAnoLetivoFiltro(e.target.value)}
+          className="turmas-filtro pequeno"
+        />
+        <select
+          value={turnoFiltro}
+          onChange={(e) => setTurnoFiltro(e.target.value)}
+          className="turmas-filtro select"
+        >
+          <option value="">Todos os Turnos</option>
+          <option value="Manhã">Manhã</option>
+          <option value="Tarde">Tarde</option>
+          <option value="Noite">Noite</option>
+          <option value="Integral">Integral</option>
+        </select>
+        <select
+          value={statusFiltro}
+          onChange={(e) => setStatusFiltro(e.target.value)}
+          className="turmas-filtro select"
+        >
+          <option value="ATIVAS">Apenas Ativas</option>
+          <option value="INATIVAS">Apenas Inativas</option>
+          <option value="TODAS">Todas</option>
+        </select>
+        <button
+          onClick={handleOpenCreateModal}
+          className="btn-turmas"
+          title="Adicionar Nova Turma"
+        >
+          <FaPlus />
+        </button>
+      </div>
 
-          <input
-            type="text"
-            placeholder="Série/Ano"
-            value={serieAnoFiltro}
-            onChange={(e) => setSerieAnoFiltro(e.target.value)}
-            className="turmas-filtro pequeno"
-          />
-          <input
-            type="text"
-            placeholder="Ano Letivo"
-            value={anoLetivoFiltro}
-            onChange={(e) => setAnoLetivoFiltro(e.target.value)}
-            className="turmas-filtro pequeno"
-          />
-          <select
-            value={turnoFiltro}
-            onChange={(e) => setTurnoFiltro(e.target.value)}
-            className="turmas-filtro select"
-          >
-            <option value="">Todos os Turnos</option>
-            <option value="Manhã">Manhã</option>
-            <option value="Tarde">Tarde</option>
-            <option value="Noite">Noite</option>
-            <option value="Integral">Integral</option>
-          </select>
-          <select
-            value={statusFiltro}
-            onChange={(e) => setStatusFiltro(e.target.value)}
-            className="turmas-filtro select"
-          >
-            <option value="ATIVAS">Apenas Ativas</option>
-            <option value="INATIVAS">Apenas Inativas</option>
-            <option value="TODAS">Todas</option>
-          </select>
-          <button
-            onClick={handleOpenCreateModal}
-            className="btn-turmas"
-            title="Adicionar Nova Turma"
-          >
-            <FaPlus />
-          </button>
-        </div>
-
-        <div className="turmas-lista">
-          {turmasExibidas.length === 0 && !loading ? (
-            <p className="sem-turmas">
-              Nenhuma turma encontrada com os filtros aplicados.
-            </p>
-          ) : (
-            turmasExibidas.map((turma) => (
-              <div className="turmas-row" key={turma.id}>
-                <div
-                  className={`turmas-borda ${
-                    turma.ativa ? "turma-ativa" : "turma-inativa"
-                  }`}
-                ></div>
-                <div className="turmas-conteudo">
-                  <div className="turmas-info">
-                    <span>
-                      <strong>Nome:</strong> {turma.nome}
-                    </span>
-                    <span>
-                      <strong>Turno:</strong> {turma.turno || "-"}
-                    </span>
-                    <span>
-                      <strong>Série/Ano:</strong> {turma.serieAno || "-"}
-                    </span>
-                    <span>
-                      <strong>Ano Letivo:</strong> {turma.anoLetivo || "-"}
-                    </span>
-                    <span>
-                      <strong>Status:</strong>{" "}
-                      <span
-                        className={
-                          turma.ativa ? "status-ativo" : "status-inativo"
-                        }
-                      >
-                        {turma.ativa ? "Ativa" : "Inativa"}
-                      </span>
-                    </span>
-                  </div>
-                  <div className="turmas-acoes">
-                    <button
-                      onClick={() =>
-                        navigate(`/secretaria/turmas/detalhes/${turma.id}`)
+      <div className="turmas-lista">
+        {turmasExibidas.length === 0 && !loading ? (
+          <p className="sem-turmas">
+            Nenhuma turma encontrada com os filtros aplicados.
+          </p>
+        ) : (
+          turmasExibidas.map((turma) => (
+            <div className="turmas-row" key={turma.id}>
+              <div
+                className={`turmas-borda ${
+                  turma.ativa ? "turma-ativa" : "turma-inativa"
+                }`}
+              ></div>
+              <div className="turmas-conteudo">
+                <div className="turmas-info">
+                  <span>
+                    <strong>Nome:</strong> {turma.nome}
+                  </span>
+                  <span>
+                    <strong>Turno:</strong> {turma.turno || "-"}
+                  </span>
+                  <span>
+                    <strong>Série/Ano:</strong> {turma.serieAno || "-"}
+                  </span>
+                  <span>
+                    <strong>Ano Letivo:</strong> {turma.anoLetivo || "-"}
+                  </span>
+                  <span>
+                    <strong>Status:</strong>{" "}
+                    <span
+                      className={
+                        turma.ativa ? "status-ativo" : "status-inativo"
                       }
-                      className="btn-action btn-view"
-                      title="Ver Detalhes e Gerenciar"
                     >
-                      <FaEye />
-                    </button>
+                      {turma.ativa ? "Ativa" : "Inativa"}
+                    </span>
+                  </span>
+                </div>
+                <div className="turmas-acoes">
+                  <button
+                    onClick={() =>
+                      navigate(`/secretaria/turmas/detalhes/${turma.id}`)
+                    }
+                    className="btn-action btn-view"
+                    title="Ver Detalhes e Gerenciar"
+                  >
+                    <FaEye />
+                  </button>
+                  <button
+                    onClick={() => handleOpenEditModal(turma)}
+                    className="btn-action btn-edit"
+                    title="Editar Turma"
+                  >
+                    <FaEdit />
+                  </button>
+                  {turma.ativa ? (
                     <button
-                      onClick={() => handleOpenEditModal(turma)}
-                      className="btn-action btn-edit"
-                      title="Editar Turma"
+                      onClick={() => handleDesativar(turma.id, turma.nome)}
+                      className="btn-action btn-delete"
+                      title="Desativar Turma"
                     >
-                      <FaEdit />
+                      <FaTrash />
                     </button>
-                    {turma.ativa ? (
-                      <button
-                        onClick={() => handleDesativar(turma.id, turma.nome)}
-                        className="btn-action btn-delete"
-                        title="Desativar Turma"
-                      >
-                        <FaTrash />
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleReativar(turma.id, turma.nome)}
-                        className="btn-action btn-reactivate"
-                        title="Reativar Turma"
-                      >
-                        <FaRedo />
-                      </button>
-                    )}
-                  </div>
+                  ) : (
+                    <button
+                      onClick={() => handleReativar(turma.id, turma.nome)}
+                      className="btn-action btn-reactivate"
+                      title="Reativar Turma"
+                    >
+                      <FaRedo />
+                    </button>
+                  )}
                 </div>
               </div>
-            ))
-          )}
-        </div>
+            </div>
+          ))
+        )}
       </div>
 
       <Modal
@@ -390,6 +391,6 @@ export default function ListaTurmas() {
           </p>
         )}
       </Modal>
-    </>
+    </div>
   );
 }

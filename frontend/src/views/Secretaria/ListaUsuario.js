@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import Navbar from "../../components/Navbar";
+// REMOVIDA: A importação do Navbar, pois ele agora é gerenciado pelo App.js
 import {
   listarTodosOsUsuarios,
   desativarUsuario,
@@ -108,151 +108,147 @@ export default function ListaUsuario() {
   });
 
   if (loading) {
+    // REMOVIDO: O Navbar da tela de loading.
     return (
-      <>
-        <Navbar />
-        <div className="usuarios-container">
-          <p>Carregando usuários...</p>
-        </div>
-      </>
+      <div className="usuarios-container">
+        <p>Carregando usuários...</p>
+      </div>
     );
   }
 
   return (
-    <>
-      <Navbar onLogout={() => console.log("Logout placeholder")} />
-      <div className="usuarios-container">
-        <div className="usuarios-header">
-          <div
-            className="voltar-seta"
-            onClick={() => navigate(-1)}
-            title="Voltar"
-          >
-            <FaArrowLeft />
-          </div>
-          <h2>GERENCIAMENTO DE USUÁRIOS</h2>
-          <div className="usuarios-filtros">
-            <input
-              type="text"
-              placeholder="Nome"
-              value={nomeFiltro}
-              onChange={(e) => setNomeFiltro(e.target.value)}
-            />
-            <select
-              value={tipoUsuarioFiltro}
-              onChange={(e) => setTipoUsuarioFiltro(e.target.value)}
-            >
-              <option value="">Todos os Tipos</option>
-              <option value="SECRETARIA">Secretaria</option>
-              <option value="ALUNO">Aluno</option>
-              <option value="PROFESSOR">Professor</option>
-            </select>
-            <select
-              value={sexoFiltro}
-              onChange={(e) => setSexoFiltro(e.target.value)}
-            >
-              <option value="">Todos os Sexos</option>
-              <option value="Masculino">Masculino</option>
-              <option value="Feminino">Feminino</option>
-              <option value="Outro">Outro</option>
-            </select>
-            <select
-              value={statusFiltro}
-              onChange={(e) => setStatusFiltro(e.target.value)}
-              className="usuario-filtro select"
-            >
-              <option value="">Todos os Status</option>
-              <option value="ATIVO">Apenas Ativos</option>
-              <option value="INATIVO">Apenas Inativos</option>
-            </select>
-            <button
-              onClick={() => navigate("/cadastro")}
-              className="btn-usuario"
-              title="Cadastrar Novo Usuário"
-            >
-              <FaPlus />
-            </button>
-          </div>
+    // REMOVIDO: O Navbar da tela principal.
+    <div className="usuarios-container">
+      <div className="usuarios-header">
+        <div
+          className="voltar-seta"
+          onClick={() => navigate(-1)}
+          title="Voltar"
+        >
+          <FaArrowLeft />
         </div>
-
-        {erroApi && <p className="error-message">{erroApi}</p>}
-
-        <div className="usuarios-lista">
-          {usuariosFiltrados.length === 0 && !loading ? (
-            <p className="sem-usuarios">
-              Nenhum usuário encontrado com os filtros aplicados.
-            </p>
-          ) : (
-            usuariosFiltrados.map((usuario) => (
-              <div className="usuario-row" key={usuario.id}>
-                <div
-                  className={`usuario-borda ${usuario.tipoUsuario?.toLowerCase()}`}
-                ></div>
-                <div className="usuario-conteudo">
-                  <div className="usuario-info">
-                    <span>
-                      <strong>Nome:</strong> {usuario.nome}
-                    </span>
-                    <span>
-                      <strong>CPF:</strong> {usuario.cpf}
-                    </span>
-                    <span>
-                      <strong>Email:</strong> {usuario.email}
-                    </span>
-                    <span>
-                      <strong>Tipo:</strong> {usuario.tipoUsuario}
-                    </span>
-                    <span>
-                      <strong>Sexo:</strong> {usuario.sexo}
-                    </span>
-                    <span>
-                      <strong>Nasc:</strong> {usuario.dtNascimento}
-                    </span>
-                    <span>
-                      <strong>Status:</strong>{" "}
-                      <span
-                        className={
-                          usuario.ativo ? "status-ativo" : "status-inativo"
-                        }
-                      >
-                        {usuario.ativo ? "Ativo" : "Inativo"}
-                      </span>
-                    </span>
-                  </div>
-                  <div className="usuario-acoes">
-                    <button
-                      onClick={() =>
-                        navigate(`/secretaria/editarUsuario/${usuario.id}`)
-                      }
-                      title="Editar Usuário"
-                    >
-                      <FaEdit />
-                    </button>
-                    {usuario.ativo ? (
-                      <button
-                        onClick={() =>
-                          handleDesativar(usuario.id, usuario.nome)
-                        }
-                        title="Desativar Usuário"
-                      >
-                        <FaTrash />
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleReativar(usuario.id, usuario.nome)}
-                        title="Reativar Usuário"
-                        className="btn-action btn-reactivate"
-                      >
-                        <FaRedo />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
+        <h2>GERENCIAMENTO DE USUÁRIOS</h2>
+        <div className="usuarios-filtros">
+          <input
+            type="text"
+            placeholder="Nome"
+            value={nomeFiltro}
+            onChange={(e) => setNomeFiltro(e.target.value)}
+          />
+          <select
+            value={tipoUsuarioFiltro}
+            onChange={(e) => setTipoUsuarioFiltro(e.target.value)}
+          >
+            <option value="">Todos os Tipos</option>
+            <option value="SECRETARIA">Secretaria</option>
+            <option value="ALUNO">Aluno</option>
+            <option value="PROFESSOR">Professor</option>
+          </select>
+          <select
+            value={sexoFiltro}
+            onChange={(e) => setSexoFiltro(e.target.value)}
+          >
+            <option value="">Todos os Sexos</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Feminino">Feminino</option>
+            <option value="Outro">Outro</option>
+          </select>
+          <select
+            value={statusFiltro}
+            onChange={(e) => setStatusFiltro(e.target.value)}
+            className="usuario-filtro select"
+          >
+            <option value="">Todos os Status</option>
+            <option value="ATIVO">Apenas Ativos</option>
+            <option value="INATIVO">Apenas Inativos</option>
+          </select>
+          <button
+            onClick={() => navigate("/cadastro")}
+            className="btn-usuario"
+            title="Cadastrar Novo Usuário"
+          >
+            <FaPlus />
+          </button>
         </div>
       </div>
-    </>
+
+      {erroApi && <p className="error-message">{erroApi}</p>}
+
+      <div className="usuarios-lista">
+        {usuariosFiltrados.length === 0 && !loading ? (
+          <p className="sem-usuarios">
+            Nenhum usuário encontrado com os filtros aplicados.
+          </p>
+        ) : (
+          usuariosFiltrados.map((usuario) => (
+            <div className="usuario-row" key={usuario.id}>
+              <div
+                className={`usuario-borda ${usuario.tipoUsuario?.toLowerCase()}`}
+              ></div>
+              <div className="usuario-conteudo">
+                <div className="usuario-info">
+                  <span>
+                    <strong>Nome:</strong> {usuario.nome}
+                  </span>
+                  <span>
+                    <strong>CPF:</strong> {usuario.cpf}
+                  </span>
+                  <span>
+                    <strong>Email:</strong> {usuario.email}
+                  </span>
+                  <span>
+                    <strong>Tipo:</strong> {usuario.tipoUsuario}
+                  </span>
+                  <span>
+                    <strong>Sexo:</strong> {usuario.sexo}
+                  </span>
+                  <span>
+                    <strong>Nasc:</strong> {usuario.dtNascimento}
+                  </span>
+                  <span>
+                    <strong>Status:</strong>{" "}
+                    <span
+                      className={
+                        usuario.ativo ? "status-ativo" : "status-inativo"
+                      }
+                    >
+                      {usuario.ativo ? "Ativo" : "Inativo"}
+                    </span>
+                  </span>
+                </div>
+                <div className="usuario-acoes">
+                  <button
+                    onClick={() =>
+                      navigate(`/secretaria/editarUsuario/${usuario.id}`)
+                    }
+                    title="Editar Usuário"
+                  >
+                    <FaEdit />
+                  </button>
+                  {usuario.ativo ? (
+                    <button
+                      onClick={() =>
+                        handleDesativar(usuario.id, usuario.nome)
+                      }
+                      title="Desativar Usuário"
+                    >
+                      <FaTrash />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleReativar(usuario.id, usuario.nome)}
+                      title="Reativar Usuário"
+                      className="btn-action btn-reactivate"
+                    >
+                      <FaRedo />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
   );
 }
