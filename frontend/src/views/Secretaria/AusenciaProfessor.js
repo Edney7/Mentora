@@ -22,11 +22,9 @@ const parseDate = (dataString) => {
 export default function AusenciaProfessor() {
   const [todasAsAusencias, setTodasAsAusencias] = useState([]);
   const [ausenciasFiltradas, setAusenciasFiltradas] = useState([]);
-  
   const [filtroNome, setFiltroNome] = useState("");
   const [mesAusencia, setMesAusencia] = useState("");
   const [mesRegistro, setMesRegistro] = useState("");
-  
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
   const navigate = useNavigate();
@@ -53,11 +51,8 @@ export default function AusenciaProfessor() {
     let ausenciasTemp = [...todasAsAusencias];
 
     if (filtroNome) {
-      ausenciasTemp = ausenciasTemp.filter(a =>
-        a.nomeProfessor?.toLowerCase().includes(filtroNome.toLowerCase())
-      );
+      ausenciasTemp = ausenciasTemp.filter(a => a.nomeProfessor?.toLowerCase().includes(filtroNome.toLowerCase()));
     }
-
     if (mesAusencia) {
       const mesNum = parseInt(mesAusencia, 10);
       ausenciasTemp = ausenciasTemp.filter(a => {
@@ -65,7 +60,6 @@ export default function AusenciaProfessor() {
         return data && data.getMonth() + 1 === mesNum;
       });
     }
-
     if (mesRegistro) {
       const mesNum = parseInt(mesRegistro, 10);
       ausenciasTemp = ausenciasTemp.filter(a => {
@@ -73,56 +67,31 @@ export default function AusenciaProfessor() {
         return data && data.getMonth() + 1 === mesNum;
       });
     }
-
     setAusenciasFiltradas(ausenciasTemp);
-
   }, [filtroNome, mesAusencia, mesRegistro, todasAsAusencias]);
-
 
   return (
     <div className="pagina-ausencias">
-      <div className="voltar-seta" onClick={() => navigate(-1)} title="Voltar">
-        <FaArrowLeft />
-      </div>
+      <div className="voltar-seta" onClick={() => navigate(-1)} title="Voltar"><FaArrowLeft /></div>
       <h2>Ausências de Professores</h2>
-      
       <div className="filtros-ausencias">
         <div className="filtro-container">
-          <input
-            type="text"
-            placeholder="Nome do professor"
-            value={filtroNome}
-            onChange={(e) => setFiltroNome(e.target.value)}
-          />
+          <input type="text" placeholder="Nome do professor" value={filtroNome} onChange={(e) => setFiltroNome(e.target.value)} />
         </div>
-
         <div className="filtro-container">
-          <select 
-            value={mesAusencia} 
-            onChange={(e) => setMesAusencia(e.target.value)}
-          >
+          <select value={mesAusencia} onChange={(e) => setMesAusencia(e.target.value)}>
             <option value="">Mês da Ausência (Todos)</option>
-            {[...Array(12).keys()].map(i => (
-              <option key={i + 1} value={i + 1}>{new Date(2000, i).toLocaleString('pt-BR', { month: 'long' })}</option>
-            ))}
+            {[...Array(12).keys()].map(i => <option key={i + 1} value={i + 1}>{new Date(2000, i).toLocaleString('pt-BR', { month: 'long' })}</option>)}
           </select>
         </div>
-
         <div className="filtro-container">
-          <select 
-            value={mesRegistro} 
-            onChange={(e) => setMesRegistro(e.target.value)}
-          >
+          <select value={mesRegistro} onChange={(e) => setMesRegistro(e.target.value)}>
             <option value="">Mês do Registro (Todos)</option>
-            {[...Array(12).keys()].map(i => (
-              <option key={i + 1} value={i + 1}>{new Date(2000, i).toLocaleString('pt-BR', { month: 'long' })}</option>
-            ))}
+            {[...Array(12).keys()].map(i => <option key={i + 1} value={i + 1}>{new Date(2000, i).toLocaleString('pt-BR', { month: 'long' })}</option>)}
           </select>
         </div>
       </div>
-
       {erro && <p className="sem-ausencias error-message">{erro}</p>}
-
       {loading ? (
         <p className="carregando-ausencias">Carregando ausências...</p>
       ) : ausenciasFiltradas.length === 0 && !erro ? (

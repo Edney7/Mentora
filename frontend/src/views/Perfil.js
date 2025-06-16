@@ -1,11 +1,7 @@
-// src/views/Perfil.js
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { buscarUsuarioPorIdIncluindoInativos } from '../services/ApiService';
-import '../styles/DetalhesUsuario.css'; // Usando o novo CSS
-
-// Importando ícones para um visual mais agradável
+import '../styles/DetalhesUsuario.css'; 
 import { FaUserCircle, FaEdit, FaKey, FaArrowLeft } from 'react-icons/fa';
 
 export default function Perfil() {
@@ -36,7 +32,6 @@ export default function Perfil() {
     carregarUsuarioLogado();
   }, [carregarUsuarioLogado]);
 
-  // Usando o novo container para as telas de loading e erro
   if (loading) {
     return <div className="detalhes-usuario-container"><p>Carregando perfil...</p></div>;
   }
@@ -46,14 +41,11 @@ export default function Perfil() {
   }
 
   return (
-    // O JSX foi completamente reestruturado para usar o novo CSS
     <div className="detalhes-usuario-container">
       {usuario && (
         <>
-          {/* --- CABEÇALHO --- */}
           <div className="usuario-header">
             <div className="avatar-container">
-              {/* Usando um ícone como placeholder para o avatar */}
               <FaUserCircle size="100%" color="#ccc" />
             </div>
             <div>
@@ -63,11 +55,7 @@ export default function Perfil() {
               </span>
             </div>
           </div>
-
-          {/* --- GRID PRINCIPAL --- */}
           <div className="usuario-grid">
-            
-            {/* PAINEL DA ESQUERDA (INFORMAÇÕES) */}
             <div className="painel-info-principal">
               <div className="info-grupo">
                 <h3>Informações Pessoais</h3>
@@ -80,7 +68,6 @@ export default function Perfil() {
                   <span>{usuario.cpf}</span>
                 </div>
               </div>
-
               <div className="info-grupo">
                 <h3>Informações da Conta</h3>
                 <div className="info-campo">
@@ -93,8 +80,6 @@ export default function Perfil() {
                 </div>
               </div>
             </div>
-
-            {/* PAINEL DA DIREITA (AÇÕES) */}
             <div className="painel-acoes">
               <h3>Ações Rápidas</h3>
               <div className="grupo-botoes">
@@ -109,7 +94,6 @@ export default function Perfil() {
               </div>
             </div>
           </div>
-          
           <div className="voltar-btn-container">
              <button onClick={() => navigate(-1)} className="btn-acao btn-secundario" style={{width: 'auto', padding: '12px 20px'}}>
                 <FaArrowLeft />

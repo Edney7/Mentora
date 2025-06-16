@@ -4,9 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import "../../styles/secretaria/NotasPresencasAlunos.css";
 
-// REMOVIDA: A função de formatar a data foi retirada.
-// const formatarData = (dataString) => { ... };
-
 export default function NotasPresencasAluno() {
   const [todasAsNotas, setTodasAsNotas] = useState([]);
   const [todasAsFaltas, setTodasAsFaltas] = useState([]);
@@ -59,28 +56,12 @@ export default function NotasPresencasAluno() {
 
   return (
     <div className="pagina-notas-faltas">
-      <div className="voltar-seta" onClick={() => navigate(-1)} title="Voltar">
-        <FaArrowLeft />
-      </div>
+      <div className="voltar-seta" onClick={() => navigate(-1)} title="Voltar"><FaArrowLeft /></div>
       <h2>Notas e Presenças dos Alunos</h2>
-
       <div className="filtros-container">
-        <input 
-          type="text"
-          className="filtro-input"
-          placeholder="Filtrar por nome do aluno..."
-          value={filtroAluno}
-          onChange={(e) => setFiltroAluno(e.target.value)}
-        />
-        <input 
-          type="text"
-          className="filtro-input"
-          placeholder="Filtrar por disciplina..."
-          value={filtroDisciplina}
-          onChange={(e) => setFiltroDisciplina(e.target.value)}
-        />
+        <input type="text" className="filtro-input" placeholder="Filtrar por nome do aluno..." value={filtroAluno} onChange={(e) => setFiltroAluno(e.target.value)} />
+        <input type="text" className="filtro-input" placeholder="Filtrar por disciplina..." value={filtroDisciplina} onChange={(e) => setFiltroDisciplina(e.target.value)} />
       </div>
-
       <div className="secoes-container">
         <div className="secao">
           <h3>Notas</h3>
@@ -103,7 +84,6 @@ export default function NotasPresencasAluno() {
             </div>
           )}
         </div>
-
         <div className="secao">
           <h3>Faltas</h3>
           {faltasFiltradas.length === 0 ? (
@@ -120,7 +100,6 @@ export default function NotasPresencasAluno() {
                 <div className="linha" key={`falta-${falta.id}`}>
                   <span>{falta.nomeAluno}</span>
                   <span>{falta.nomeDisciplina}</span>
-                  {/* ALTERAÇÃO AQUI: Mostrando a data sem formatação */}
                   <span>{falta.dataFalta || "-"}</span>
                   <span>{falta.justificada ? "Sim" : "Não"}</span>
                 </div>
