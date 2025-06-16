@@ -1,5 +1,6 @@
 package com.example.mentora.controller; // Ou o seu pacote de controllers
 
+import com.example.mentora.dto.nota.AlunoNotasResumoDTO;
 import com.example.mentora.dto.nota.NotaCreateDTO;
 import com.example.mentora.dto.nota.NotaResponseDTO;
 import com.example.mentora.dto.nota.NotaUpdateDTO; // Importar se for usar endpoints de atualização
@@ -61,5 +62,11 @@ public class NotaController {
         return ResponseEntity.ok(notas);
     }
 
-
+    @Operation(summary = "Resumo de notas de um aluno (com totais e por disciplina)")
+    @GetMapping("/aluno/{alunoId}/resumo")
+    public ResponseEntity<AlunoNotasResumoDTO> buscarResumoNotas(
+            @Parameter(description = "ID do aluno") @PathVariable Long alunoId){
+        AlunoNotasResumoDTO resumo = notaService.buscarResumoNotas(alunoId);
+        return ResponseEntity.ok(resumo);
+    }
 }

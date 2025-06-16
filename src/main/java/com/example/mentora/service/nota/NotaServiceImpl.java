@@ -1,29 +1,30 @@
 package com.example.mentora.service.nota;
 
+import com.example.mentora.dto.nota.AlunoNotasResumoDTO;
+import com.example.mentora.dto.nota.AlunoNotasResumoDTO.MediaPorDisciplinaDTO;
 import com.example.mentora.dto.nota.NotaCreateDTO;
 import com.example.mentora.dto.nota.NotaResponseDTO;
-import com.example.mentora.dto.nota.NotaUpdateDTO; // Importar se for usar o método de atualização
+import com.example.mentora.dto.nota.NotaUpdateDTO;
 import com.example.mentora.model.Aluno;
 import com.example.mentora.model.Disciplina;
 import com.example.mentora.model.Nota;
-import com.example.mentora.model.Professor; // Importar Professor
-import com.example.mentora.model.Turma;     // Importar Turma para validações
-import com.example.mentora.model.TurmaDisciplina; // Importar TurmaDisciplina para validações
-import com.example.mentora.model.ProfessorDisciplina; // Importar ProfessorDisciplina para validações
+import com.example.mentora.model.Professor;
+import com.example.mentora.model.Turma;
+import com.example.mentora.model.TurmaDisciplina;
+import com.example.mentora.model.ProfessorDisciplina;
 import com.example.mentora.repository.AlunoRepository;
 import com.example.mentora.repository.DisciplinaRepository;
 import com.example.mentora.repository.NotaRepository;
-import com.example.mentora.repository.ProfessorRepository; // Importar ProfessorRepository
-import com.example.mentora.repository.TurmaDisciplinaRepository; // Importar para validação
-import com.example.mentora.repository.ProfessorDisciplinaRepository; // Importar para validação
-
+import com.example.mentora.repository.ProfessorRepository;
+import com.example.mentora.repository.TurmaDisciplinaRepository;
+import com.example.mentora.repository.ProfessorDisciplinaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,22 +35,21 @@ public class NotaServiceImpl implements NotaService {
     private final NotaRepository notaRepository;
     private final AlunoRepository alunoRepository;
     private final DisciplinaRepository disciplinaRepository;
-    private final ProfessorRepository professorRepository; // Injetar ProfessorRepository
-    private final TurmaDisciplinaRepository turmaDisciplinaRepository; // Para validação
-    private final ProfessorDisciplinaRepository professorDisciplinaRepository; // Para validação
-
+    private final ProfessorRepository professorRepository;
+    private final TurmaDisciplinaRepository turmaDisciplinaRepository;
+    private final ProfessorDisciplinaRepository professorDisciplinaRepository;
 
     @Autowired
     public NotaServiceImpl(NotaRepository notaRepository,
                            AlunoRepository alunoRepository,
                            DisciplinaRepository disciplinaRepository,
-                           ProfessorRepository professorRepository, // Adicionar ao construtor
+                           ProfessorRepository professorRepository,
                            TurmaDisciplinaRepository turmaDisciplinaRepository,
                            ProfessorDisciplinaRepository professorDisciplinaRepository) {
         this.notaRepository = notaRepository;
         this.alunoRepository = alunoRepository;
         this.disciplinaRepository = disciplinaRepository;
-        this.professorRepository = professorRepository; // Atribuir
+        this.professorRepository = professorRepository;
         this.turmaDisciplinaRepository = turmaDisciplinaRepository;
         this.professorDisciplinaRepository = professorDisciplinaRepository;
     }
@@ -61,44 +61,31 @@ public class NotaServiceImpl implements NotaService {
                 dto.getAlunoId(), dto.getDisciplinaId(), dto.getProfessorId());
 
         Aluno aluno = alunoRepository.findById(dto.getAlunoId())
-                .orElseThrow(() -> {
-                    log.warn("Aluno com ID {} não encontrado.", dto.getAlunoId());
-                    return new RuntimeException("Aluno com ID " + dto.getAlunoId() + " não encontrado.");
-                });
+                .orElseThrow(() -> new RuntimeException("Aluno com ID " + dto.getAlunoId() + " não encontrado."));
 
         Disciplina disciplina = disciplinaRepository.findById(dto.getDisciplinaId())
-                .orElseThrow(() -> {
-                    log.warn("Disciplina com ID {} não encontrada.", dto.getDisciplinaId());
-                    return new RuntimeException("Disciplina com ID " + dto.getDisciplinaId() + " não encontrada.");
-                });
+                .orElseThrow(() -> new RuntimeException("Disciplina com ID " + dto.getDisciplinaId() + " não encontrada."));
 
         Professor professor = professorRepository.findById(dto.getProfessorId())
-                .orElseThrow(() -> {
-                    log.warn("Professor com ID {} não encontrado.", dto.getProfessorId());
-                    return new RuntimeException("Professor com ID " + dto.getProfessorId() + " não encontrado.");
-                });
+                .orElseThrow(() -> new RuntimeException("Professor com ID " + dto.getProfessorId() + " não encontrado."));
 
         if (aluno.getUsuario() == null || !aluno.getUsuario().getAtivo()) {
-            log.warn("Tentativa de lançar nota para aluno (ID Usuário: {}) que está inativo ou sem usuário associado.", aluno.getUsuario() != null ? aluno.getUsuario().getId() : "N/A");
             throw new RuntimeException("Não é possível lançar nota para um aluno inativo.");
         }
 
         if (professor.getUsuario() == null || !professor.getUsuario().getAtivo()) {
-            log.warn("Tentativa de lançamento de nota por professor (ID Usuário: {}) que está inativo ou sem usuário associado.", professor.getUsuario() != null ? professor.getUsuario().getId() : "N/A");
             throw new RuntimeException("Professor inativo não pode lançar notas.");
         }
 
         Turma turmaDoAluno = aluno.getTurma();
         if (turmaDoAluno == null) {
-            log.warn("Aluno ID {} não está associado a nenhuma turma.", aluno.getId());
             throw new RuntimeException("Aluno ID " + aluno.getId() + " não está associado a nenhuma turma.");
         }
+
         boolean disciplinaNaTurma = turmaDisciplinaRepository.findByTurmaId(turmaDoAluno.getId())
                 .stream()
                 .anyMatch(td -> td.getDisciplina().getId().equals(disciplina.getId()));
         if (!disciplinaNaTurma) {
-            log.warn("Disciplina ID {} não está associada à turma ID {} do aluno ID {}.",
-                    disciplina.getId(), turmaDoAluno.getId(), aluno.getId());
             throw new RuntimeException("Disciplina ID " + disciplina.getId() +
                     " não pertence à turma do aluno ID " + aluno.getId() + ".");
         }
@@ -107,8 +94,6 @@ public class NotaServiceImpl implements NotaService {
                 .stream()
                 .anyMatch(pd -> pd.getDisciplina().getId().equals(disciplina.getId()));
         if (!professorLecionaDisciplina) {
-            log.warn("Professor ID {} não está autorizado a lançar notas para a disciplina ID {}.",
-                    professor.getId(), disciplina.getId());
             throw new RuntimeException("Professor ID " + professor.getId() +
                     " não leciona a disciplina ID " + disciplina.getId() + ".");
         }
@@ -116,7 +101,7 @@ public class NotaServiceImpl implements NotaService {
         Nota nota = new Nota();
         nota.setAluno(aluno);
         nota.setDisciplina(disciplina);
-        nota.setProfessor(professor); // Associar o professor
+        nota.setProfessor(professor);
         nota.setBimestre(dto.getBimestre());
         nota.setProva1(dto.getProva1());
         nota.setProva2(dto.getProva2());
@@ -132,34 +117,25 @@ public class NotaServiceImpl implements NotaService {
     @Override
     @Transactional(readOnly = true)
     public NotaResponseDTO buscarNotaPorId(Long id) {
-        log.debug("Buscando nota com ID: {}", id);
         Nota nota = notaRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.warn("Nota com ID {} não encontrada.", id);
-                    return new RuntimeException("Nota com ID " + id + " não encontrada.");
-                });
+                .orElseThrow(() -> new RuntimeException("Nota com ID " + id + " não encontrada."));
         return toResponseDTO(nota);
     }
+
     @Override
     public List<NotaResponseDTO> listarTodasNotas() {
         List<Nota> notas = notaRepository.findAll();
-        return notas.stream()
-                .map(this::toResponseDTO)
-                .toList();
+        return notas.stream().map(this::toResponseDTO).toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<NotaResponseDTO> listarNotasPorAluno(Long alunoId) {
-        log.debug("Listando notas para o aluno ID: {}", alunoId);
-
         Aluno aluno = alunoRepository.findById(alunoId)
-                .orElseThrow(() -> new RuntimeException("Aluno com ID " + alunoId + " não encontrado."));
+                .orElseThrow(() -> new RuntimeException("Aluno com ID " + alunoId + " não encontrado.!!!!"));
         if (aluno.getUsuario() == null || !aluno.getUsuario().getAtivo()) {
-            log.warn("Tentativa de listar notas para aluno (ID Usuário: {}) que está inativo ou sem usuário.", aluno.getUsuario() != null ? aluno.getUsuario().getId() : "N/A");
             throw new RuntimeException("Não é possível listar notas de um aluno inativo.");
         }
-
         List<Nota> notas = notaRepository.findByAlunoId(alunoId);
         return toResponseDTOList(notas);
     }
@@ -167,19 +143,57 @@ public class NotaServiceImpl implements NotaService {
     @Override
     @Transactional(readOnly = true)
     public List<NotaResponseDTO> listarNotasPorAlunoEDisciplina(Long alunoId, Long disciplinaId) {
-        log.debug("Listando notas para o aluno ID: {} e disciplina ID: {}", alunoId, disciplinaId);
         Aluno aluno = alunoRepository.findById(alunoId)
                 .orElseThrow(() -> new RuntimeException("Aluno com ID " + alunoId + " não encontrado."));
         if (aluno.getUsuario() == null || !aluno.getUsuario().getAtivo()) {
-            log.warn("Tentativa de listar notas para aluno (ID Usuário: {}) que está inativo ou sem usuário.", aluno.getUsuario() != null ? aluno.getUsuario().getId() : "N/A");
             throw new RuntimeException("Não é possível listar notas de um aluno inativo.");
         }
         if (!disciplinaRepository.existsById(disciplinaId)) {
             throw new RuntimeException("Disciplina com ID " + disciplinaId + " não encontrada.");
         }
-
         List<Nota> notas = notaRepository.findByAlunoIdAndDisciplinaId(alunoId, disciplinaId);
         return toResponseDTOList(notas);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AlunoNotasResumoDTO buscarResumoNotas(Long alunoId) {
+        Aluno aluno = alunoRepository.findById(alunoId)
+                .orElseThrow(() -> new RuntimeException("Aluno com ID " + alunoId + " não encontrado."));
+
+        List<Nota> notas = notaRepository.findByAlunoId(alunoId);
+
+        Map<Long, List<Nota>> notasPorDisciplina = notas.stream()
+                .filter(n -> n.getDisciplina() != null)
+                .collect(Collectors.groupingBy(n -> n.getDisciplina().getId()));
+
+        List<MediaPorDisciplinaDTO> mediasPorDisciplina = new ArrayList<>();
+
+        for (Map.Entry<Long, List<Nota>> entry : notasPorDisciplina.entrySet()) {
+            Long disciplinaId = entry.getKey();
+            List<Nota> notasDisciplina = entry.getValue();
+
+            double mediaFinal = notasDisciplina.stream()
+                    .filter(n -> n.getMedia() != null)
+                    .mapToDouble(Nota::getMedia)
+                    .average()
+                    .orElse(0);
+
+            String nomeDisciplina = notasDisciplina.get(0).getDisciplina().getNome();
+
+            mediasPorDisciplina.add(new MediaPorDisciplinaDTO(disciplinaId, nomeDisciplina, mediaFinal));
+        }
+
+        AlunoNotasResumoDTO resumo = new AlunoNotasResumoDTO();
+        resumo.setAlunoId(aluno.getId());
+        resumo.setNomeAluno(aluno.getUsuario().getNome());
+        resumo.setMediasPorDisciplina(mediasPorDisciplina);
+        resumo.setTotalFaltas(0);
+        resumo.setTotalAulas(0);
+        resumo.setAulasAssistidas(0);
+        resumo.setFaltasPorDisciplina(Collections.emptyList());
+
+        return resumo;
     }
 
     private NotaResponseDTO toResponseDTO(Nota nota) {
@@ -203,10 +217,7 @@ public class NotaServiceImpl implements NotaService {
                 .build();
     }
 
-    // Método auxiliar para converter uma lista de entidades Nota para uma lista de NotaResponseDTOs.
     private List<NotaResponseDTO> toResponseDTOList(List<Nota> notas) {
-        return notas.stream()
-                .map(this::toResponseDTO)
-                .collect(Collectors.toList());
+        return notas.stream().map(this::toResponseDTO).collect(Collectors.toList());
     }
 }
