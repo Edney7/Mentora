@@ -1,0 +1,91 @@
+.titulo-turma {
+  text-align: center;
+  font-size: 2rem;
+  margin: 1rem 0;
+  color: #004b4b;
+}
+
+.painel-geral {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.painel-alunos,
+.painel-notas {
+  background: #f7f7f7;
+  border-radius: 10px;
+  padding: 1rem;
+  flex: 1;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.titulo {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #2980f2;
+  margin-bottom: 0.5rem;
+}
+
+.aluno-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border-left: 5px solid #2980f2;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.aluno-box.selecionado {
+  background: #ddd;
+}
+
+.aluno-box input {
+  margin-left: 0.3rem;
+  width: 20px;
+  height: 20px;
+}
+
+.tabela-notas table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.tabela-notas th,
+.tabela-notas td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+.tabela-notas input {
+  width: 60px;
+  text-align: center;
+}
+
+.tabela-notas button {
+  padding: 4px 10px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.tabela-notas button:hover {
+  background-color: #45a049;
+}
+.btn-enviar {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  background: #004b4b;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}

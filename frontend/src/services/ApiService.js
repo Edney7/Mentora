@@ -97,6 +97,11 @@ export const listarProfessoresAtivos = async () => {
     const response = await api.get("/professores");
     return response.data;
 };
+export const listarTurmasDoProfessor = async (professorId) => {
+  const response = await api.get(`/turma-disciplina-professor/professor/${professorId}`);
+  return response.data;
+};// estou usando
+
 
 export const buscarProfessorAtivoPorId = async (professorId) => {
     const response = await api.get(`/professores/${professorId}`);
@@ -285,7 +290,7 @@ export const listarNotasDoAlunoPorDisciplina = async (alunoId, disciplinaId) => 
 };
 
 // --- Faltas ---
-export const registarFalta = async (faltaData) => {
+export const registrarFalta = async (faltaData) => {
     const response = await api.post("/faltas", faltaData);
     return response.data;
 };

@@ -5,6 +5,7 @@ import {
   desativarUsuario,
   reativarUsuario,
 } from "../../services/ApiService";
+import "../../styles/secretaria/ListaUsuario.css";
 import { FaEdit, FaTrash, FaArrowLeft, FaPlus, FaRedo } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
@@ -162,6 +163,7 @@ export default function ListaUsuario() {
             <select
               value={statusFiltro}
               onChange={(e) => setStatusFiltro(e.target.value)}
+              className="usuario-filtro select"
             >
               <option value="">Todos os Status</option>
               <option value="ATIVO">Apenas Ativos</option>
@@ -169,7 +171,7 @@ export default function ListaUsuario() {
             </select>
             <button
               onClick={() => navigate("/cadastro")}
-              className="btn-add"
+              className="btn-usuario"
               title="Cadastrar Novo Usuário"
             >
               <FaPlus />
@@ -223,11 +225,10 @@ export default function ListaUsuario() {
                   </div>
                   <div className="usuario-acoes">
                     <button
-                      onClick={() => navigate(`/secretaria/editarUsuario/${usuario.id}`)
-                        
+                      onClick={() =>
+                        navigate(`/secretaria/editarUsuario/${usuario.id}`)
                       }
                       title="Editar Usuário"
-                      
                     >
                       <FaEdit />
                     </button>

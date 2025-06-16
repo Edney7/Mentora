@@ -60,9 +60,9 @@
   gap: 12px;
 }
 
-.linha-cabecalho {
+.linha-cabecalho-ausencia {
   display: grid;
-  grid-template-columns:2fr 3fr 1fr 1fr;
+  grid-template-columns:2fr 2fr 1fr 1fr;
   font-weight: bold;
   background-color: #e6f0fa;
   padding: 12px 16px;
@@ -73,7 +73,7 @@
 
 .linha-ausencia {
   display: grid;
-  grid-template-columns: 2fr 3fr 1fr 1fr;
+  grid-template-columns: 2fr 2fr 1fr 1fr;
   padding: 12px 16px;
   background-color: #ffffff;
   border: 1px solid #dbe9f5;
@@ -81,9 +81,6 @@
   transition: background-color 0.2s;
 }
 
-.linha-ausencia:hover {
-  background-color: #f0f8ff;
-}
 
 @media (max-width: 700px) {
   .linha-cabecalho, .linha-ausencia {

@@ -5,11 +5,13 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6); /* Fundo semi-transparente */
+  background-color: rgba(0, 0, 0, 0.6);
+  /* Fundo semi-transparente */
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000; /* Garante que fica por cima de outros elementos */
+  z-index: 1000;
+  /* Garante que fica por cima de outros elementos */
 }
 
 .modal-content {
@@ -18,10 +20,13 @@
   border-radius: 8px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   min-width: 300px;
-  max-width: 600px; /* Largura máxima do modal */
-  width: 90%; /* Responsivo */
+  max-width: 600px;
+  /* Largura máxima do modal */
+  width: 90%;
+  /* Responsivo */
   position: relative;
-  max-height: 90vh; /* Altura máxima */
+  max-height: 90vh;
+  /* Altura máxima */
   display: flex;
   flex-direction: column;
 }
@@ -49,6 +54,7 @@
   cursor: pointer;
   color: #888;
 }
+
 .modal-close-btn:hover {
   color: #333;
 }
@@ -56,22 +62,51 @@
 .modal-body {
   overflow-y: auto;
 }
+
 /* Turma */
-.modal-turma{
+.modal-turma {
   display: flex;
   flex-direction: column;
 }
-.modal-turma-form input{
+
+.modal-turma-form input {
   color: #016cdf;
 
 }
 
+.modal-add-disciplina select {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.modal-select-disicplina {
+  margin-bottom: 20px;
+}
+
+.btn-add-disciplina{
+  background-color: #007a99;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.btn-add-disciplina:hover{
+   background-color: #005f73;
+}
 /*  Disciplina */
-.modal-detail-disciplina-conteudo h3{
+.modal-detail-disciplina-conteudo h3 {
   color: #016cdf;
   font-size: 20px;
 }
-.modal-detail-disciplina-conteudo li{
+
+.modal-detail-disciplina-conteudo li {
   color: #383839;
   font-size: 17px;
   padding-bottom: 5px;

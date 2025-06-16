@@ -1,25 +1,20 @@
-import React, { useState } from "react";
-import "../../styles/professor/HomeProfessor.css"
+import React, { useState, useEffect } from "react";
+import "../../styles/professor/HomeProfessor.css";
 import Calendar from "../../components/Calendario";
 import { useNavigate } from "react-router-dom";
-
-import Navbar from "../../components/Navbar"; 
-
+import { listarTurmasDoProfessor } from "../../services/ApiService";
+import Navbar from "../../components/Navbar";
 
 export default function HomeProfessor() {
   const navigate = useNavigate();
 
-  const turmas = [
-    { id: 1, nome: "Turma 1", turno: "MANHÃ", serie: "3° SÉRIE" },
-    { id: 2, nome: "Turma 1", turno: "MANHÃ", serie: "3° SÉRIE" },
-    { id: 3, nome: "Turma 1", turno: "MANHÃ", serie: "3° SÉRIE" },
-    { id: 4, nome: "Turma 1", turno: "MANHÃ", serie: "3° SÉRIE" },
-  ];
-
   const [modalAberto, setModalAberto] = useState(false);
   const [descricao, setDescricao] = useState("");
   const [data, setData] = useState("");
+  const [turmas, setTurmas] = useState([]);
 
+  const idProfessor = localStorage.getItem("idProfessor");
+  console.log("ID do prof:", idProfessor);
   const abrirModal = () => {
     setDescricao("");
     setData("");
@@ -32,52 +27,67 @@ export default function HomeProfessor() {
     setModalAberto(false);
   };
 
+  useEffect(() => {
+    const carregarTurmas = async () => {
+      try {
+        const resposta = await listarTurmasDoProfessor(idProfessor);
+        setTurmas(resposta);
+        console.log(turmas)
+      } catch (error) {
+        console.error("Erro ao buscar turmas do professor:", error);
+        alert("Erro ao carregar turmas.");
+      }
+    };
+
+    if (idProfessor) {
+      carregarTurmas();
+    }
+  }, [idProfessor]);
   return (
     <>
       <Navbar onLogout={() => console.log("Logout clicado")} />
       <div className="home-secretaria-container">
         <main className="main-content-turmas">
-          <div className="turmas-grid">
+          <div
+            className="ausencia-card"
+            onClick={abrirModal}
+            style={{ cursor: "pointer" }}
+          >
+            <h2>Ausência Planejada</h2>
+          </div>
+          <div className="turmas-lista">
             {turmas.map((turma) => (
               <div
                 key={turma.id}
-                className="card-turma-box"
+                className="turma-lista-item"
                 onClick={() => navigate(`/turmaDetalhe/${turma.id}`)}
-                style={{ cursor: "pointer" }}
               >
-                <h2>{turma.nome}</h2>
-                <div className="turma-info">
-                  <div>
-                    <p className="label">TURNO</p>
-                    <p>{turma.turno}</p>
-                  </div>
-                  <div>
-                    <p className="label">SÉRIE</p>
-                    <p>{turma.serie}</p>
-                  </div>
-                </div>
+                <strong>{turma.nome}</strong>
+                <span>Turno: {turma.turno}</span>
+                <span className="turmas-serie">Série: {turma.serieAno}</span>
               </div>
             ))}
           </div>
-
-          <div className="ausencia-card" onClick={abrirModal} style={{ cursor: "pointer" }}>
-            <h2>Ausência Planejada</h2>
-          </div>
         </main>
 
-        <section className="event-panel"> 
-          <div className="event-card branco"> 
-            <div className="calendar-container"> 
+        <section className="event-panel">
+          <div className="event-card branco">
+            <div className="calendar-container">
               <Calendar />
             </div>
           </div>
-          
+
           <div className="event-group">
             <div className="event-card verde">
               <span>Próximo Feriado</span>
               <span className="hora">xx/xx</span>
             </div>
-            <button className="event-card laranja" onClick={() => navigate("/secretaria/calendario/eventos/cadastrar")}>
+            <button
+              className="event-card laranja"
+              onClick={() =>
+                navigate("/secretaria/calendario/eventos/cadastrar")
+              }
+            >
               <h2>Cadastrar Eventos</h2>
             </button>
           </div>
@@ -86,14 +96,18 @@ export default function HomeProfessor() {
         {modalAberto && (
           <div className="modal-backdrop">
             <div className="modal">
-              <label><strong>Descrição</strong></label>
+              <label>
+                <strong>Descrição</strong>
+              </label>
               <textarea
                 rows={4}
                 value={descricao}
                 onChange={(e) => setDescricao(e.target.value)}
               />
 
-              <label><strong>Data</strong></label>
+              <label>
+                <strong>Data</strong>
+              </label>
               <input
                 type="date"
                 value={data}

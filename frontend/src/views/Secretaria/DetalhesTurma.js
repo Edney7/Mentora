@@ -9,7 +9,7 @@ import {
   vincularDisciplinaEProfessorNaTurma,
   listarDisciplinaTurma,
 } from "../../services/ApiService";
-import { FaArrowLeft, FaPlus, FaPen } from "react-icons/fa";
+import { FaArrowLeft, FaPlus } from "react-icons/fa";
 import Modal from "../../components/Modal";
 
 export default function DetalhesTurma() {
@@ -61,7 +61,7 @@ export default function DetalhesTurma() {
           >
             <FaArrowLeft />
           </div>
-          <span>TURMA {turma.nome}</span>
+          <span className="titulo-turma">TURMA: {turma.nome}</span>
         </div>
         <div className="painel-duplo">
           <div className="painel-esquerdo">
@@ -80,21 +80,25 @@ export default function DetalhesTurma() {
           <div className="painel-direito">
             <div className="cabecalho">
               <span className="titulo">Disciplinas</span>{" "}
-              <button onClick={() => setModalDisciplinaAberto(true)} className="btn-icon-only">
+              <button
+                onClick={() => setModalDisciplinaAberto(true)}
+                className="btn-icon-only"
+              >
                 <FaPlus className="btn-icone" />
               </button>
             </div>
-            <div className="grupo">
+            <div className="tabela-disciplina">
+              <div className="linha-cabecalho-disciplina">
+                <span>Disciplina</span>
+                <span>Professor</span>
+              </div>
               {ofertasDisciplinaTurma.map(
                 (
-                  oferta // <--- MAPA O NOVO ESTADO
+                  oferta 
                 ) => (
-                  <div className="item" key={oferta.id}>
-                    {" "}
-                    {/* Use o ID da oferta */}
-                    <div className="linha-cor disciplina"></div>
-                    {oferta.nomeDisciplina} - Prof: {oferta.nomeProfessor}{" "}
-                    {/* Mostra disciplina E professor */}
+                  <div className="linha-disciplina" key={oferta.id}>
+                    <span>{oferta.nomeDisciplina} </span>
+                    <span>{oferta.nomeProfessor}</span>
                   </div>
                 )
               )}
@@ -105,9 +109,10 @@ export default function DetalhesTurma() {
             isOpen={modalDisciplinaAberto}
             onClose={() => setModalDisciplinaAberto(false)}
             title="Adicionar Disciplina à Turma"
+            className="modal-add-disciplina"
           >
             <select
-              className="item"
+              className="modal-select-disicplina"
               value={disciplinaSelecionada}
               onChange={async (e) => {
                 const idSelecionado = e.target.value;
@@ -133,7 +138,7 @@ export default function DetalhesTurma() {
             </select>
             {professoresDaDisciplina.length > 0 && (
               <select
-                className="item"
+               className="modal-select-disicplina"
                 value={professorSelecionado}
                 onChange={(e) => setProfessorSelecionado(e.target.value)}
               >
@@ -146,8 +151,8 @@ export default function DetalhesTurma() {
               </select>
             )}
 
-            <button
-              className="btn-salvar"
+            <button className="btn-add-disciplina"
+              
               onClick={async () => {
                 const disciplina = todasDisciplinas.find(
                   (d) => d.id === parseInt(disciplinaSelecionada)
