@@ -290,7 +290,7 @@ export const listarNotasDoAlunoPorDisciplina = async (alunoId, disciplinaId) => 
 };
 
 // --- Faltas ---
-export const registarFalta = async (faltaData) => {
+export const registrarFalta = async (faltaData) => {
     const response = await api.post("/faltas", faltaData);
     return response.data;
 };
