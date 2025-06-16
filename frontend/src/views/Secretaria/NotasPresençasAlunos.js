@@ -1,43 +1,91 @@
 import React, { useEffect, useState } from "react";
 import { listarTodasNotas, listarTodasFaltas } from "../../services/ApiService";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../../components/Navbar";
 import { FaArrowLeft } from "react-icons/fa";
 import "../../styles/secretaria/NotasPresencasAlunos.css";
 
+// REMOVIDA: A função de formatar a data foi retirada.
+// const formatarData = (dataString) => { ... };
+
 export default function NotasPresencasAluno() {
-  const [notas, setNotas] = useState([]);
-  const [faltas, setFaltas] = useState([]);
+  const [todasAsNotas, setTodasAsNotas] = useState([]);
+  const [todasAsFaltas, setTodasAsFaltas] = useState([]);
+  const [filtroAluno, setFiltroAluno] = useState('');
+  const [filtroDisciplina, setFiltroDisciplina] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
     async function carregarDados() {
+      setLoading(true);
+      setErro('');
       try {
-        const notasData = await listarTodasNotas();
-        const faltasData = await listarTodasFaltas();
-        setNotas(notasData);
-        setFaltas(faltasData);
+        const [notasData, faltasData] = await Promise.all([
+          listarTodasNotas(),
+          listarTodasFaltas(),
+        ]);
+        setTodasAsNotas(notasData || []);
+        setTodasAsFaltas(faltasData || []);
       } catch (error) {
         console.error("Erro ao carregar dados:", error);
-        alert("Erro ao carregar notas ou faltas.");
+        setErro("Erro ao carregar notas ou faltas. Verifique a conexão.");
+      } finally {
+        setLoading(false);
       }
     }
     carregarDados();
   }, []);
 
-  return (
-    <>
-      <Navbar />
-      <div className="pagina-notas-faltas">
-        <div className="voltar-seta" onClick={() => navigate(-1)} title="Voltar">
-          <FaArrowLeft />
-        </div>
-        <h2>Notas e Presenças</h2>
+  const notasFiltradas = todasAsNotas.filter(nota => {
+    const matchAluno = nota.nomeAluno?.toLowerCase().includes(filtroAluno.toLowerCase());
+    const matchDisciplina = nota.nomeDisciplina?.toLowerCase().includes(filtroDisciplina.toLowerCase());
+    return matchAluno && matchDisciplina;
+  });
 
-        <div className="secao-notas">
+  const faltasFiltradas = todasAsFaltas.filter(falta => {
+    const matchAluno = falta.nomeAluno?.toLowerCase().includes(filtroAluno.toLowerCase());
+    const matchDisciplina = falta.nomeDisciplina?.toLowerCase().includes(filtroDisciplina.toLowerCase());
+    return matchAluno && matchDisciplina;
+  });
+
+  if (loading) {
+    return <div className="pagina-notas-faltas"><p>Carregando dados...</p></div>;
+  }
+
+  if (erro) {
+    return <div className="pagina-notas-faltas"><p className="error-message">{erro}</p></div>;
+  }
+
+  return (
+    <div className="pagina-notas-faltas">
+      <div className="voltar-seta" onClick={() => navigate(-1)} title="Voltar">
+        <FaArrowLeft />
+      </div>
+      <h2>Notas e Presenças dos Alunos</h2>
+
+      <div className="filtros-container">
+        <input 
+          type="text"
+          className="filtro-input"
+          placeholder="Filtrar por nome do aluno..."
+          value={filtroAluno}
+          onChange={(e) => setFiltroAluno(e.target.value)}
+        />
+        <input 
+          type="text"
+          className="filtro-input"
+          placeholder="Filtrar por disciplina..."
+          value={filtroDisciplina}
+          onChange={(e) => setFiltroDisciplina(e.target.value)}
+        />
+      </div>
+
+      <div className="secoes-container">
+        <div className="secao">
           <h3>Notas</h3>
-          {notas.length === 0 ? (
-            <p>Nenhuma nota registrada.</p>
+          {notasFiltradas.length === 0 ? (
+            <p>Nenhuma nota encontrada para os filtros aplicados.</p>
           ) : (
             <div className="tabela">
               <div className="linha-cabecalho">
@@ -45,8 +93,8 @@ export default function NotasPresencasAluno() {
                 <span>Disciplina</span>
                 <span>Nota</span>
               </div>
-              {notas.map((nota) => (
-                <div className="linha" key={nota.id}>
+              {notasFiltradas.map((nota) => (
+                <div className="linha" key={`nota-${nota.id}`}>
                   <span>{nota.nomeAluno}</span>
                   <span>{nota.nomeDisciplina}</span>
                   <span>{nota.media}</span>
@@ -56,10 +104,10 @@ export default function NotasPresencasAluno() {
           )}
         </div>
 
-        <div className="secao-faltas">
+        <div className="secao">
           <h3>Faltas</h3>
-          {faltas.length === 0 ? (
-            <p>Nenhuma falta registrada.</p>
+          {faltasFiltradas.length === 0 ? (
+            <p>Nenhuma falta encontrada para os filtros aplicados.</p>
           ) : (
             <div className="tabela">
               <div className="linha-cabecalho">
@@ -68,11 +116,12 @@ export default function NotasPresencasAluno() {
                 <span>Data</span>
                 <span>Justificada</span>
               </div>
-              {faltas.map((falta) => (
-                <div className="linha" key={falta.id}>
+              {faltasFiltradas.map((falta) => (
+                <div className="linha" key={`falta-${falta.id}`}>
                   <span>{falta.nomeAluno}</span>
                   <span>{falta.nomeDisciplina}</span>
-                  <span>{falta.dataFalta}</span>
+                  {/* ALTERAÇÃO AQUI: Mostrando a data sem formatação */}
+                  <span>{falta.dataFalta || "-"}</span>
                   <span>{falta.justificada ? "Sim" : "Não"}</span>
                 </div>
               ))}
@@ -80,6 +129,6 @@ export default function NotasPresencasAluno() {
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 }
