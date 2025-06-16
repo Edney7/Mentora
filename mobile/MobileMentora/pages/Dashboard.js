@@ -1,11 +1,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+  FlatList, // Importar FlatList para renderizar listas de forma eficiente
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation, useFocusEffect } from '@react-navigation/native'; // Importe useFocusEffect
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 // BASE_URL da sua API (Certifique-se de que esta URL está correta!)
-const API_BASE_URL = 'http://192.168.248.47:8080';
+const API_BASE_URL = 'http://192.168.248.47:8080'; // Confirme este IP/Porta
 
 export default function Dashboard() {
   const navigation = useNavigation();
@@ -19,14 +29,14 @@ export default function Dashboard() {
   const [faltasPorDisciplina, setFaltasPorDisciplina] = useState([]);
   const [aulasAssistidas, setAulasAssistidas] = useState(0);
   const [totalAulas, setTotalAulas] = useState(0);
+  const [notasAlunoResumo, setNotasAlunoResumo] = useState(null); // NOVO ESTADO: para o resumo de notas
 
   // Estados específicos para PROFESSOR
   const [atividadesProfessor, setAtividadesProfessor] = useState([]);
 
-  // Função para buscar dados de aluno usando o novo endpoint de resumo
-  const fetchAlunoData = async (alunoId) => {
+  // Função para buscar dados de faltas do aluno
+  const fetchAlunoFaltasData = async (alunoId) => {
     try {
-      // **CHAMANDO O NOVO ENDPOINT DE RESUMO**
       const resumoFaltasResponse = await fetch(`${API_BASE_URL}/faltas/resumo-aluno/${alunoId}`, {
         headers: { 'Content-Type': 'application/json' },
       });
@@ -41,17 +51,15 @@ export default function Dashboard() {
         setTotalAulas(0);
       } else {
         const resumoData = await resumoFaltasResponse.json();
-        console.log("Dados de resumo de faltas recebidos:", resumoData); // Verifique este log!
-
-        // Atualiza os estados com os dados do DTO de resumo
-        setFaltas(resumoData.totalFaltas || 0); // Use 0 como fallback
-        setFaltasPorDisciplina(resumoData.faltasPorDisciplina || []); // Use array vazio como fallback
+        console.log("Dados de resumo de faltas recebidos:", resumoData);
+        setFaltas(resumoData.totalFaltas || 0);
+        setFaltasPorDisciplina(resumoData.faltasPorDisciplina || []);
         setAulasAssistidas(resumoData.aulasAssistidas || 0);
         setTotalAulas(resumoData.totalAulas || 0);
       }
     } catch (error) {
-      console.error('Erro geral ao buscar dados do aluno:', error);
-      Alert.alert('Erro de Conexão', 'Não foi possível carregar os dados do aluno. Verifique a API.');
+      console.error('Erro geral ao buscar dados de faltas do aluno:', error);
+      Alert.alert('Erro de Conexão', 'Não foi possível carregar os dados de faltas do aluno. Verifique a API.');
       setFaltas(0);
       setFaltasPorDisciplina([]);
       setAulasAssistidas(0);
@@ -59,20 +67,43 @@ export default function Dashboard() {
     }
   };
 
+  // NOVA FUNÇÃO: Para buscar o resumo de notas do aluno
+  const fetchAlunoNotasData = async (alunoId) => {
+    try {
+      const notasResumoResponse = await fetch(`${API_BASE_URL}/notas/aluno/${alunoId}/resumo`, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!notasResumoResponse.ok) {
+        const errorBody = await notasResumoResponse.text();
+        console.error('Erro ao buscar resumo de notas:', notasResumoResponse.status, errorBody);
+        Alert.alert('Erro', `Não foi possível carregar o resumo de notas. (Código: ${notasResumoResponse.status})`);
+        setNotasAlunoResumo(null);
+      } else {
+        const resumoData = await notasResumoResponse.json();
+        console.log("Dados de resumo de notas recebidos:", resumoData); // Verifique este log!
+        setNotasAlunoResumo(resumoData); // Armazena o DTO completo
+      }
+    } catch (error) {
+      console.error('Erro geral ao buscar resumo de notas do aluno:', error);
+      Alert.alert('Erro de Conexão', 'Não foi possível carregar o resumo de notas. Verifique a API.');
+      setNotasAlunoResumo(null);
+    }
+  };
+
+
   const fetchProfessorData = async (professorId) => {
     try {
-      // Exemplo: Buscar atividades do professor
-      // Adapte o endpoint e a estrutura da resposta da sua API
       const atividadesResponse = await fetch(`${API_BASE_URL}/atividades/professor/${professorId}`, {
         headers: { 'Content-Type': 'application/json' },
       });
       if (atividadesResponse.ok) {
         const atividadesData = await atividadesResponse.json();
         if (Array.isArray(atividadesData)) {
-            setAtividadesProfessor(atividadesData);
+          setAtividadesProfessor(atividadesData);
         } else {
-            console.warn('Resposta da API de atividades do professor não é um array:', atividadesData);
-            setAtividadesProfessor([]);
+          console.warn('Resposta da API de atividades do professor não é um array:', atividadesData);
+          setAtividadesProfessor([]);
         }
       } else {
         console.warn('Não foi possível carregar atividades do professor:', atividadesResponse.status);
@@ -85,13 +116,15 @@ export default function Dashboard() {
     }
   };
 
-  const loadUserDataAndFetchAPI = useCallback(() => {
+
+const loadUserDataAndFetchAPI = useCallback(() => {
     const fetchData = async () => {
         setLoading(true);
         try {
             const storedUserName = await AsyncStorage.getItem('userName');
             const storedUserType = await AsyncStorage.getItem('userType');
-            const storedUserId = await AsyncStorage.getItem('userId');
+            const storedUserId = await AsyncStorage.getItem('userId'); // ID do Usuário (login)
+            const storedAlunoId = await AsyncStorage.getItem('alunoId'); // NOVO: Obtenha o ID do Aluno
 
             if (!storedUserName || !storedUserType || !storedUserId) {
                 Alert.alert('Sessão Expirada', 'Você precisa fazer login novamente.');
@@ -103,19 +136,23 @@ export default function Dashboard() {
             setTipoUsuario(storedUserType);
 
             if (storedUserType === 'ALUNO') {
-                const alunoId = await AsyncStorage.getItem('alunoId');
-                if (alunoId) {
-                    console.log('Dashboard: Buscando dados para ALUNO com ID:', alunoId);
-                    await fetchAlunoData(alunoId);
+                // CORREÇÃO AQUI: Use storedAlunoId para buscar dados do aluno
+                if (storedAlunoId) { // Verifique se o alunoId existe
+                    console.log('Dashboard: Buscando dados para ALUNO com ID:', storedAlunoId);
+                    await Promise.all([
+                        fetchAlunoFaltasData(storedAlunoId), // Use storedAlunoId
+                        fetchAlunoNotasData(storedAlunoId)  // Use storedAlunoId
+                    ]);
                 } else {
-                    Alert.alert('Erro de Dados', 'ID do aluno não encontrado no armazenamento. Não foi possível buscar as faltas.');
+                    Alert.alert('Erro de Dados', 'ID do aluno não encontrado no armazenamento. Por favor, relogue.');
                     setFaltas(0);
                     setFaltasPorDisciplina([]);
                     setAulasAssistidas(0);
                     setTotalAulas(0);
+                    setNotasAlunoResumo(null);
                 }
             } else if (storedUserType === 'PROFESSOR') {
-                const professorId = await AsyncStorage.getItem('professorId');
+                const professorId = storedUserId; // Para professor, storedUserId deve ser o ID do professor
                 if (professorId) {
                     console.log('Dashboard: Buscando dados para PROFESSOR com ID:', professorId);
                     await fetchProfessorData(professorId);
@@ -134,9 +171,9 @@ export default function Dashboard() {
     };
 
     fetchData();
-  }, []);
+}, []); // Dependências vazias para rodar apenas uma vez na montagem (useFocusEffect já cuida da re-execução)
 
-  useFocusEffect(loadUserDataAndFetchAPI);
+  useFocusEffect(loadUserDataAndFetchAPI); // Isso fará com que os dados sejam recarregados sempre que a tela ganhar foco
 
   const handleLogout = async () => {
     Alert.alert(
@@ -158,6 +195,36 @@ export default function Dashboard() {
       { cancelable: false }
     );
   };
+
+  // Funções auxiliares para renderizar as notas
+  const renderNotaItem = ({ item: nota }) => (
+    <View style={styles.notaItem}>
+      <Text style={styles.notaTipo}>{nota.tipoNota || 'Nota'}:</Text>
+      {/* Verifica se valor existe antes de chamar toFixed */}
+      <Text style={styles.notaValor}>{nota.valor !== undefined && nota.valor !== null ? nota.valor.toFixed(1) : 'N/A'}</Text>
+      {/* Exibe a data de lançamento se existir */}
+      {nota.dataLancamento && <Text style={styles.notaData}>({nota.dataLancamento})</Text>}
+    </View>
+  );
+
+  const renderNotasPorDisciplinaItem = ({ item: disciplinaNotas }) => (
+    <View style={styles.disciplinaCard}>
+      <Text style={styles.disciplinaTitle}>{disciplinaNotas.nomeDisciplina}</Text>
+      <View style={styles.notasContainer}>
+        {disciplinaNotas.notas && disciplinaNotas.notas.length > 0 ? (
+          <FlatList
+            data={disciplinaNotas.notas}
+            keyExtractor={(nota, index) => nota.id ? nota.id.toString() : `nota-${index}`} // Use ID ou index como fallback
+            renderItem={renderNotaItem}
+            ListEmptyComponent={<Text style={styles.emptyNotaText}>Nenhuma nota nesta disciplina.</Text>}
+            scrollEnabled={false} // Para permitir que o ScrollView pai role
+          />
+        ) : (
+          <Text style={styles.emptyNotaText}>Nenhuma nota nesta disciplina.</Text>
+        )}
+      </View>
+    </View>
+  );
 
   if (loading) {
     return (
@@ -222,6 +289,23 @@ export default function Dashboard() {
               <Text style={styles.noDataText}>Nenhuma falta detalhada registrada por disciplina.</Text>
             )}
           </View>
+
+          {/* NOVA SEÇÃO: Suas Notas */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Suas Notas</Text>
+            {notasAlunoResumo && notasAlunoResumo.notasPorDisciplina && notasAlunoResumo.notasPorDisciplina.length > 0 ? (
+              <FlatList
+                data={notasAlunoResumo.notasPorDisciplina}
+                keyExtractor={(item) => item.disciplinaId.toString()}
+                renderItem={renderNotasPorDisciplinaItem}
+                contentContainerStyle={styles.listContent}
+                ListEmptyComponent={<Text style={styles.noDataText}>Nenhuma nota encontrada.</Text>}
+                scrollEnabled={false} // Essencial para que o ScrollView pai possa rolar
+              />
+            ) : (
+              <Text style={styles.noDataText}>Nenhuma nota encontrada para este aluno.</Text>
+            )}
+          </View>
         </>
       )}
 
@@ -248,7 +332,7 @@ export default function Dashboard() {
                 <Text style={styles.value}>Matemática - 2A</Text>
                 <Text style={styles.label}>Ver Alunos</Text>
             </View>
-             <View style={styles.card}>
+              <View style={styles.card}>
                 <Text style={styles.value}>Física - 3B</Text>
                 <Text style={styles.label}>Ver Alunos</Text>
             </View>
@@ -402,4 +486,61 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     width: '100%',
   },
+  // NOVOS ESTILOS PARA AS NOTAS
+  disciplinaCard: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
+    width: '100%', // Para ocupar a largura total dentro da section
+  },
+  disciplinaTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#444',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+    paddingBottom: 5,
+  },
+  notasContainer: {
+    marginTop: 5,
+  },
+  notaItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  notaTipo: {
+    fontSize: 16,
+    color: '#555',
+    flex: 1, // Permite que o texto ocupe o espaço disponível
+  },
+  notaValor: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginRight: 5,
+  },
+  notaData: {
+    fontSize: 14,
+    color: '#999',
+  },
+  emptyNotaText: {
+    fontSize: 14,
+    color: '#888',
+    textAlign: 'center',
+    paddingVertical: 10,
+  },
+  listContent: {
+    // Pode adicionar padding ou margem se precisar
+  }
 });
