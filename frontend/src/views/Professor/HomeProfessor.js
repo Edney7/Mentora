@@ -13,7 +13,8 @@ export default function HomeProfessor() {
   const [data, setData] = useState("");
   const [turmas, setTurmas] = useState([]);
 
- const idUsuario = localStorage.getItem("idUsuario");
+  const idProfessor = localStorage.getItem("idProfessor");
+  console.log("ID do prof:", idProfessor);
   const abrirModal = () => {
     setDescricao("");
     setData("");
@@ -25,21 +26,23 @@ export default function HomeProfessor() {
     console.log("Ausência planejada:", { descricao, data });
     setModalAberto(false);
   };
-useEffect(() => {
-  const carregarTurmas = async () => {
-    try {
-      const resposta = await listarTurmasDoProfessor(idUsuario);
-      setTurmas(resposta);
-    } catch (error) {
-      console.error("Erro ao buscar turmas do professor:", error);
-      alert("Erro ao carregar turmas.");
-    }
-  };
 
-  if (idUsuario) {
-    carregarTurmas();
-  }
-}, [idUsuario]);
+  useEffect(() => {
+    const carregarTurmas = async () => {
+      try {
+        const resposta = await listarTurmasDoProfessor(idProfessor);
+        setTurmas(resposta);
+        console.log(turmas)
+      } catch (error) {
+        console.error("Erro ao buscar turmas do professor:", error);
+        alert("Erro ao carregar turmas.");
+      }
+    };
+
+    if (idProfessor) {
+      carregarTurmas();
+    }
+  }, [idProfessor]);
   return (
     <>
       <Navbar onLogout={() => console.log("Logout clicado")} />
@@ -52,25 +55,16 @@ useEffect(() => {
           >
             <h2>Ausência Planejada</h2>
           </div>
-          <div className="turmas-grid">
+          <div className="turmas-lista">
             {turmas.map((turma) => (
               <div
                 key={turma.id}
-                className="card-turma-box"
+                className="turma-lista-item"
                 onClick={() => navigate(`/turmaDetalhe/${turma.id}`)}
-                style={{ cursor: "pointer" }}
               >
-                <h2>{turma.nome}</h2>
-                <div className="turma-info">
-                  <div>
-                    <p className="label">TURNO</p>
-                    <p>{turma.turno}</p>
-                  </div>
-                  <div>
-                    <p className="label">SÉRIE</p>
-                    <p>{turma.serie}</p>
-                  </div>
-                </div>
+                <strong>{turma.nome}</strong>
+                <span>Turno: {turma.turno}</span>
+                <span className="turmas-serie">Série: {turma.serieAno}</span>
               </div>
             ))}
           </div>

@@ -9,43 +9,42 @@
   gap: 30px;
 }
 
-.turmas-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 25px;
-  width: 100%;
-  justify-items: center;
-}
-
-.card-turma-box {
-  background-color: white;
-  padding: 20px 30px;
-  border-radius: 15px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-  width: 270px;
-  border-left: 6px solid #f4b400;
+.turmas-lista {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  width: 50%;
 }
 
-.card-turma-box h2 {
-  color: #004b4f;
-  margin-bottom: 10px;
+.turma-lista-item {
+  background-color: #ffffff;
+  border-left: 5px solid #091662;
+  padding: 16px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
-.turma-info {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  font-weight: bold;
+.turma-lista-item:hover {
+  background-color: #e0e0e0;
 }
 
-.turma-info .label {
-  font-size: 14px;
-  color: #4a4a4a;
+.turma-lista-item strong {
+  display: flex ;
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+  color: #333;
 }
 
+.turma-lista-item span {
+  color: #000000;
+  font-size: 0.95rem;
+}
+.turmas-serie{
+   padding-left: 15%;
+}
 .ausencia-card {
   margin-top: 30px;
   background-color: #d5ecf5;

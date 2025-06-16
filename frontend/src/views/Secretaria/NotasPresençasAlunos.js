@@ -49,7 +49,7 @@ export default function NotasPresencasAluno() {
                 <div className="linha" key={nota.id}>
                   <span>{nota.nomeAluno}</span>
                   <span>{nota.nomeDisciplina}</span>
-                  <span>{nota.valor}</span>
+                  <span>{nota.media}</span>
                 </div>
               ))}
             </div>
