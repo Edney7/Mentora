@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { buscarUsuarioPorIdIncluindoInativos } from '../services/ApiService';
 import '../styles/DetalhesUsuario.css'; 
 import { FaUserCircle, FaEdit, FaKey, FaArrowLeft } from 'react-icons/fa';
+import { toast } from 'react-toastify'; // 1. Importa o toast
 
 export default function Perfil() {
   const [usuario, setUsuario] = useState(null);
@@ -13,7 +14,9 @@ export default function Perfil() {
   const carregarUsuarioLogado = useCallback(async () => {
     const userId = localStorage.getItem('userId');
     if (!userId) {
-      setErro('ID do usuário não encontrado. Faça o login novamente.');
+      const errorMsg = 'ID do usuário não encontrado. Faça o login novamente.';
+      toast.error(errorMsg); // 2. Adiciona notificação de erro
+      setErro(errorMsg);
       setLoading(false);
       return;
     }
@@ -22,7 +25,9 @@ export default function Perfil() {
       setUsuario(dadosUsuario);
     } catch (error) {
       console.error("Erro ao carregar dados do usuário:", error);
-      setErro("Não foi possível carregar os dados do perfil.");
+      const errorMsg = "Não foi possível carregar os dados do perfil.";
+      toast.error(errorMsg); // 2. Adiciona notificação de erro
+      setErro(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -36,8 +41,17 @@ export default function Perfil() {
     return <div className="detalhes-usuario-container"><p>Carregando perfil...</p></div>;
   }
 
+  // A exibição de erro na tela foi mantida para uma melhor UX em caso de falha de carregamento
   if (erro) {
-    return <div className="detalhes-usuario-container"><p className="error-message">{erro}</p></div>;
+    return (
+      <div className="detalhes-usuario-container">
+        <p className="error-message">{erro}</p>
+        <button onClick={() => navigate(-1)} className="btn-acao btn-secundario" style={{width: 'auto', padding: '12px 20px', marginTop: '20px'}}>
+            <FaArrowLeft />
+            <span>Voltar</span>
+        </button>
+      </div>
+    );
   }
 
   return (

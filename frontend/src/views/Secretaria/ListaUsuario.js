@@ -7,6 +7,7 @@ import {
 import "../../styles/secretaria/ListaUsuario.css";
 import { FaEdit, FaTrash, FaArrowLeft, FaPlus, FaRedo } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify'; // 1. Importa o toast
 
 export default function ListaUsuario() {
   const [usuarios, setUsuarios] = useState([]);
@@ -26,7 +27,9 @@ export default function ListaUsuario() {
       setUsuarios(data || []);
     } catch (error) {
       console.error("Erro ao carregar usuários:", error);
-      setErroApi("Falha ao carregar usuários. Verifique a conexão e tente novamente.");
+      const errorMsg = "Falha ao carregar usuários. Verifique a conexão e tente novamente.";
+      toast.error(errorMsg); // 2. Notificação de erro no carregamento
+      setErroApi(errorMsg);
       setUsuarios([]);
     } finally {
       setLoading(false);
@@ -42,10 +45,12 @@ export default function ListaUsuario() {
       try {
         await desativarUsuario(id);
         setUsuarios(prev => prev.map(u => u.id === id ? { ...u, ativo: false } : u));
-        alert(`Usuário "${nomeUsuario}" desativado com sucesso.`);
+        // 3. Substituindo alert por toast
+        toast.success(`Usuário "${nomeUsuario}" desativado com sucesso.`);
       } catch (error) {
         const errorMsg = error.response?.data?.message || error.message || "Erro desconhecido.";
-        alert(`Erro ao desativar usuário: ${errorMsg}`);
+        // 3. Substituindo alert por toast
+        toast.error(`Erro ao desativar usuário: ${errorMsg}`);
       }
     }
   };
@@ -55,10 +60,12 @@ export default function ListaUsuario() {
       try {
         await reativarUsuario(id);
         setUsuarios(prev => prev.map(u => u.id === id ? { ...u, ativo: true } : u));
-        alert(`Usuário "${nomeUsuario}" reativado com sucesso.`);
+        // 3. Substituindo alert por toast
+        toast.success(`Usuário "${nomeUsuario}" reativado com sucesso.`);
       } catch (error) {
         const errorMsg = error.response?.data?.message || error.message || "Erro desconhecido.";
-        alert(`Erro ao reativar usuário: ${errorMsg}`);
+        // 3. Substituindo alert por toast
+        toast.error(`Erro ao reativar usuário: ${errorMsg}`);
       }
     }
   };

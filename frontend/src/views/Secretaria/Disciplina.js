@@ -11,6 +11,7 @@ import {
 } from "../../services/ApiService";
 import { FaEdit, FaTrash, FaArrowLeft, FaPlus, FaEye } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify'; // 1. Importa o toast
 
 export default function Disciplina() {
   const [nomeFiltro, setNomeFiltro] = useState("");
@@ -35,7 +36,9 @@ export default function Disciplina() {
       setDisciplinas(data || []);
     } catch (error) {
       console.error("Erro ao buscar disciplinas:", error);
-      setErroApi("Falha ao carregar disciplinas. Verifique sua conexão e tente novamente.");
+      const errorMsg = "Falha ao carregar disciplinas. Verifique sua conexão e tente novamente.";
+      toast.error(errorMsg); // Notificação de erro
+      setErroApi(errorMsg);
       setDisciplinas([]);
     } finally {
       setLoading(false);
@@ -65,6 +68,7 @@ export default function Disciplina() {
       setProfessoresDaDisciplina(professores || []);
     } catch (error) {
       console.error("Erro ao buscar professores da disciplina:", error);
+      toast.error("Erro ao buscar professores da disciplina."); // Notificação de erro
       setProfessoresDaDisciplina([]);
     } finally {
       setLoadingDetails(false);
@@ -76,28 +80,25 @@ export default function Disciplina() {
     setShowEditModal(false);
     setShowDetailModal(false);
     setDisciplinaParaEditar(null);
-    setErroApi("");
     setProfessoresDaDisciplina([]);
   };
 
   const handleSaveDisciplina = async (disciplinaData) => {
     setSaving(true);
-    setErroApi("");
     try {
       if (disciplinaParaEditar) {
         const disciplinaAtualizada = await atualizarDisciplina(disciplinaParaEditar.id, disciplinaData);
-        setDisciplinas(disciplinas.map(d => d.id === disciplinaAtualizada.id ? disciplinaAtualizada : d));
-        alert("Disciplina atualizada com sucesso!");
+        setDisciplinas(d => d.map(item => item.id === disciplinaAtualizada.id ? disciplinaAtualizada : item));
+        toast.success("Disciplina atualizada com sucesso!");
       } else {
         const novaDisciplina = await cadastrarDisciplina(disciplinaData);
         setDisciplinas(prev => [novaDisciplina, ...prev]);
-        alert("Disciplina cadastrada com sucesso!");
+        toast.success("Disciplina cadastrada com sucesso!");
       }
       handleCloseModals();
     } catch (error) {
       const errorMsg = error.response?.data?.message || error.message || "Erro desconhecido.";
-      setErroApi(`Erro ao salvar disciplina: ${errorMsg}`);
-      return Promise.reject(error);
+      toast.error(`Erro ao salvar disciplina: ${errorMsg}`);
     } finally {
       setSaving(false);
     }
@@ -108,10 +109,10 @@ export default function Disciplina() {
       try {
         await excluirDisciplina(id);
         setDisciplinas(prev => prev.filter((d) => d.id !== id));
-        alert(`Disciplina "${nomeDisciplina}" excluída com sucesso!`);
+        toast.success(`Disciplina "${nomeDisciplina}" excluída com sucesso!`);
       } catch (error) {
         const errorMsg = error.response?.data?.message || error.message || "Erro desconhecido.";
-        alert(`Erro ao excluir disciplina: ${errorMsg}`);
+        toast.error(`Erro ao excluir disciplina: ${errorMsg}`);
       }
     }
   };
@@ -134,7 +135,7 @@ export default function Disciplina() {
           <button onClick={handleOpenCreateModal} className="btn-disciplina" title="Adicionar Nova Disciplina"><FaPlus /></button>
         </div>
       </div>
-      {erroApi && !showCreateModal && !showEditModal && <p className="error-message">{erroApi}</p>}
+      {erroApi && <p className="error-message">{erroApi}</p>}
       <div className="disciplina-lista">
         {disciplinasFiltradas.length === 0 && !loading ? (
           <p className="sem-disciplina">Nenhuma disciplina encontrada com os filtros aplicados.</p>
@@ -158,11 +159,9 @@ export default function Disciplina() {
       </div>
       <Modal isOpen={showCreateModal} onClose={handleCloseModals} title="Cadastrar Nova Disciplina">
         <DisciplinaForm onSubmit={handleSaveDisciplina} onClose={handleCloseModals} isEditing={false} />
-        {saving === false && erroApi && showCreateModal && <p className="error-message">{erroApi}</p>}
       </Modal>
       <Modal isOpen={showEditModal} onClose={handleCloseModals} title={`Editar Disciplina: ${disciplinaParaEditar?.nome || ""}`}>
         {disciplinaParaEditar && <DisciplinaForm onSubmit={handleSaveDisciplina} onClose={handleCloseModals} initialData={disciplinaParaEditar} isEditing={true} />}
-        {saving === false && erroApi && showEditModal && <p className="error-message">{erroApi}</p>}
       </Modal>
       <Modal isOpen={showDetailModal} onClose={handleCloseModals} title={`Detalhes de: ${disciplinaDetalhes?.nome || ""}`} className="modal-detail-disciplina">
         {loadingDetails ? (

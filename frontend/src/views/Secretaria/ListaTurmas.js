@@ -11,6 +11,7 @@ import {
 } from "../../services/ApiService";
 import { FaEdit, FaTrash, FaArrowLeft, FaPlus, FaEye, FaRedo } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify'; // 1. Importa o toast
 
 export default function ListaTurmas() {
   const [nomeFiltro, setNomeFiltro] = useState("");
@@ -36,7 +37,9 @@ export default function ListaTurmas() {
       setTodasAsTurmasDoBackend(data || []);
     } catch (error) {
       console.error("Erro ao buscar turmas:", error);
-      setErro("Falha ao carregar turmas. Verifique a conexão ou tente mais tarde.");
+      const errorMsg = "Falha ao carregar turmas. Verifique a conexão ou tente mais tarde.";
+      toast.error(errorMsg); // Adiciona notificação de erro
+      setErro(errorMsg);
       setTodasAsTurmasDoBackend([]);
     } finally {
       setLoading(false);
@@ -54,7 +57,6 @@ export default function ListaTurmas() {
     } else if (statusFiltro === "INATIVAS") {
       turmasProcessadas = turmasProcessadas.filter(t => t.ativa === false);
     }
-
     const filtradas = turmasProcessadas.filter((turma) => {
       const nomeMatch = turma.nome?.toLowerCase().includes(nomeFiltro.toLowerCase());
       const turnoMatch = turnoFiltro ? (turma.turno?.toLowerCase() || "") === turnoFiltro.toLowerCase() : true;
@@ -79,27 +81,28 @@ export default function ListaTurmas() {
     setShowCreateModal(false);
     setShowEditModal(false);
     setTurmaSelecionada(null);
-    setErro("");
+    setErro(""); // Limpa o erro ao fechar
   };
 
   const handleSaveTurma = async (turmaData) => {
     setSaving(true);
-    setErro("");
+    // setErro(""); // Não precisa mais
     try {
       if (turmaSelecionada && turmaSelecionada.id) {
         const turmaAtualizada = await atualizarTurma(turmaSelecionada.id, turmaData);
         setTodasAsTurmasDoBackend(prev => prev.map(t => t.id === turmaAtualizada.id ? turmaAtualizada : t));
-        alert("Turma atualizada com sucesso!");
+        toast.success("Turma atualizada com sucesso!");
       } else {
         const novaTurma = await cadastrarTurma(turmaData);
         setTodasAsTurmasDoBackend(prev => [novaTurma, ...prev]);
-        alert("Turma cadastrada com sucesso!");
+        toast.success("Turma cadastrada com sucesso!");
       }
       handleCloseModals();
     } catch (error) {
       const errorMsg = error.response?.data?.message || error.message || "Erro desconhecido.";
-      setErro(`Erro ao salvar turma: ${errorMsg}`);
-      return Promise.reject(error);
+      toast.error(`Erro ao salvar turma: ${errorMsg}`);
+      // Opcional: não rejeitar a promessa para não fechar o modal em caso de erro
+      // return Promise.reject(error); 
     } finally {
       setSaving(false);
     }
@@ -110,9 +113,9 @@ export default function ListaTurmas() {
       try {
         await desativarTurma(id);
         setTodasAsTurmasDoBackend(prev => prev.map(t => t.id === id ? { ...t, ativa: false } : t));
-        alert("Turma desativada com sucesso!");
+        toast.success("Turma desativada com sucesso!");
       } catch (error) {
-        alert(`Erro ao desativar turma: ${error.response?.data?.message || error.message}`);
+        toast.error(`Erro ao desativar turma: ${error.response?.data?.message || error.message}`);
       }
     }
   };
@@ -122,9 +125,9 @@ export default function ListaTurmas() {
       try {
         await reativarTurma(id);
         setTodasAsTurmasDoBackend(prev => prev.map(t => t.id === id ? { ...t, ativa: true } : t));
-        alert("Turma reativada com sucesso!");
+        toast.success("Turma reativada com sucesso!");
       } catch (error) {
-        alert(`Erro ao reativar turma: ${error.response?.data?.message || error.message}`);
+        toast.error(`Erro ao reativar turma: ${error.response?.data?.message || error.message}`);
       }
     }
   };
@@ -189,11 +192,11 @@ export default function ListaTurmas() {
       </div>
       <Modal isOpen={showCreateModal} onClose={handleCloseModals} title="Cadastrar Nova Turma" className="modal-turma">
         <TurmaForm onSubmit={handleSaveTurma} onClose={handleCloseModals} isEditing={false} className="modal-turma-form" />
-        {saving === false && erro && showCreateModal && <p className="error-message">{erro}</p>}
+        {/* A mensagem de erro dentro do modal foi removida em favor do toast */}
       </Modal>
       <Modal isOpen={showEditModal} onClose={handleCloseModals} title={`Editar Turma: ${turmaSelecionada?.nome || ""}`}>
         {turmaSelecionada && <TurmaForm onSubmit={handleSaveTurma} onClose={handleCloseModals} initialData={turmaSelecionada} isEditing={true} />}
-        {saving === false && erro && showEditModal && <p className="error-message">{erro}</p>}
+        {/* A mensagem de erro dentro do modal foi removida em favor do toast */}
       </Modal>
     </div>
   );
