@@ -8,7 +8,7 @@ import {
 } from "../../services/ApiService"; 
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { toast } from 'react-toastify'; // 1. Importa o toast
+import { toast } from 'react-toastify';
 
 export default function Cadastro() {
   const [nome, setNome] = useState("");
@@ -24,7 +24,6 @@ export default function Cadastro() {
   const [turmaSelecionada, setTurmaSelecionada] = useState("");
   const [disciplinasSelecionadas, setDisciplinasSelecionadas] = useState([]); 
   const [loading, setLoading] = useState(false); 
-  // O estado 'erro' foi removido em favor do toast
   const navigate = useNavigate(); 
 
   const formatarCPF = (value) => {
@@ -35,17 +34,13 @@ export default function Cadastro() {
       .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
   };
 
-  const formatarDataParaBackend = (dataYYYYMMDD) => {
-    if (!dataYYYYMMDD) return "";
-    const [ano, mes, dia] = dataYYYYMMDD.split("-"); 
-    return `${dia}/${mes}/${ano}`; 
-  };
+  // REMOVIDA: A função de formatação de data não é mais necessária.
+  // const formatarDataParaBackend = (dataYYYYMMDD) => { ... };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // 2. Validações agora usam toast
     if (!nome.trim() || !cpf || !dataNascimentoInput || !sexo || !email || !senha || !senhaRepetida || !tipoUsuario) {
       toast.warn("Todos os campos básicos e o tipo de usuário são obrigatórios.");
       setLoading(false);
@@ -67,17 +62,13 @@ export default function Cadastro() {
       return;
     }
 
-    const dataFormatadaBackend = formatarDataParaBackend(dataNascimentoInput);
-    if (!dataFormatadaBackend) {
-        toast.error("Formato de data de nascimento inválido.");
-        setLoading(false);
-        return;
-    }
-
+    // A validação e a chamada da função de formatação foram removidas daqui.
+    
     const dadosUsuario = {
       nome,
       cpf,
-      dtNascimento: dataFormatadaBackend, 
+      // A data agora é enviada no formato padrão do input (AAAA-MM-DD)
+      dtNascimento: dataNascimentoInput, 
       sexo,
       email,
       senha,
@@ -90,7 +81,6 @@ export default function Cadastro() {
       await cadastrarUsuario(dadosUsuario);
       toast.success("Usuário cadastrado com sucesso!");
       
-      // Limpa o formulário
       setNome(""); setCpf(""); setDataNascimentoInput(""); setSexo(""); setEmail("");
       setSenha(""); setSenhaRepetida(""); setTipoUsuario(""); setTurmaSelecionada("");
       setDisciplinasSelecionadas([]);
@@ -105,30 +95,32 @@ export default function Cadastro() {
     }
   };
   
-  // 3. Lógica otimizada para carregar dependências
   useEffect(() => {
     const carregarDependencias = async () => {
+      // Não carrega nada se o tipo de usuário não foi selecionado
+      if (!tipoUsuario) {
+        setTurmas([]);
+        setDisciplinas([]);
+        return;
+      }
+
       setLoading(true);
-      // Limpa campos dependentes ao trocar o tipo de usuário
       setTurmas([]); setDisciplinas([]);
       setTurmaSelecionada(""); setDisciplinasSelecionadas([]);
 
-      if (tipoUsuario === "ALUNO") {
-        try {
+      try {
+        if (tipoUsuario === "ALUNO") {
           const data = await buscarTurmasAtivas(); 
           setTurmas(data || []);
-        } catch (err) {
-          toast.error("Falha ao carregar lista de turmas.");
-        }
-      } else if (tipoUsuario === "PROFESSOR") {
-        try {
+        } else if (tipoUsuario === "PROFESSOR") {
           const data = await buscarDisciplinas();
           setDisciplinas(data || []);
-        } catch (err) {
-          toast.error("Falha ao carregar lista de disciplinas.");
         }
+      } catch (err) {
+        toast.error(`Falha ao carregar lista de ${tipoUsuario === 'ALUNO' ? 'turmas' : 'disciplinas'}.`);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     carregarDependencias();
@@ -147,8 +139,6 @@ export default function Cadastro() {
         <form className="cadastro-form" onSubmit={handleSubmit}>
           <h1 className="cadastro-title">Cadastro de Usuário</h1>
           <div className="voltar-seta" onClick={() => navigate(-1)} title="Voltar"><FaArrowLeft /></div>
-          
-          {/* O erro em <p> foi removido em favor do toast */}
           
           <input type="text" placeholder="Nome Completo" value={nome} onChange={(e) => setNome(e.target.value)} required minLength={3} maxLength={100} />
           
@@ -172,29 +162,23 @@ export default function Cadastro() {
               <option value="ALUNO">Aluno</option>
             </select>
             
-            {tipoUsuario === "ALUNO" && (
-              <select value={turmaSelecionada} onChange={(e) => setTurmaSelecionada(e.target.value)} required>
-                <option value="">Selecione a Turma</option>
-                {turmas.map((turma) => <option key={turma.id} value={turma.id}>{turma.nome}</option>)}
-              </select>
-            )}
+            {loading ? <p>Carregando...</p> : <>
+              {tipoUsuario === "ALUNO" && (
+                <select value={turmaSelecionada} onChange={(e) => setTurmaSelecionada(e.target.value)} required>
+                  <option value="">Selecione a Turma</option>
+                  {turmas.map((turma) => <option key={turma.id} value={turma.id}>{turma.nome}</option>)}
+                </select>
+              )}
 
-            {tipoUsuario === "PROFESSOR" && (
-              // 4. Corrigido para permitir seleção múltipla
-              <select
-                multiple={true} // Habilita a seleção múltipla
-                value={disciplinasSelecionadas} 
-                onChange={handleDisciplinasChange} 
-                required
-                className="select-multiple" // Classe para estilização opcional
-              >
-                {/* A primeira opção é desabilitada para não ser selecionável */}
-                <option value="" disabled>Selecione a(s) Disciplina(s)</option>
-                {disciplinas.map((d) => <option key={d.id} value={d.id}>{d.nome}</option>)}
-              </select>
-            )}
-            {/* Placeholders para manter o grid alinhado */}
-            {(tipoUsuario === "SECRETARIA" || !tipoUsuario) && <div />}
+              {tipoUsuario === "PROFESSOR" && (
+                <select multiple={true} value={disciplinasSelecionadas} onChange={handleDisciplinasChange} required className="select-multiple">
+                  <option value="" disabled>Selecione a(s) Disciplina(s)</option>
+                  {disciplinas.map((d) => <option key={d.id} value={d.id}>{d.nome}</option>)}
+                </select>
+              )}
+              
+              {(tipoUsuario === "SECRETARIA" || !tipoUsuario) && <div />}
+            </>}
           </div>
 
           <div className="form-senha-grid">
