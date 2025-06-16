@@ -3,6 +3,7 @@ package com.example.mentora.service.nota; // Ou o seu pacote de serviços
 import com.example.mentora.dto.nota.NotaCreateDTO;
 import com.example.mentora.dto.nota.NotaResponseDTO;
 import com.example.mentora.dto.nota.NotaUpdateDTO; // Importar se for adicionar método de atualização
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -43,6 +44,8 @@ public interface NotaService {
 
     List<NotaResponseDTO> listarTodasNotas();
     // --- Métodos Opcionais (descomente e defina se necessário) ---
+    NotaResponseDTO atualizarNota(Long id, NotaUpdateDTO dto);
+
 
     /**
      * Atualiza uma nota existente.

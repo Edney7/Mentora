@@ -8,13 +8,11 @@ import com.example.mentora.model.Disciplina;
 import com.example.mentora.model.Nota;
 import com.example.mentora.model.Professor; // Importar Professor
 import com.example.mentora.model.Turma;     // Importar Turma para validações
-import com.example.mentora.model.TurmaDisciplina; // Importar TurmaDisciplina para validações
-import com.example.mentora.model.ProfessorDisciplina; // Importar ProfessorDisciplina para validações
 import com.example.mentora.repository.AlunoRepository;
 import com.example.mentora.repository.DisciplinaRepository;
 import com.example.mentora.repository.NotaRepository;
 import com.example.mentora.repository.ProfessorRepository; // Importar ProfessorRepository
-import com.example.mentora.repository.TurmaDisciplinaRepository; // Importar para validação
+import com.example.mentora.repository.TurmaDisciplinaProfessorRepository; // Importar para validação
 import com.example.mentora.repository.ProfessorDisciplinaRepository; // Importar para validação
 
 import org.slf4j.Logger;
@@ -35,7 +33,7 @@ public class NotaServiceImpl implements NotaService {
     private final AlunoRepository alunoRepository;
     private final DisciplinaRepository disciplinaRepository;
     private final ProfessorRepository professorRepository; // Injetar ProfessorRepository
-    private final TurmaDisciplinaRepository turmaDisciplinaRepository; // Para validação
+    private final TurmaDisciplinaProfessorRepository turmaDisciplinaProfessorRepository; // Para validação
     private final ProfessorDisciplinaRepository professorDisciplinaRepository; // Para validação
 
 
@@ -44,13 +42,13 @@ public class NotaServiceImpl implements NotaService {
                            AlunoRepository alunoRepository,
                            DisciplinaRepository disciplinaRepository,
                            ProfessorRepository professorRepository, // Adicionar ao construtor
-                           TurmaDisciplinaRepository turmaDisciplinaRepository,
+                           TurmaDisciplinaProfessorRepository turmaDisciplinaProfessorRepository,
                            ProfessorDisciplinaRepository professorDisciplinaRepository) {
         this.notaRepository = notaRepository;
         this.alunoRepository = alunoRepository;
         this.disciplinaRepository = disciplinaRepository;
         this.professorRepository = professorRepository; // Atribuir
-        this.turmaDisciplinaRepository = turmaDisciplinaRepository;
+        this.turmaDisciplinaProfessorRepository = turmaDisciplinaProfessorRepository;
         this.professorDisciplinaRepository = professorDisciplinaRepository;
     }
 
@@ -93,12 +91,12 @@ public class NotaServiceImpl implements NotaService {
             log.warn("Aluno ID {} não está associado a nenhuma turma.", aluno.getId());
             throw new RuntimeException("Aluno ID " + aluno.getId() + " não está associado a nenhuma turma.");
         }
-        boolean disciplinaNaTurma = turmaDisciplinaRepository.findByTurmaId(turmaDoAluno.getId())
+        boolean disciplinaNaTurma = turmaDisciplinaProfessorRepository.findByTurmaId(turmaDoAluno.getId())
                 .stream()
                 .anyMatch(td -> td.getDisciplina().getId().equals(disciplina.getId()));
         if (!disciplinaNaTurma) {
             log.warn("Disciplina ID {} não está associada à turma ID {} do aluno ID {}.",
-                    disciplina.getId(), turmaDoAluno.getId(), aluno.getId());
+                    disciplina.getId(), turmaDoAluno.getId(), aluno.getId());/* mexer aqui*/
             throw new RuntimeException("Disciplina ID " + disciplina.getId() +
                     " não pertence à turma do aluno ID " + aluno.getId() + ".");
         }
@@ -180,6 +178,20 @@ public class NotaServiceImpl implements NotaService {
 
         List<Nota> notas = notaRepository.findByAlunoIdAndDisciplinaId(alunoId, disciplinaId);
         return toResponseDTOList(notas);
+    }
+
+    @Override
+    @Transactional
+    public NotaResponseDTO atualizarNota(Long id, NotaUpdateDTO dto) {
+        Nota nota = notaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Nota com ID " + id + " não encontrada."));
+
+        nota.setProva1(dto.getProva1());
+        nota.setProva2(dto.getProva2());
+        nota.setMedia(dto.getMedia());
+
+        Nota notaAtualizada = notaRepository.save(nota);
+        return toResponseDTO(notaAtualizada);
     }
 
     private NotaResponseDTO toResponseDTO(Nota nota) {

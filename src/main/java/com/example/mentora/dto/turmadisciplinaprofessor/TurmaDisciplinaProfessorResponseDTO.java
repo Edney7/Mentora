@@ -1,4 +1,4 @@
-package com.example.mentora.dto.ofertadisciplinaturma;
+package com.example.mentora.dto.turmadisciplinaprofessor;
 
 
 import lombok.*;
@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-public class OfertaDisciplinaTurmaResponseDTO {
+public class TurmaDisciplinaProfessorResponseDTO {
     private Long id; // ID da associação TurmaDisciplinaProfessor (se tiver um ID próprio)
     private Long disciplinaId;
     private String nomeDisciplina;

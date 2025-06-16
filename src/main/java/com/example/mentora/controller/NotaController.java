@@ -60,6 +60,16 @@ public class NotaController {
         List<NotaResponseDTO> notas = notaService.listarNotasPorAlunoEDisciplina(alunoId, disciplinaId);
         return ResponseEntity.ok(notas);
     }
+    @Operation(summary = "Atualizar uma nota existente")
+    @PutMapping("/{id}")
+    public ResponseEntity<NotaResponseDTO> atualizarNota(
+            @PathVariable Long id,
+            @RequestBody @Valid NotaUpdateDTO notaUpdateDTO) {
+        NotaResponseDTO atualizada = notaService.atualizarNota(id, notaUpdateDTO);
+        return ResponseEntity.ok(atualizada);
+    }
+
+
 
 
 }

@@ -1,9 +1,9 @@
 package com.example.mentora.controller;
 
-import com.example.mentora.dto.ofertadisciplinaturma.OfertaDisciplinaTurmaRequestDTO;
-import com.example.mentora.dto.ofertadisciplinaturma.OfertaDisciplinaTurmaResponseDTO;
+import com.example.mentora.dto.turmadisciplinaprofessor.TurmaDisciplinaProfessorRequestDTO;
+import com.example.mentora.dto.turmadisciplinaprofessor.TurmaDisciplinaProfessorResponseDTO;
 import com.example.mentora.dto.turma.TurmaResponseDTO;
-import com.example.mentora.service.turmadisciplinaprofessor.OfertaDisciplinaTurmaService;
+import com.example.mentora.service.turmadisciplinaprofessor.TurmaDisciplinaProfessorService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,12 +18,12 @@ public class TurmaDisciplinaProfessorController {
 
 
     @Autowired
-    private OfertaDisciplinaTurmaService service;
+    private TurmaDisciplinaProfessorService service;
 
     @Operation(summary = "Associar uma disciplina a um professor em uma turma")
     @PostMapping
     public ResponseEntity<Void> associarDisciplinaProfessorTurma(
-            @RequestBody OfertaDisciplinaTurmaRequestDTO request) {
+            @RequestBody TurmaDisciplinaProfessorRequestDTO request) {
         service.associar(request.getTurmaId(),
                 request.getDisciplinaId(),
                 request.getProfessorId());
@@ -32,9 +32,9 @@ public class TurmaDisciplinaProfessorController {
 
     @Operation(summary = "Listar disciplinas e seus professores para uma turma específica")
     @GetMapping("/turma/{turmaId}")
-    public ResponseEntity<List<OfertaDisciplinaTurmaResponseDTO>> listarOfertasPorTurma(
+    public ResponseEntity<List<TurmaDisciplinaProfessorResponseDTO>> listarOfertasPorTurma(
             @PathVariable Long turmaId) {
-        List<OfertaDisciplinaTurmaResponseDTO> ofertas = service.listarPorTurma(turmaId);
+        List<TurmaDisciplinaProfessorResponseDTO> ofertas = service.listarPorTurma(turmaId);
         return ResponseEntity.ok(ofertas);
     }
     @Operation(summary = "listar as turmas do professor")
