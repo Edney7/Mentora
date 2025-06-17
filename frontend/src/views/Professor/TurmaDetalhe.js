@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import Navbar from "../../components/Navbar";
 import {
   listarAlunosDaTurma,
   listarNotasDoAlunoPorDisciplina,
@@ -8,6 +7,7 @@ import {
   lancarNota,
   registrarFalta,
 } from "../../services/ApiService";
+import axios from "axios";
 import "../../styles/professor/TurmaDetalhe.css";
 
 export default function TurmaDetalhe() {
@@ -18,12 +18,14 @@ export default function TurmaDetalhe() {
   const [notas, setNotas] = useState([]);
   const [faltas, setFaltas] = useState([]);
 
+
   useEffect(() => {
     async function carregarAlunos() {
       try {
         const resposta = await listarAlunosDaTurma(id);
         setAlunos(resposta);
         const idProfessor = localStorage.getItem("idProfessor");
+
         const disciplinaResposta = await listarDisciplinasDoProfessor(idProfessor);
         setDisciplinas(disciplinaResposta);
 
@@ -34,6 +36,59 @@ export default function TurmaDetalhe() {
     }
     carregarAlunos();
   }, [id]);
+
+  useEffect(() => {
+    async function carregarNotasDoAlunoSelecionado() {
+      // Só continua se o aluno estiver selecionado e houver pelo menos 1 disciplina carregada
+      if (!alunoSelecionado || disciplinas.length === 0) return;
+
+      const disciplinaId = disciplinas[0]?.id;
+      if (!disciplinaId) {
+        console.warn("Disciplina não definida");
+        return;
+      }
+
+      try {
+        console.log("Buscando notas do aluno", alunoSelecionado.id, "disciplina", disciplinaId);
+
+        const notasRecebidas = await listarNotasDoAlunoPorDisciplina(alunoSelecionado.id, disciplinaId);
+
+        const notasFormatadas = {};
+        notasRecebidas.forEach((nota) => {
+          const { alunoId, disciplinaId, bimestre, prova1, prova2, id } = nota;
+
+          if (!notasFormatadas[alunoId]) notasFormatadas[alunoId] = {};
+          if (!notasFormatadas[alunoId][disciplinaId]) notasFormatadas[alunoId][disciplinaId] = {};
+          notasFormatadas[alunoId][disciplinaId][bimestre] = {
+            prova1,
+            prova2,
+            id,
+            cadastrada: true,
+          };
+        });
+
+        setNotas((prev) => {
+          const atualizadas = { ...prev };
+          Object.entries(notasFormatadas).forEach(([alunoId, disciplinasObj]) => {
+            if (!atualizadas[alunoId]) atualizadas[alunoId] = {};
+            Object.entries(disciplinasObj).forEach(([disciplinaId, bimestresObj]) => {
+              if (!atualizadas[alunoId][disciplinaId]) atualizadas[alunoId][disciplinaId] = {};
+              Object.entries(bimestresObj).forEach(([bimestre, nota]) => {
+                atualizadas[alunoId][disciplinaId][bimestre] = nota;
+              });
+            });
+          });
+          return atualizadas;
+        });
+      } catch (error) {
+        console.error("Erro ao buscar notas do aluno:", error);
+        alert("Erro ao carregar notas lançadas.");
+      }
+    }
+
+    carregarNotasDoAlunoSelecionado();
+  }, [alunoSelecionado, disciplinas]); // <-- depende dos dois!
+
 
   /*useEffect(() => {
     async function carregarNotasEFaltas() {
@@ -69,17 +124,49 @@ export default function TurmaDetalhe() {
     }
 
     try {
-      await lancarNota({
+      const professorId = localStorage.getItem("idProfessor");
+      const media = (parseFloat(nota.prova1) + parseFloat(nota.prova2)) / 2;
+
+      const notaDTO = {
         alunoId,
         disciplinaId,
+        professorId: parseInt(professorId),
         bimestre,
         prova1: parseFloat(nota.prova1),
         prova2: parseFloat(nota.prova2),
-        media:  (parseFloat(nota.prova1) + parseFloat(nota.prova2)) / 2,
-     
-      });
-      alert("Notas salvas com sucesso!");
-      console.log("Enviando nota:", lancarNota);
+        media: media,
+      };
+
+      if (nota.id) {
+        // Atualizar nota existente (PUT)
+        await axios.put(`http://localhost:8080/notas/${nota.id}`, notaDTO);
+        alert("Nota atualizada com sucesso!");
+      } else {
+        // Cadastrar nova nota (POST)
+        const response = await axios.post("http://localhost:8080/notas", notaDTO);
+        const novaNotaId = response.data.id;
+
+        // Atualiza o estado local com ID retornado
+        setNotas((prev) => ({
+          ...prev,
+          [alunoId]: {
+            ...prev[alunoId],
+            [disciplinaId]: {
+              ...prev[alunoId][disciplinaId],
+              [bimestre]: {
+                ...nota,
+                id: novaNotaId,
+                prova1: parseFloat(nota.prova1),
+                prova2: parseFloat(nota.prova2),
+                media: media,
+                cadastrada: true,
+              },
+            },
+          },
+        }));
+        alert("Nota cadastrada com sucesso!");
+      }
+
     } catch (error) {
       console.error("Erro ao salvar nota:", error);
       alert("Erro ao salvar nota.");
@@ -87,7 +174,7 @@ export default function TurmaDetalhe() {
   };
 
 
-  const handleFalta = async (bimestre) => {
+  /*const handleFalta = async (bimestre) => {
     const confirmar = window.confirm(`Registrar falta no ${bimestre}º Bimestre?`);
     if (!confirmar) return;
     await registrarFalta({
@@ -96,12 +183,12 @@ export default function TurmaDetalhe() {
       justificada: false,
     });
     setAlunoSelecionado({ ...alunoSelecionado });
-  };
+  };*/
 
   return (
     <>
-      <Navbar />
-      <h1 className="titulo-turma">TURMA {id}</h1>
+
+      <h1 className="titulo-turma">Notas e faltas - TURMA {id}</h1>
       <div className="painel-geral">
         <div className="painel-alunos">
           <h3 className="titulo">ALUNOS</h3>
@@ -130,7 +217,7 @@ export default function TurmaDetalhe() {
                 <table>
                   <thead>
                     <tr>
-                      <th>Aluno</th>
+
                       <th>Disciplina</th>
                       <th>Bimestre</th>
                       <th>Prova 1</th>
@@ -139,59 +226,60 @@ export default function TurmaDetalhe() {
                     </tr>
                   </thead>
                   <tbody>
-                     {disciplinas.map((disciplina) =>
-                        [1, 2, 3, 4].map((bimestre) => (
-                          <tr key={`${alunoSelecionado.id}-${disciplina.id}-${bimestre}`}>
-                            <td>{alunoSelecionado.nomeUsuario}</td> 
-                            <td>{disciplina.nome}</td> 
-                            <td>{bimestre}º</td> 
-                            <td>
-                              <input
-                                type="number"
-                                min="0"
-                                max="10"
-                                value={notas[alunoSelecionado.id]?.[disciplina.id]?.[bimestre]?.prova1 || ""}
-                                onChange={(e) =>
-                                  handleNotaChange(
-                                    alunoSelecionado.id,
-                                    disciplina.id,
-                                    bimestre,
-                                    "prova1",
-                                    e.target.value
-                                  )
-                                }
-                              />
-                            </td>
-                            <td>
-                              <input
-                                type="number"
-                                min="0"
-                                max="10"
-                                value={notas[alunoSelecionado.id]?.[disciplina.id]?.[bimestre]?.prova2 || ""}
-                                onChange={(e) =>
-                                  handleNotaChange(
-                                    alunoSelecionado.id,
-                                    disciplina.id,
-                                    bimestre,
-                                    "prova2",
-                                    e.target.value
-                                  )
-                                }
-                              />
-                            </td>
-                            <td>
-                              <button
-                                onClick={() =>
-                                  salvarNotas(alunoSelecionado.id, disciplina.id, bimestre)
-                                }
-                              >
-                                Salvar
-                              </button>
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    
+                    {disciplinas.map((disciplina) =>
+                      [1, 2, 3, 4].map((bimestre) => (
+                        <tr key={`${alunoSelecionado.id}-${disciplina.id}-${bimestre}`}>
+                          <td>{disciplina.nome}</td>
+                          <td>{bimestre}º</td>
+                          <td>
+                            <input
+                              type="number"
+                              min="0"
+                              max="10"
+                              value={notas[alunoSelecionado.id]?.[disciplina.id]?.[bimestre]?.prova1 || ""}
+                              onChange={(e) =>
+                                handleNotaChange(
+                                  alunoSelecionado.id,
+                                  disciplina.id,
+
+                                  bimestre,
+                                  "prova1",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="number"
+                              min="0"
+                              max="10"
+                              value={notas[alunoSelecionado.id]?.[disciplina.id]?.[bimestre]?.prova2 || ""}
+                              onChange={(e) =>
+                                handleNotaChange(
+                                  alunoSelecionado.id,
+                                  disciplina.id,
+                                  bimestre,
+                                  "prova2",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </td>
+                          <td>
+                            <button
+                              onClick={() =>
+                                salvarNotas(alunoSelecionado.id, disciplina.id, bimestre)
+                              }
+                            >{notas[alunoSelecionado.id]?.[disciplina.id]?.[bimestre]?.id
+                              ? "Editar" : "Salvar"}
+
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+
                   </tbody>
                 </table>
               </div>
