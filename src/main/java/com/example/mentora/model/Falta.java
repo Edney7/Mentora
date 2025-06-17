@@ -19,41 +19,25 @@ public class Falta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @NotNull(message = "A data da falta é obrigatória.")
-    @Column(name = "data_falta", nullable = false)
-    private LocalDate dataFalta;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "aluno_id", nullable = false)
+    private Aluno aluno; // Quem faltou
 
-    @Column(name = "justificada", nullable = false)
-    private Boolean justificada = false;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "aula_id", nullable = false) // CHAVE ESTRANGEIRA PARA A NOVA ENTIDADE AULA
+    private Aula aula; // A qual aula específica essa falta se refere
 
-    @Column(name = "descricao_justificativa", columnDefinition = "TEXT")
-    private String descricaoJustificativa;
+    private Boolean justificada = false; // Se a falta foi justificada ou não (padrão false)
 
-    @NotNull
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "aluno_id", referencedColumnName = "id", nullable = false)
-    private Aluno aluno;
+    @Column(nullable = false)
+    private LocalDate dataRegistro; // Quando a falta foi registrada no sistema
 
-    @NotNull
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "disciplina_id", referencedColumnName = "id", nullable = false)
-    private Disciplina disciplina;
-
-    @NotNull
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "professor_id", referencedColumnName = "id", nullable = false)
-    private Professor professor;
-
-
-    public Falta(LocalDate dataFalta, Aluno aluno, Disciplina disciplina, Professor professor) {
-        this.dataFalta = dataFalta;
-        this.aluno = aluno;
-        this.disciplina = disciplina;
-        this.professor = professor;
-        this.justificada = false; // Default
-    }
-
+    // O professor que registrou a falta pode ser o professor da aula ou um coordenador, etc.
+    // Se for sempre o professor da aula, você pode derivá-lo de 'aula.getProfessor()'.
+    // Se puder ser qualquer professor/admin, mantenha este campo.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "professor_que_registrou_id", nullable = false)
+    private Professor professorQueRegistrou; // Quem registrou esta falta no sistema
 }

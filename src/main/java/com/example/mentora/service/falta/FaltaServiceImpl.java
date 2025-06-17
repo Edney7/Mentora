@@ -30,6 +30,7 @@ public class FaltaServiceImpl implements FaltaService {
     private final ProfessorRepository professorRepository;
     private final TurmaDisciplinaProfessorRepository turmaDisciplinaProfessorRepository;
     private final ProfessorDisciplinaRepository professorDisciplinaRepository;
+    private final AulaRepository aulaRepository;
 
     @Autowired
     public FaltaServiceImpl(FaltaRepository faltaRepository,
@@ -37,20 +38,22 @@ public class FaltaServiceImpl implements FaltaService {
                             DisciplinaRepository disciplinaRepository,
                             ProfessorRepository professorRepository,
                             TurmaDisciplinaProfessorRepository turmaDisciplinaProfessorRepository,
-                            ProfessorDisciplinaRepository professorDisciplinaRepository) {
+                            ProfessorDisciplinaRepository professorDisciplinaRepository,
+                            AulaRepository aulaRepository) {
         this.faltaRepository = faltaRepository;
         this.alunoRepository = alunoRepository;
         this.disciplinaRepository = disciplinaRepository;
         this.professorRepository = professorRepository;
         this.turmaDisciplinaProfessorRepository = turmaDisciplinaProfessorRepository;
         this.professorDisciplinaRepository = professorDisciplinaRepository;
+        this.aulaRepository = aulaRepository;
     }
 
     @Override
     @Transactional
     public FaltaResponseDTO registarFalta(FaltaCreateDTO dto) {
-        log.info("A registar falta para aluno ID {}, disciplina ID {}, data {}, por professor ID {}",
-                dto.getAlunoId(), dto.getDisciplinaId(), dto.getDataFalta(), dto.getProfessorId());
+        log.info("A registar falta para aluno ID {}, aula ID {}, disciplina ID {}, data {}, por professor ID {}",
+                dto.getAlunoId(),dto.getAulaId(), dto.getDisciplinaId(), dto.getDataFalta(), dto.getProfessorId());
 
         // 1. Buscar entidades principais
         Aluno aluno = alunoRepository.findById(dto.getAlunoId())
@@ -58,7 +61,11 @@ public class FaltaServiceImpl implements FaltaService {
                     log.warn("Aluno com ID {} não encontrado ao registar falta.", dto.getAlunoId());
                     return new RuntimeException("Aluno com ID " + dto.getAlunoId() + " não encontrado.");
                 });
-
+        Aula aula = aulaRepository.findById(dto.getAulaId()) // <--- NOVO: Buscar a Aula
+                .orElseThrow(() -> {
+                    log.warn("Aula com ID {} não encontrada ao registar falta.", dto.getAulaId());
+                    return new RuntimeException("Aula com ID " + dto.getAulaId() + " não encontrada.");
+                });
         Disciplina disciplina = disciplinaRepository.findById(dto.getDisciplinaId())
                 .orElseThrow(() -> {
                     log.warn("Disciplina com ID {} não encontrada ao registar falta.", dto.getDisciplinaId());
@@ -115,6 +122,7 @@ public class FaltaServiceImpl implements FaltaService {
         // 3. Criar e salvar a falta
         Falta falta = new Falta();
         falta.setAluno(aluno);
+        falta.setAula(aula);
         falta.setDisciplina(disciplina);
         falta.setProfessor(professor);
         falta.setDataFalta(dto.getDataFalta());
