@@ -28,7 +28,7 @@ public class FaltaServiceImpl implements FaltaService {
     private final AlunoRepository alunoRepository;
     private final DisciplinaRepository disciplinaRepository;
     private final ProfessorRepository professorRepository;
-    private final TurmaDisciplinaRepository turmaDisciplinaRepository;
+    private final TurmaDisciplinaProfessorRepository turmaDisciplinaProfessorRepository;
     private final ProfessorDisciplinaRepository professorDisciplinaRepository;
 
     @Autowired
@@ -36,13 +36,13 @@ public class FaltaServiceImpl implements FaltaService {
                             AlunoRepository alunoRepository,
                             DisciplinaRepository disciplinaRepository,
                             ProfessorRepository professorRepository,
-                            TurmaDisciplinaRepository turmaDisciplinaRepository,
+                            TurmaDisciplinaProfessorRepository turmaDisciplinaProfessorRepository,
                             ProfessorDisciplinaRepository professorDisciplinaRepository) {
         this.faltaRepository = faltaRepository;
         this.alunoRepository = alunoRepository;
         this.disciplinaRepository = disciplinaRepository;
         this.professorRepository = professorRepository;
-        this.turmaDisciplinaRepository = turmaDisciplinaRepository;
+        this.turmaDisciplinaProfessorRepository = turmaDisciplinaProfessorRepository;
         this.professorDisciplinaRepository = professorDisciplinaRepository;
     }
 
@@ -92,7 +92,7 @@ public class FaltaServiceImpl implements FaltaService {
             log.warn("Aluno ID {} não está associado a nenhuma turma.", aluno.getId());
             throw new RuntimeException("Aluno ID " + aluno.getId() + " não está associado a nenhuma turma.");
         }
-        boolean disciplinaNaTurma = turmaDisciplinaRepository.findByTurmaId(turmaDoAluno.getId())
+        boolean disciplinaNaTurma = turmaDisciplinaProfessorRepository.findByTurmaId(turmaDoAluno.getId())
                 .stream()
                 .anyMatch(td -> td.getDisciplina().getId().equals(disciplina.getId()));
         if (!disciplinaNaTurma) {

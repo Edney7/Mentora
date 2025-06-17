@@ -1,6 +1,6 @@
 package com.example.mentora.service.turmadisciplinaprofessor;
 
-import com.example.mentora.dto.ofertadisciplinaturma.OfertaDisciplinaTurmaResponseDTO;
+import com.example.mentora.dto.turmadisciplinaprofessor.TurmaDisciplinaProfessorResponseDTO;
 import com.example.mentora.dto.turma.TurmaResponseDTO;
 import com.example.mentora.model.Disciplina;
 import com.example.mentora.model.Professor;
@@ -13,16 +13,14 @@ import com.example.mentora.repository.TurmaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.mentora.service.turmadisciplinaprofessor.OfertaDisciplinaTurmaService;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.Optional;
 
 @Service
-public class OfertaDisciplinaTurmaServiceImpl implements OfertaDisciplinaTurmaService {
+public class TurmaDisciplinaProfessorServiceImpl implements TurmaDisciplinaProfessorService {
     @Autowired
-    private TurmaDisciplinaProfessorRepository ofertaRepository; // Repositório da sua nova entidade
+    private TurmaDisciplinaProfessorRepository TurmaDisciplinaProfessorRepository; // Repositório da sua nova entidade
     @Autowired
     private TurmaRepository turmaRepository; // Para buscar a entidade Turma
     @Autowired
@@ -34,7 +32,7 @@ public class OfertaDisciplinaTurmaServiceImpl implements OfertaDisciplinaTurmaSe
     @Transactional // Garante que a operação seja atômica
     public void associar(Long turmaId, Long disciplinaId, Long professorId) {
         // 1. Verificar se a associação já existe para evitar duplicatas (opcional, mas recomendado)
-        boolean exists = ofertaRepository.findByTurmaIdAndDisciplinaId(turmaId, disciplinaId).isPresent();
+        boolean exists = TurmaDisciplinaProfessorRepository.findByTurmaIdAndDisciplinaId(turmaId, disciplinaId).isPresent();
         if (exists) {
             // Poderia lançar uma exceção ou simplesmente ignorar se a associação já existe
             throw new RuntimeException("Disciplina já possui professor associado a esta turma.");
@@ -49,20 +47,20 @@ public class OfertaDisciplinaTurmaServiceImpl implements OfertaDisciplinaTurmaSe
                 .orElseThrow(() -> new RuntimeException("Professor não encontrado com ID: " + professorId));
 
         // 3. Criar a nova entidade de associação
-        TurmaDisciplinaProfessor novaOferta = new TurmaDisciplinaProfessor();
-        novaOferta.setTurma(turma);
-        novaOferta.setDisciplina(disciplina);
-        novaOferta.setProfessor(professor);
+        TurmaDisciplinaProfessor novaTurmaDisciplinaProfessor = new TurmaDisciplinaProfessor();
+        novaTurmaDisciplinaProfessor.setTurma(turma);
+        novaTurmaDisciplinaProfessor.setDisciplina(disciplina);
+        novaTurmaDisciplinaProfessor.setProfessor(professor);
 
         // 4. Salvar no banco de dados
-        ofertaRepository.save(novaOferta);
+        TurmaDisciplinaProfessorRepository.save(novaTurmaDisciplinaProfessor);
     }
 
     @Override
     @Transactional(readOnly = true) // Otimiza para leitura
-    public List<OfertaDisciplinaTurmaResponseDTO> listarPorTurma(Long turmaId) {
+    public List<TurmaDisciplinaProfessorResponseDTO> listarPorTurma(Long turmaId) {
         // 1. Buscar todas as associações para a turma específica
-        List<TurmaDisciplinaProfessor> ofertas = ofertaRepository.findByTurmaId(turmaId);// Crie este método no seu repositório
+        List<TurmaDisciplinaProfessor> ofertas = TurmaDisciplinaProfessorRepository.findByTurmaId(turmaId);// Crie este método no seu repositório
 
         // 2. Mapear as entidades para DTOs de resposta
         return ofertas.stream()
@@ -71,8 +69,8 @@ public class OfertaDisciplinaTurmaServiceImpl implements OfertaDisciplinaTurmaSe
     }
 
     // Método auxiliar para converter a entidade para o DTO
-    private OfertaDisciplinaTurmaResponseDTO convertToDto(TurmaDisciplinaProfessor entity) {
-        OfertaDisciplinaTurmaResponseDTO dto = new OfertaDisciplinaTurmaResponseDTO();
+    private TurmaDisciplinaProfessorResponseDTO convertToDto(TurmaDisciplinaProfessor entity) {
+        TurmaDisciplinaProfessorResponseDTO dto = new TurmaDisciplinaProfessorResponseDTO();
         dto.setId(entity.getId());
         dto.setDisciplinaId(entity.getDisciplina().getId());
         dto.setNomeDisciplina(entity.getDisciplina().getNome());
@@ -83,7 +81,7 @@ public class OfertaDisciplinaTurmaServiceImpl implements OfertaDisciplinaTurmaSe
     @Override
     public List<TurmaResponseDTO> listarTurmasPorProfessor(Long professorId) {
         List<TurmaDisciplinaProfessor> vinculacoes =
-                ofertaRepository.findByProfessorId(professorId);
+                TurmaDisciplinaProfessorRepository.findByProfessorId(professorId);
 
         return vinculacoes.stream()
                 .map(v -> {

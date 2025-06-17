@@ -10,9 +10,19 @@ import lombok.Setter;
 @Setter
 public class NotaUpdateDTO {
 
-    @NotNull(message = "O valor da nota é obrigatório para atualização.")
-    @DecimalMin(value = "0.0", inclusive = true, message = "A nota não pode ser menor que 0.")
-    @DecimalMax(value = "100.0", inclusive = true, message = "A nota não pode ser maior que 100.") // Ajuste conforme a sua escala
-    private Double valor;
+
+    private Long id;
+
+    @NotNull(message = "A nota da Prova 1 é obrigatória.")
+    @DecimalMin(value = "0.0", message = "A nota não pode ser menor que 0.")
+    @DecimalMax(value = "10.0", message = "A nota não pode ser maior que 10.")
+    private Double prova1;
+
+    @NotNull(message = "A nota da Prova 2 é obrigatória.")
+    @DecimalMin(value = "0.0", message = "A nota não pode ser menor que 0.")
+    @DecimalMax(value = "10.0", message = "A nota não pode ser maior que 10.")
+    private Double prova2;
+
+    private Double media;
 
 }
