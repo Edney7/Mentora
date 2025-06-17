@@ -207,24 +207,67 @@ const loadUserDataAndFetchAPI = useCallback(() => {
     </View>
   );
 
-  const renderNotasPorDisciplinaItem = ({ item: disciplinaNotas }) => (
+// const renderNotasPorDisciplinaItem = ({ item: disciplinaNotas }) => {
+//   // Calcula a média das notas da disciplina
+//   const media =
+//     disciplinaNotas.notas && disciplinaNotas.notas.length > 0
+//       ? (
+//           disciplinaNotas.notas.reduce((total, nota) => total + (nota.valor || 0), 0) /
+//           disciplinaNotas.notas.length
+//         ).toFixed(1)
+//       : null;
+
+//   return (
+//     <View style={styles.disciplinaCard}>
+//       <Text style={styles.disciplinaTitle}>
+//         {disciplinaNotas.nomeDisciplina}
+//         {media !== null ? ` - Média: ${media}` : ''}
+//       </Text>
+//       <View style={styles.notasContainer}>
+//         {disciplinaNotas.notas && disciplinaNotas.notas.length > 0 ? (
+//           <FlatList
+//             data={disciplinaNotas.notas}
+//             keyExtractor={(nota, index) =>
+//               nota.id ? nota.id.toString() : `nota-${index}`
+//             }
+//             renderItem={renderNotaItem}
+//             ListEmptyComponent={
+//               <Text style={styles.emptyNotaText}>
+//                 {/* Nenhuma nota nesta disciplina. */}
+//                 ${media === null ? 'Nenhuma nota registrada.' : ''}
+//               </Text>
+//             }
+//             scrollEnabled={false}
+//           />
+//         ) : (
+//           <Text style={styles.emptyNotaText}>
+//             {/* Nenhuma nota nesta disciplina. */}
+//             ${media === null ? 'Nenhuma nota registrada.' : ''}
+//           </Text>
+//         )}
+//       </View>
+//     </View>
+//   );
+// };
+
+const renderNotasPorDisciplinaItem = ({ item: disciplinaNotas }) => {
+  const media = disciplinaNotas.media !== undefined && disciplinaNotas.media !== null
+    ? disciplinaNotas.media.toFixed(1)
+    : null;
+
+  return (
     <View style={styles.disciplinaCard}>
-      <Text style={styles.disciplinaTitle}>{disciplinaNotas.nomeDisciplina}</Text>
-      <View style={styles.notasContainer}>
-        {disciplinaNotas.notas && disciplinaNotas.notas.length > 0 ? (
-          <FlatList
-            data={disciplinaNotas.notas}
-            keyExtractor={(nota, index) => nota.id ? nota.id.toString() : `nota-${index}`} // Use ID ou index como fallback
-            renderItem={renderNotaItem}
-            ListEmptyComponent={<Text style={styles.emptyNotaText}>Nenhuma nota nesta disciplina.</Text>}
-            scrollEnabled={false} // Para permitir que o ScrollView pai role
-          />
-        ) : (
-          <Text style={styles.emptyNotaText}>Nenhuma nota nesta disciplina.</Text>
-        )}
-      </View>
+      <Text style={styles.disciplinaTitle}>
+        {disciplinaNotas.nomeDisciplina}
+        {media !== null ? `: ${media}` : ''}
+      </Text>
+      <Text style={styles.notaData}>
+        {media === null ? 'Nenhuma nota registrada.' : ''}
+      </Text>
     </View>
   );
+};
+
 
   if (loading) {
     return (
@@ -260,19 +303,6 @@ const loadUserDataAndFetchAPI = useCallback(() => {
               <Text style={styles.value}>{faltas}</Text>
               <Text style={styles.label}>FALTAS TOTAIS</Text>
             </View>
-            <View style={styles.card}>
-              {totalAulas > 0 ? (
-                <>
-                  <Text style={styles.value}>{aulasAssistidas}/{totalAulas}</Text>
-                  <Text style={styles.label}>AULAS ASSISTIDAS</Text>
-                </>
-              ) : (
-                <>
-                  <Text style={styles.value}>N/A</Text>
-                  <Text style={styles.label}>AULAS ASSISTIDAS</Text>
-                </>
-              )}
-            </View>
           </View>
 
           <View style={styles.section}>
@@ -293,9 +323,9 @@ const loadUserDataAndFetchAPI = useCallback(() => {
           {/* NOVA SEÇÃO: Suas Notas */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Suas Notas</Text>
-            {notasAlunoResumo && notasAlunoResumo.notasPorDisciplina && notasAlunoResumo.notasPorDisciplina.length > 0 ? (
+            {notasAlunoResumo && notasAlunoResumo.mediasPorDisciplina && notasAlunoResumo.mediasPorDisciplina.length > 0 ? (
               <FlatList
-                data={notasAlunoResumo.notasPorDisciplina}
+                data={notasAlunoResumo.mediasPorDisciplina}
                 keyExtractor={(item) => item.disciplinaId.toString()}
                 renderItem={renderNotasPorDisciplinaItem}
                 contentContainerStyle={styles.listContent}
