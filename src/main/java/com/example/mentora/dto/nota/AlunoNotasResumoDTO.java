@@ -16,6 +16,8 @@ public class AlunoNotasResumoDTO {
     private int totalFaltas;
     private int totalAulas;
     private int aulasAssistidas;
+    private Double mediaGeral;
+    private Integer totalDisciplinas;
 
     private List<FaltasPorDisciplinaDTO> faltasPorDisciplina;
     private List<MediaPorDisciplinaDTO> mediasPorDisciplina;

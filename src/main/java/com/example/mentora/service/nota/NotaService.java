@@ -58,7 +58,6 @@ public interface NotaService {
      * @return A NotaResponseDTO da nota atualizada.
      * @throws RuntimeException se a nota não for encontrada ou se o utilizador não tiver permissão.
      */
-    // NotaResponseDTO atualizarNota(Long notaId, NotaUpdateDTO dto);
 
     /**
      * Exclui uma nota específica.

@@ -72,11 +72,11 @@ public class NotaController {
 
 
 
-    @Operation(summary = "Resumo de notas de um aluno (com totais e por disciplina)")
-    @GetMapping("/aluno/{alunoId}/resumo")
-    public ResponseEntity<AlunoNotasResumoDTO> buscarResumoNotas(
-            @Parameter(description = "ID do aluno") @PathVariable Long alunoId){
-        AlunoNotasResumoDTO resumo = notaService.buscarResumoNotas(alunoId);
-        return ResponseEntity.ok(resumo);
-    }
+//    @Operation(summary = "Resumo de notas de um aluno (com totais e por disciplina)")
+//    @GetMapping("/aluno/{alunoId}/resumo")
+//    public ResponseEntity<AlunoNotasResumoDTO> buscarResumoNotas(
+//            @Parameter(description = "ID do aluno") @PathVariable Long alunoId){
+//        AlunoNotasResumoDTO resumo = notaService.buscarResumoNotas(alunoId);
+//        return ResponseEntity.ok(resumo);
+//    }
 }
