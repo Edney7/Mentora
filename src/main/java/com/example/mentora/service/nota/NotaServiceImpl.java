@@ -212,6 +212,10 @@ public class NotaServiceImpl implements NotaService {
                 .nomeDisciplina(nomeDisciplina)
                 .professorId(professor != null ? professor.getId() : null)
                 .nomeProfessor(nomeProfessor)
+                .prova1(nota.getProva1()) // Mapeia a prova1 da entidade Nota
+                .prova2(nota.getProva2()) // Mapeia a prova2 da entidade Nota
+                .media(nota.getMedia())   // Mapeia a média da entidade Nota
+                .bimestre(nota.getBimestre()) // Mapeia o bimestre da entidade Nota (certifique-se que é Integer no DTO e na entidade)
                 .build();
     }
 
