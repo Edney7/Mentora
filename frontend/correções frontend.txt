@@ -1,0 +1,13 @@
+SECRETARIA
+
+- arruamar inativos turma (não aparecem)
+
+- tirar função de apagar disciplina
+
+- arrumar cadastro e ediçao de usuario (data)
+
+- fazer detalhes da turma
+
+PROFESSOR
+
+- refazer as telas
