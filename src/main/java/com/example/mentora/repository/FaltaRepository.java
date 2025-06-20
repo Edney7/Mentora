@@ -13,15 +13,16 @@ public interface FaltaRepository extends JpaRepository<Falta, Long> {
 
     List<Falta> findByAlunoId(Long alunoId);
 
-    List<Falta> findByAlunoIdAndDisciplinaId(Long alunoId, Long disciplinaId);
+    List<Falta> findByAlunoIdAndAula_DisciplinaId(Long alunoId, Long disciplinaId);
 
     Optional<Falta> findByAlunoIdAndDisciplinaIdAndDataFalta(Long alunoId, Long disciplinaId, LocalDate dataFalta);
-
-    boolean existsByAlunoIdAndDisciplinaIdAndDataFalta(Long alunoId, Long disciplinaId, LocalDate dataFalta);
+    boolean existsByAlunoIdAndAulaId(Long alunoId, Long aulaId);
+    //boolean existsByAlunoIdAndDisciplinaIdAndDataFalta(Long alunoId, Long disciplinaId, LocalDate dataFalta);
 
     List<Falta> findByDisciplinaId(Long disciplinaId);
 
     List<Falta> findByProfessorId(Long professorId);
 
-    List<Falta> findByDataFalta(LocalDate dataFalta);
+    List<Falta> findByAula_DataFalta(LocalDate dataFalta);
+    List<Falta> findByProfessorQueRegistrouId(Long professorId);
 }
