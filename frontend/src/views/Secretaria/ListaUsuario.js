@@ -131,7 +131,7 @@ export default function ListaUsuario() {
                   <span><strong>Nasc:</strong> {usuario.dtNascimento}</span>
                   <span>
                     <strong>Status:</strong>{" "}
-                    <span className={usuario.ativo ? "" : "status-inativo"}>
+                    <span>
                       {usuario.ativo ? "Ativo" : "Inativo"}
                     </span>
                   </span>
