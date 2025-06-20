@@ -2,7 +2,6 @@ package com.example.mentora.service.falta; // Ou o seu pacote de serviços
 
 import com.example.mentora.dto.falta.AlunoFaltasResumoDTO;
 import com.example.mentora.dto.falta.FaltaCreateDTO;
-import com.example.mentora.dto.falta.FaltaJustificativaDTO;
 import com.example.mentora.dto.falta.FaltaResponseDTO;
 
 import java.time.LocalDate;
@@ -10,9 +9,9 @@ import java.util.List;
 
 public interface FaltaService {
 
-    FaltaResponseDTO registarFalta(FaltaCreateDTO dto);
+    FaltaResponseDTO registrarFalta(FaltaCreateDTO dto);
 
-    FaltaResponseDTO justificarFalta(Long faltaId, FaltaJustificativaDTO dto);
+    //FaltaResponseDTO justificarFalta(Long faltaId, FaltaJustificativaDTO dto);
 
     FaltaResponseDTO buscarFaltaPorId(Long id);
 

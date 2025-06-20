@@ -2,7 +2,6 @@ package com.example.mentora.controller;
 
 import com.example.mentora.dto.falta.AlunoFaltasResumoDTO; // NOVO IMPORT
 import com.example.mentora.dto.falta.FaltaCreateDTO;
-import com.example.mentora.dto.falta.FaltaJustificativaDTO;
 import com.example.mentora.dto.falta.FaltaResponseDTO;
 import com.example.mentora.service.falta.FaltaService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,19 +31,19 @@ public class FaltaController {
 
     @Operation(summary = "Registar uma nova falta para um aluno")
     @PostMapping
-    public ResponseEntity<FaltaResponseDTO> registarFalta(@Valid @RequestBody FaltaCreateDTO faltaCreateDTO) {
-        FaltaResponseDTO faltaRegistada = faltaService.registarFalta(faltaCreateDTO);
+    public ResponseEntity<FaltaResponseDTO> registrarFalta(@Valid @RequestBody FaltaCreateDTO faltaCreateDTO) {
+        FaltaResponseDTO faltaRegistada = faltaService.registrarFalta(faltaCreateDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(faltaRegistada);
     }
 
-    @Operation(summary = "Justificar uma falta existente")
+    /*@Operation(summary = "Justificar uma falta existente")
     @PutMapping("/{faltaId}/justificar")
     public ResponseEntity<FaltaResponseDTO> justificarFalta(
             @Parameter(description = "ID da falta a ser justificada") @PathVariable Long faltaId,
             @Valid @RequestBody FaltaJustificativaDTO faltaJustificativaDTO) {
         FaltaResponseDTO faltaJustificada = faltaService.justificarFalta(faltaId, faltaJustificativaDTO);
         return ResponseEntity.ok(faltaJustificada);
-    }
+    }*/
 
     @Operation(summary = "Buscar uma falta específica pelo seu ID")
     @GetMapping("/{id}")

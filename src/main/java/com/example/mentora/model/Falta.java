@@ -30,7 +30,7 @@ public class Falta {
     private Aula aula; // A qual aula específica essa falta se refere
 
     private Boolean justificada = false; // Se a falta foi justificada ou não (padrão false)
-
+    private String descricaoJustificativa;
     @Column(nullable = false)
     private LocalDate dataRegistro; // Quando a falta foi registrada no sistema
 
