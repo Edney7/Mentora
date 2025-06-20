@@ -144,18 +144,6 @@ export default function Login() {
           >
             {loginMutation.isPending ? "Entrando..." : "ENTRAR"}
           </Button>
-
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Não tem uma conta?{" "}
-              <Link
-                to="/cadastro"
-                className="text-teal-600 hover:text-teal-700 font-medium"
-              >
-                Cadastre-se
-              </Link>
-            </p>
-          </div>
         </form>
       </div>
     </div>
