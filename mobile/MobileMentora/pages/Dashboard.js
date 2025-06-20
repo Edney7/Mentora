@@ -1,116 +1,155 @@
-// Dashboard.js
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
-  Image,
-  TouchableOpacity,
-  Alert,
   ActivityIndicator,
-  FlatList,
   Dimensions,
+  TouchableOpacity
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { LineChart, BarChart } from 'react-native-chart-kit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { LineChart } from 'react-native-chart-kit';
+import { useFocusEffect } from '@react-navigation/native';
 
 const API_BASE_URL = 'http://192.168.248.47:8080';
 const screenWidth = Dimensions.get("window").width;
 
 const chartConfig = {
-  backgroundColor: "#fff",
   backgroundGradientFrom: "#e0f7fa",
   backgroundGradientTo: "#e0f2f1",
   decimalPlaces: 1,
-  color: (opacity = 1) => `rgba(0, 100, 200, ${opacity})`,
+  color: (opacity = 1) => `rgba(0, 102, 204, ${opacity})`,
   labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-  style: { borderRadius: 16 },
+  style: { borderRadius: 12 },
   propsForDots: {
     r: "4",
-    strokeWidth: "1",
+    strokeWidth: "2",
     stroke: "#007aff"
   }
 };
 
 export default function Dashboard() {
-  const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
   const [nomeUsuario, setNomeUsuario] = useState('');
-  const [tipoUsuario, setTipoUsuario] = useState(null);
+  const [mediaGeral, setMediaGeral] = useState(null);
+  const [totalFaltas, setTotalFaltas] = useState(null);
   const [notasDetalhadas, setNotasDetalhadas] = useState([]);
+  const [faltasPorDisciplina, setFaltasPorDisciplina] = useState([]);
+  const [modoGrafico, setModoGrafico] = useState('NOTAS');
 
   const fetchAlunoNotasData = async (alunoId) => {
     try {
-      const responseDisciplinas = await fetch(`${API_BASE_URL}/disciplinas/aluno/${alunoId}`);
-      const disciplinas = await responseDisciplinas.json();
-
-      const notasDetalhadasArray = await Promise.all(disciplinas.map(async (disciplina) => {
-        const responseNotas = await fetch(`${API_BASE_URL}/notas/aluno/${alunoId}/disciplina/${disciplina.id}`);
-        const notas = await responseNotas.json();
-        return {
-          nomeDisciplina: disciplina.nome,
-          notas: notas
-        };
-      }));
-
-      setNotasDetalhadas(notasDetalhadasArray);
+      const response = await fetch(`${API_BASE_URL}/notas/aluno/${alunoId}/resumo`);
+      if (!response.ok) throw new Error();
+      const resumo = await response.json();
+      setNotasDetalhadas(resumo.mediasPorDisciplina || []);
+      setMediaGeral(resumo.mediaGeral);
     } catch (error) {
-      console.error("Erro ao buscar notas detalhadas por disciplina:", error);
-      setNotasDetalhadas([]);
+      console.error("Erro ao buscar notas:", error);
+      Alert.alert("Erro", "Erro ao buscar notas.");
     }
   };
 
-  const loadUserDataAndFetchAPI = useCallback(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const alunoId = await AsyncStorage.getItem('alunoId');
-      const userName = await AsyncStorage.getItem('userName');
-      const userType = await AsyncStorage.getItem('userType');
+  const fetchAlunoFaltasData = async (alunoId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/faltas/resumo-aluno/${alunoId}`);
+      if (!response.ok) throw new Error();
+      const data = await response.json();
+      setFaltasPorDisciplina(data.faltasPorDisciplina || []);
+      setTotalFaltas(data.totalFaltas);
+    } catch (error) {
+      console.error("Erro ao buscar faltas:", error);
+      Alert.alert("Erro", "Erro ao buscar faltas.");
+    }
+  };
 
-      setNomeUsuario(userName);
-      setTipoUsuario(userType);
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
+        setLoading(true);
+        const alunoId = await AsyncStorage.getItem('alunoId');
+        const userName = await AsyncStorage.getItem('userName');
+        setNomeUsuario(userName || '');
+        if (alunoId) {
+          await fetchAlunoNotasData(alunoId);
+          await fetchAlunoFaltasData(alunoId);
+        }
+        setLoading(false);
+      };
+      fetchData();
+    }, [])
+  );
 
-      if (alunoId && userType === 'ALUNO') {
-        await fetchAlunoNotasData(alunoId);
-      }
-      setLoading(false);
-    };
-    fetchData();
-  }, []);
-
-  useFocusEffect(loadUserDataAndFetchAPI);
+  const renderResumo = () => (
+    <View style={styles.resumoContainer}>
+      <View style={styles.box}>
+        <Text style={styles.boxTitulo}>FALTAS</Text>
+        <Text style={styles.boxValor}>{totalFaltas ?? '--'}</Text>
+      </View>
+      <View style={styles.box}>
+        <Text style={styles.boxTitulo}>MÉDIA</Text>
+        <Text style={styles.boxValor}>{mediaGeral ?? '--'}</Text>
+      </View>
+    </View>
+  );
 
   const renderGraficoNotas = () => {
-    if (!notasDetalhadas || notasDetalhadas.length === 0) return null;
-
+    if (!notasDetalhadas.length) return null;
     return notasDetalhadas.map((disciplina, index) => {
-      const bimestres = ['1º', '2º', '3º', '4º'];
-      const medias = [1, 2, 3, 4].map(b => {
-        const nota = disciplina.notas.find(n => n.bimestre === b);
-        return nota ? nota.media : 0;
-      });
-
+      const labels = ['1º', '2º', '3º', '4º'];
+      const valores = Array(4).fill(disciplina.media);
       return (
-        <View key={index} style={styles.chartContainer}>
+        <View key={index} style={styles.card}>
           <Text style={styles.chartTitle}>{disciplina.nomeDisciplina}</Text>
           <LineChart
-            data={{
-              labels: bimestres,
-              datasets: [{ data: medias }]
-            }}
+            data={{ labels, datasets: [{ data: valores }] }}
             width={screenWidth - 40}
-            height={220}
+            height={180}
             chartConfig={chartConfig}
             bezier
-            style={{ borderRadius: 12 }}
+            style={{ borderRadius: 10 }}
           />
         </View>
       );
     });
   };
+
+  const renderGraficoFaltas = () => {
+    if (!faltasPorDisciplina.length) return null;
+    const labels = faltasPorDisciplina.map(f => f.nomeDisciplina);
+    const dados = faltasPorDisciplina.map(f => f.faltas);
+    return (
+      <View style={styles.card}>
+        <Text style={styles.chartTitle}>Faltas por Disciplina</Text>
+        <BarChart
+          data={{ labels, datasets: [{ data: dados }] }}
+          width={screenWidth - 40}
+          height={220}
+          chartConfig={chartConfig}
+          verticalLabelRotation={30}
+          style={{ borderRadius: 10 }}
+        />
+      </View>
+    );
+  };
+
+  const renderAlternador = () => (
+    <View style={styles.toggleContainer}>
+      <TouchableOpacity
+        style={[styles.toggleButton, modoGrafico === 'NOTAS' && styles.toggleAtivo]}
+        onPress={() => setModoGrafico('NOTAS')}
+      >
+        <Text style={styles.toggleText}>Notas</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.toggleButton, modoGrafico === 'FALTAS' && styles.toggleAtivo]}
+        onPress={() => setModoGrafico('FALTAS')}
+      >
+        <Text style={styles.toggleText}>Faltas</Text>
+      </TouchableOpacity>
+    </View>
+  );
 
   if (loading) {
     return (
@@ -124,9 +163,9 @@ export default function Dashboard() {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.header}>Olá, {nomeUsuario}</Text>
-      <Text style={styles.subHeader}>Dashboard do Aluno</Text>
-      <Text style={styles.sectionTitle}>Gráficos de Notas</Text>
-      {renderGraficoNotas()}
+      {renderResumo()}
+      {renderAlternador()}
+      {modoGrafico === 'NOTAS' ? renderGraficoNotas() : renderGraficoFaltas()}
     </ScrollView>
   );
 }
@@ -134,8 +173,8 @@ export default function Dashboard() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5'
+    backgroundColor: '#e6f0f7',
+    padding: 20
   },
   loadingContainer: {
     flex: 1,
@@ -147,38 +186,70 @@ const styles = StyleSheet.create({
     fontSize: 16
   },
   header: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#003366',
-    marginBottom: 4
-  },
-  subHeader: {
-    fontSize: 18,
-    color: '#666',
     marginBottom: 20
   },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    color: '#003366'
+  resumoContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20
   },
-  chartContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 10,
+  box: {
+    backgroundColor: '#cce6ff',
+    flex: 1,
+    marginHorizontal: 5,
+    paddingVertical: 25,
+    borderRadius: 14,
+    alignItems: 'center'
+  },
+  boxTitulo: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#003366',
+    marginBottom: 6
+  },
+  boxValor: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#007acc'
+  },
+  card: {
+    backgroundColor: '#ffffff',
+    padding: 15,
+    borderRadius: 14,
     marginBottom: 20,
-    elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2
   },
   chartTitle: {
     fontSize: 18,
     fontWeight: '600',
     textAlign: 'center',
-    marginBottom: 8,
-    color: '#333'
+    marginBottom: 10,
+    color: '#003366'
+  },
+  toggleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 20
+  },
+  toggleButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginHorizontal: 5,
+    borderRadius: 20,
+    backgroundColor: '#cce6ff'
+  },
+  toggleAtivo: {
+    backgroundColor: '#007acc'
+  },
+  toggleText: {
+    color: '#003366',
+    fontWeight: 'bold'
   }
 });
