@@ -1,14 +1,14 @@
-// src/App.js
-
 import React from 'react';
-import { BrowserRouter, useLocation, useNavigate } from 'react-router-dom';
-
-// 1. IMPORTE O TOASTIFY E O CSS DELE
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Toaster } from "./components/ui/toaster";      // CAMINHO CORRIGIDO
+import { Toaster as Sonner } from "./components/ui/sonner"; // CAMINHO CORRIGIDO
+import { TooltipProvider } from "./components/ui/tooltip"; // CAMINHO CORRIGIDO
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AppRoutes from './AppRoutes';
 import Navbar from './components/Navbar';
+
+// 2. INICIALIZE O CLIENTE DO REACT QUERY
+const queryClient = new QueryClient();
 
 function AppContent() {
   const location = useLocation();
@@ -19,37 +19,30 @@ function AppContent() {
     navigate('/');
   };
 
-  const noNavbarRoutes = ['/', '/cadastro', '/esqueci-senha', '/redefinir-senha'];
+  // Mantive suas rotas originais que não mostram a Navbar
+  const noNavbarRoutes = ['/', '/cadastro', '/esqueci-senha', '/redefinir-senha', '/nao-autorizado'];
   const showNavbar = !noNavbarRoutes.includes(location.pathname);
 
   return (
-    <>
-      {/* 2. ADICIONE O TOASTCONTAINER AQUI */}
-      {/* Ele é invisível até que uma notificação seja disparada. */}
-      {/* Você pode customizar a posição, tempo, tema, etc. */}
-      <ToastContainer
-        position="top-right"
-        autoClose={5000} // Fecha após 5 segundos
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
+    // 3. ADICIONE O CONTAINER PRINCIPAL COM ESTILIZAÇÃO DE FUNDO
+    <div className="min-h-screen bg-gray-50">
+      {/* 4. ADICIONE OS NOVOS COMPONENTES DE NOTIFICAÇÃO */}
+      <Toaster />
+      <Sonner />
 
       {showNavbar && <Navbar onLogout={handleLogout} />}
       <AppRoutes />
-    </>
+    </div>
   );
 }
 
+// 5. ENVOLVA O APP COM TODOS OS PROVIDERS NECESSÁRIOS
 export default function App() {
   return (
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <AppContent />
+        </TooltipProvider>
+      </QueryClientProvider>
   );
 }
