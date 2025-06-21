@@ -10,7 +10,6 @@ import java.time.LocalDate;
 @Builder
 public class FaltaResponseDTO {
     private Long id;
-    private LocalDate dataFalta;
     private Boolean justificada;
     private String descricaoJustificativa;
 

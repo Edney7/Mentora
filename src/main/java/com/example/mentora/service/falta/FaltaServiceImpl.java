@@ -52,8 +52,8 @@ public class FaltaServiceImpl implements FaltaService {
     @Override
     @Transactional
     public FaltaResponseDTO registrarFalta(FaltaCreateDTO dto) {
-        log.info("A registrar falta para aluno ID {}, aula ID {}, disciplina ID {}, data {}, por professor ID {}",
-                dto.getAlunoId(),dto.getAulaId(), dto.getProfessorId(), dto.getDataFalta(), dto.getProfessorId());
+        log.info("A registrar falta para aluno ID {}, aula ID {}, disciplina ID {}, por professor ID {}",
+                dto.getAlunoId(),dto.getAulaId(), dto.getProfessorId(),  dto.getProfessorId());
 
         // 1. Buscar entidades principais
         Aluno aluno = alunoRepository.findById(dto.getAlunoId())
@@ -87,9 +87,10 @@ public class FaltaServiceImpl implements FaltaService {
             throw new RuntimeException("Professor inativo não pode registrar faltas.");
         }
 
-        if (faltaRepository.existsByAlunoIdAndAulaId(aluno.getId(), aula.getId())) {
-            log.warn("Já existe uma falta registada para o aluno ID {}, disciplina ID {}.", aluno.getId(), aula.getId());
-            throw new RuntimeException("Já existe uma falta registada para este aluno nesta disciplina e data.");
+        if (faltaRepository.existsByAlunoIdAndAula_Disciplina_IdAndAula_DataAula(aluno.getId(), disciplinaDaAula.getId(), dataDaAula)) {
+            log.warn("Já existe uma falta registrada para o aluno ID {}, na disciplina ID {} e data {}.",
+                    aluno.getId(), disciplinaDaAula.getId(), dataDaAula);
+            throw new RuntimeException("Já existe uma falta registrada para este aluno, nesta disciplina e data.");
         }
 
         Turma turmaDoAluno = aluno.getTurma();
@@ -123,9 +124,9 @@ public class FaltaServiceImpl implements FaltaService {
         falta.setAula(aula);
 
         falta.setProfessorQueRegistrou(professorQueRegistrou);
-
+        falta.setDataRegistro(LocalDate.now());
         falta.setJustificada(false);
-
+        falta.setDescricaoJustificativa(dto.getDescricaoJustificativa());
         Falta faltaSalva = faltaRepository.save(falta);
         log.info("Falta ID {} registada com sucesso para aluno ID {}, disciplina ID {}, data {}, por professor ID {}.",
                 faltaSalva.getId(), aluno.getId(), disciplinaDaAula.getId(), aula.getId(), professorQueRegistrou.getId());
@@ -204,9 +205,9 @@ public class FaltaServiceImpl implements FaltaService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<FaltaResponseDTO> listarFaltasPorData(LocalDate dataFalta) {
-        log.debug("A listar faltas para a data: {}", dataFalta);
-        List<Falta> faltas = faltaRepository.findByAula_DataFalta(dataFalta);
+    public List<FaltaResponseDTO> listarFaltasPorData(LocalDate dataAula) {
+        log.debug("A listar faltas para a data: {}", dataAula);
+        List<Falta> faltas = faltaRepository.findByAula_DataAula(dataAula);
         return toFaltaResponseDTOList(faltas);
     }
 
@@ -333,7 +334,7 @@ public class FaltaServiceImpl implements FaltaService {
         // Dados que vêm da Aula
         String nomeDisciplina = (aula != null && aula.getDisciplina() != null) ? aula.getDisciplina().getNome() : "Disciplina não disponível";
         Long disciplinaId = (aula != null && aula.getDisciplina() != null) ? aula.getDisciplina().getId() : null;
-        LocalDate dataFalta = (aula != null) ? aula.getDataAula() : null; // Data da falta é a data da AULA
+        LocalDate dataAula = (aula != null) ? aula.getDataAula() : null; // Data da falta é a data da AULA
 
         // Dados do Professor que Registrou a Falta
         String nomeProfessorQueRegistrou = (professorQueRegistrou != null && professorQueRegistrou.getUsuario() != null) ? professorQueRegistrou.getUsuario().getNome() : "Professor não disponível";
@@ -341,7 +342,7 @@ public class FaltaServiceImpl implements FaltaService {
 
         return FaltaResponseDTO.builder()
                 .id(falta.getId())
-                .dataFalta(dataFalta)
+
                 .justificada(falta.getJustificada())
                 .descricaoJustificativa(falta.getDescricaoJustificativa()) // Manter se o campo existir na sua entidade Falta
                 .alunoId(aluno != null ? aluno.getId() : null)

@@ -21,9 +21,7 @@ public class FaltaCreateDTO {
     @NotNull(message = "O ID do Professor que está a registar a falta é obrigatório.")
     private Long professorId;
 
-    @NotNull(message = "A data da falta é obrigatória.")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", locale = "pt-BR", timezone = "America/Sao_Paulo")
-    private LocalDate dataFalta;
+
 
     private Boolean justificada;
     @NotBlank(message = "A descrição da justificativa é obrigatória.")

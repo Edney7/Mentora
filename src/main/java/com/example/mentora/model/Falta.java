@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Entity
 @Table(name = "falta", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"aluno_id", "disciplina_id", "data_falta"}, name = "uk_aluno_disciplina_data_falta")
+        @UniqueConstraint(columnNames = {"aluno_id", "aula_id"}, name = "uk_aluno_aula")
 })
 public class Falta {
 
@@ -31,7 +31,7 @@ public class Falta {
 
     private Boolean justificada = false; // Se a falta foi justificada ou não (padrão false)
     private String descricaoJustificativa;
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalDate dataRegistro; // Quando a falta foi registrada no sistema
 
     // O professor que registrou a falta pode ser o professor da aula ou um coordenador, etc.
