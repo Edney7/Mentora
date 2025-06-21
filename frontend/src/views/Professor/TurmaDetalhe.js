@@ -74,7 +74,6 @@ export default function TurmaDetalhe() {
         alunoId,
         disciplinaId,
         professorId: parseInt(professorId),
-        professorId: parseInt(professorId),
         bimestre,
         prova1: parseFloat(nota.prova1),
         prova2: parseFloat(nota.prova2),
@@ -90,7 +89,7 @@ export default function TurmaDetalhe() {
   };
 
 
-  /*const handleFalta = async (bimestre) => {
+  const handleFalta = async (bimestre) => {
     const confirmar = window.confirm(`Registrar falta no ${bimestre}º Bimestre?`);
     if (!confirmar) return;
     await registrarFalta({
@@ -103,7 +102,7 @@ export default function TurmaDetalhe() {
 
   return (
     <>
-      <Navbar />
+     
       <h1 className="titulo-turma">TURMA {id}</h1>
       <div className="painel-geral">
         <div className="painel-alunos">
@@ -133,7 +132,7 @@ export default function TurmaDetalhe() {
                 <table>
                   <thead>
                     <tr>
-
+                    
                       <th>Disciplina</th>
                       <th>Bimestre</th>
                       <th>Prova 1</th>
@@ -145,7 +144,7 @@ export default function TurmaDetalhe() {
                      {disciplinas.map((disciplina) =>
                         [1, 2, 3, 4].map((bimestre) => (
                           <tr key={`${alunoSelecionado.id}-${disciplina.id}-${bimestre}`}>
-                            <td>{alunoSelecionado.nomeUsuario}</td> 
+                            
                             <td>{disciplina.nome}</td> 
                             <td>{bimestre}º</td> 
                             <td>
