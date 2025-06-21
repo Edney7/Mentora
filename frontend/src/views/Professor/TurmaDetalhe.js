@@ -69,9 +69,11 @@ export default function TurmaDetalhe() {
     }
 
     try {
+      const professorId = localStorage.getItem("idProfessor");
       await lancarNota({
         alunoId,
         disciplinaId,
+        professorId: parseInt(professorId),
         bimestre,
         prova1: parseFloat(nota.prova1),
         prova2: parseFloat(nota.prova2),
