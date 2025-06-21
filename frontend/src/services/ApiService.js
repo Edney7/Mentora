@@ -178,9 +178,10 @@ export const buscarTurmaDetalhada = async (id) => {
  * Busca TODAS as turmas (ativas e inativas) - geralmente para admin.
  * @returns {Promise<Array<object>>} Lista de todas as turmas.
  */
-export const buscarTodasAsTurmas = async () => { // <<< FUNÇÃO ADICIONADA
-    const response = await api.get('/turmas/todas'); // Chama o novo endpoint do backend
-    return response.data;
+export const buscarTodasAsTurmas = async () => {
+  // A chamada correta é para a URL base do recurso
+  const response = await api.get("/turmas"); 
+  return response.data;
 };
 
 export const cadastrarTurma = async (turmaData) => { 
@@ -286,7 +287,7 @@ export const buscarNotaPorId = async (id) => {
 
 export const listarNotasDoAlunoPorDisciplina = async (alunoId, disciplinaId) => {
     const response = await api.get(`/notas/aluno/${alunoId}/disciplina/${disciplinaId}`);
-    return response.data;
+    return response.data; //usar
 };
 
 // --- Faltas ---

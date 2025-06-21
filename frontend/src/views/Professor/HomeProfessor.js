@@ -3,7 +3,6 @@ import "../../styles/professor/HomeProfessor.css";
 import Calendar from "../../components/Calendario";
 import { useNavigate } from "react-router-dom";
 import { listarTurmasDoProfessor } from "../../services/ApiService";
-import Navbar from "../../components/Navbar";
 
 export default function HomeProfessor() {
   const navigate = useNavigate();
@@ -45,9 +44,10 @@ export default function HomeProfessor() {
   }, [idProfessor]);
   return (
     <>
-      <Navbar onLogout={() => console.log("Logout clicado")} />
+      
       <div className="home-secretaria-container">
         <main className="main-content-turmas">
+      
           <div
             className="ausencia-card"
             onClick={abrirModal}

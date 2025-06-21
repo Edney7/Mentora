@@ -1,405 +1,255 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useCallback } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  Dimensions,
+  TouchableOpacity
+} from 'react-native';
+import { LineChart, BarChart } from 'react-native-chart-kit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation, useFocusEffect } from '@react-navigation/native'; // Importe useFocusEffect
+import { useFocusEffect } from '@react-navigation/native';
 
-// BASE_URL da sua API (Certifique-se de que esta URL está correta!)
 const API_BASE_URL = 'http://192.168.248.47:8080';
+const screenWidth = Dimensions.get("window").width;
+
+const chartConfig = {
+  backgroundGradientFrom: "#e0f7fa",
+  backgroundGradientTo: "#e0f2f1",
+  decimalPlaces: 1,
+  color: (opacity = 1) => `rgba(0, 102, 204, ${opacity})`,
+  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+  style: { borderRadius: 12 },
+  propsForDots: {
+    r: "4",
+    strokeWidth: "2",
+    stroke: "#007aff"
+  }
+};
 
 export default function Dashboard() {
-  const navigation = useNavigation();
-
   const [loading, setLoading] = useState(true);
-  const [nomeUsuario, setNomeUsuario] = useState('Carregando...');
-  const [tipoUsuario, setTipoUsuario] = useState(null);
-
-  // Estados específicos para ALUNO
-  const [faltas, setFaltas] = useState(0);
+  const [nomeUsuario, setNomeUsuario] = useState('');
+  const [mediaGeral, setMediaGeral] = useState(null);
+  const [totalFaltas, setTotalFaltas] = useState(null);
+  const [notasDetalhadas, setNotasDetalhadas] = useState([]);
   const [faltasPorDisciplina, setFaltasPorDisciplina] = useState([]);
-  const [aulasAssistidas, setAulasAssistidas] = useState(0);
-  const [totalAulas, setTotalAulas] = useState(0);
+  const [modoGrafico, setModoGrafico] = useState('NOTAS');
 
-  // Estados específicos para PROFESSOR
-  const [atividadesProfessor, setAtividadesProfessor] = useState([]);
-
-  // Função para buscar dados de aluno usando o novo endpoint de resumo
-  const fetchAlunoData = async (alunoId) => {
+  const fetchAlunoNotasData = async (alunoId) => {
     try {
-      // **CHAMANDO O NOVO ENDPOINT DE RESUMO**
-      const resumoFaltasResponse = await fetch(`${API_BASE_URL}/faltas/resumo-aluno/${alunoId}`, {
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!resumoFaltasResponse.ok) {
-        const errorBody = await resumoFaltasResponse.text();
-        console.error('Erro ao buscar resumo de faltas:', resumoFaltasResponse.status, errorBody);
-        Alert.alert('Erro', `Não foi possível carregar o resumo de faltas. (Código: ${resumoFaltasResponse.status})`);
-        setFaltas(0);
-        setFaltasPorDisciplina([]);
-        setAulasAssistidas(0);
-        setTotalAulas(0);
-      } else {
-        const resumoData = await resumoFaltasResponse.json();
-        console.log("Dados de resumo de faltas recebidos:", resumoData); // Verifique este log!
-
-        // Atualiza os estados com os dados do DTO de resumo
-        setFaltas(resumoData.totalFaltas || 0); // Use 0 como fallback
-        setFaltasPorDisciplina(resumoData.faltasPorDisciplina || []); // Use array vazio como fallback
-        setAulasAssistidas(resumoData.aulasAssistidas || 0);
-        setTotalAulas(resumoData.totalAulas || 0);
-      }
+      const response = await fetch(`${API_BASE_URL}/notas/aluno/${alunoId}/resumo`);
+      if (!response.ok) throw new Error();
+      const resumo = await response.json();
+      setNotasDetalhadas(resumo.mediasPorDisciplina || []);
+      setMediaGeral(resumo.mediaGeral);
     } catch (error) {
-      console.error('Erro geral ao buscar dados do aluno:', error);
-      Alert.alert('Erro de Conexão', 'Não foi possível carregar os dados do aluno. Verifique a API.');
-      setFaltas(0);
-      setFaltasPorDisciplina([]);
-      setAulasAssistidas(0);
-      setTotalAulas(0);
+      console.error("Erro ao buscar notas:", error);
+      Alert.alert("Erro", "Erro ao buscar notas.");
     }
   };
 
-  const fetchProfessorData = async (professorId) => {
+  const fetchAlunoFaltasData = async (alunoId) => {
     try {
-      // Exemplo: Buscar atividades do professor
-      // Adapte o endpoint e a estrutura da resposta da sua API
-      const atividadesResponse = await fetch(`${API_BASE_URL}/atividades/professor/${professorId}`, {
-        headers: { 'Content-Type': 'application/json' },
-      });
-      if (atividadesResponse.ok) {
-        const atividadesData = await atividadesResponse.json();
-        if (Array.isArray(atividadesData)) {
-            setAtividadesProfessor(atividadesData);
-        } else {
-            console.warn('Resposta da API de atividades do professor não é um array:', atividadesData);
-            setAtividadesProfessor([]);
-        }
-      } else {
-        console.warn('Não foi possível carregar atividades do professor:', atividadesResponse.status);
-        setAtividadesProfessor([]);
-      }
+      const response = await fetch(`${API_BASE_URL}/faltas/resumo-aluno/${alunoId}`);
+      if (!response.ok) throw new Error();
+      const data = await response.json();
+      setFaltasPorDisciplina(data.faltasPorDisciplina || []);
+      setTotalFaltas(data.totalFaltas);
     } catch (error) {
-      console.error('Erro geral ao buscar dados do professor:', error);
-      Alert.alert('Erro de Conexão', 'Não foi possível carregar os dados do professor. Verifique a API.');
-      setAtividadesProfessor([]);
+      console.error("Erro ao buscar faltas:", error);
+      Alert.alert("Erro", "Erro ao buscar faltas.");
     }
   };
 
-  const loadUserDataAndFetchAPI = useCallback(() => {
-    const fetchData = async () => {
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
         setLoading(true);
-        try {
-            const storedUserName = await AsyncStorage.getItem('userName');
-            const storedUserType = await AsyncStorage.getItem('userType');
-            const storedUserId = await AsyncStorage.getItem('userId');
-
-            if (!storedUserName || !storedUserType || !storedUserId) {
-                Alert.alert('Sessão Expirada', 'Você precisa fazer login novamente.');
-                navigation.replace('Login');
-                return;
-            }
-
-            setNomeUsuario(storedUserName);
-            setTipoUsuario(storedUserType);
-
-            if (storedUserType === 'ALUNO') {
-                const alunoId = await AsyncStorage.getItem('alunoId');
-                if (alunoId) {
-                    console.log('Dashboard: Buscando dados para ALUNO com ID:', alunoId);
-                    await fetchAlunoData(alunoId);
-                } else {
-                    Alert.alert('Erro de Dados', 'ID do aluno não encontrado no armazenamento. Não foi possível buscar as faltas.');
-                    setFaltas(0);
-                    setFaltasPorDisciplina([]);
-                    setAulasAssistidas(0);
-                    setTotalAulas(0);
-                }
-            } else if (storedUserType === 'PROFESSOR') {
-                const professorId = await AsyncStorage.getItem('professorId');
-                if (professorId) {
-                    console.log('Dashboard: Buscando dados para PROFESSOR com ID:', professorId);
-                    await fetchProfessorData(professorId);
-                } else {
-                    Alert.alert('Erro de Dados', 'ID do professor não encontrado no armazenamento. Não foi possível buscar atividades.');
-                    setAtividadesProfessor([]);
-                }
-            }
-
-        } catch (error) {
-            console.error('Erro ao carregar dados do AsyncStorage ou iniciar fetch no Dashboard:', error);
-            Alert.alert('Erro', 'Não foi possível carregar os dados do usuário. Tente novamente.');
-        } finally {
-            setLoading(false);
+        const alunoId = await AsyncStorage.getItem('alunoId');
+        const userName = await AsyncStorage.getItem('userName');
+        setNomeUsuario(userName || '');
+        if (alunoId) {
+          await fetchAlunoNotasData(alunoId);
+          await fetchAlunoFaltasData(alunoId);
         }
-    };
+        setLoading(false);
+      };
+      fetchData();
+    }, [])
+  );
 
-    fetchData();
-  }, []);
+  const renderResumo = () => (
+    <View style={styles.resumoContainer}>
+      <View style={styles.box}>
+        <Text style={styles.boxTitulo}>FALTAS</Text>
+        <Text style={styles.boxValor}>{totalFaltas ?? '--'}</Text>
+      </View>
+      <View style={styles.box}>
+        <Text style={styles.boxTitulo}>MÉDIA</Text>
+        <Text style={styles.boxValor}>{mediaGeral ?? '--'}</Text>
+      </View>
+    </View>
+  );
 
-  useFocusEffect(loadUserDataAndFetchAPI);
+  const renderGraficoNotas = () => {
+    if (!notasDetalhadas.length) return null;
+    return notasDetalhadas.map((disciplina, index) => {
+      const labels = ['1º', '2º', '3º', '4º'];
+      const valores = Array(4).fill(disciplina.media);
+      return (
+        <View key={index} style={styles.card}>
+          <Text style={styles.chartTitle}>{disciplina.nomeDisciplina}</Text>
+          <LineChart
+            data={{ labels, datasets: [{ data: valores }] }}
+            width={screenWidth - 40}
+            height={180}
+            chartConfig={chartConfig}
+            bezier
+            style={{ borderRadius: 10 }}
+          />
+        </View>
+      );
+    });
+  };
 
-  const handleLogout = async () => {
-    Alert.alert(
-      'Sair',
-      'Tem certeza que deseja sair?',
-      [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
-        },
-        {
-          text: 'Sair',
-          onPress: async () => {
-            await AsyncStorage.clear();
-            navigation.replace('Login');
-          },
-        },
-      ],
-      { cancelable: false }
+  const renderGraficoFaltas = () => {
+    if (!faltasPorDisciplina.length) return null;
+    const labels = faltasPorDisciplina.map(f => f.nomeDisciplina);
+    const dados = faltasPorDisciplina.map(f => f.faltas);
+    return (
+      <View style={styles.card}>
+        <Text style={styles.chartTitle}>Faltas por Disciplina</Text>
+        <BarChart
+          data={{ labels, datasets: [{ data: dados }] }}
+          width={screenWidth - 40}
+          height={220}
+          chartConfig={chartConfig}
+          verticalLabelRotation={30}
+          style={{ borderRadius: 10 }}
+        />
+      </View>
     );
   };
+
+  const renderAlternador = () => (
+    <View style={styles.toggleContainer}>
+      <TouchableOpacity
+        style={[styles.toggleButton, modoGrafico === 'NOTAS' && styles.toggleAtivo]}
+        onPress={() => setModoGrafico('NOTAS')}
+      >
+        <Text style={styles.toggleText}>Notas</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.toggleButton, modoGrafico === 'FALTAS' && styles.toggleAtivo]}
+        onPress={() => setModoGrafico('FALTAS')}
+      >
+        <Text style={styles.toggleText}>Faltas</Text>
+      </TouchableOpacity>
+    </View>
+  );
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#007bff" />
-        <Text style={styles.loadingText}>Carregando dados...</Text>
+        <Text style={styles.loadingText}>Carregando...</Text>
       </View>
     );
   }
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Image source={require('../assets/logo.png')} style={styles.logo} />
-        <TouchableOpacity onPress={handleLogout}>
-          <Ionicons name="log-out-outline" size={24} color="black" />
-        </TouchableOpacity>
-      </View>
-
-      <Text style={styles.welcomeText}>Olá, {nomeUsuario}!</Text>
-      <Text style={styles.roleText}>{tipoUsuario === 'ALUNO' ? 'Dashboard do Aluno' : 'Dashboard do Professor'}</Text>
-
-      {/* Seção para ALUNOS */}
-      {tipoUsuario === 'ALUNO' && (
-        <>
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Suas Disciplinas</Text>
-            <Image source={require('../assets/students.jpg')} style={styles.image} />
-          </View>
-
-          <View style={styles.cardContainer}>
-            <View style={styles.card}>
-              <Text style={styles.value}>{faltas}</Text>
-              <Text style={styles.label}>FALTAS TOTAIS</Text>
-            </View>
-            <View style={styles.card}>
-              {totalAulas > 0 ? (
-                <>
-                  <Text style={styles.value}>{aulasAssistidas}/{totalAulas}</Text>
-                  <Text style={styles.label}>AULAS ASSISTIDAS</Text>
-                </>
-              ) : (
-                <>
-                  <Text style={styles.value}>N/A</Text>
-                  <Text style={styles.label}>AULAS ASSISTIDAS</Text>
-                </>
-              )}
-            </View>
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Faltas por Disciplina</Text>
-            {faltasPorDisciplina.length > 0 ? (
-              faltasPorDisciplina.map((item, index) => (
-                // Use item.disciplinaId como key se for único, senão use index
-                <View key={item.disciplinaId || item.nomeDisciplina || index} style={styles.disciplineItem}>
-                  <Text style={styles.disciplineName}>{item.nomeDisciplina}</Text>
-                  <Text style={styles.disciplineFaltas}>{item.faltas} falta(s)</Text>
-                </View>
-              ))
-            ) : (
-              <Text style={styles.noDataText}>Nenhuma falta detalhada registrada por disciplina.</Text>
-            )}
-          </View>
-        </>
-      )}
-
-      {/* Seção para PROFESSORES */}
-      {tipoUsuario === 'PROFESSOR' && (
-        <>
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Minhas Atividades</Text>
-            {atividadesProfessor.length > 0 ? (
-              atividadesProfessor.map((item) => (
-                <View key={item.id} style={styles.activityItem}>
-                  <Text style={styles.activityDescription}>{item.descricao}</Text>
-                  <Text style={styles.activityDate}>{item.data}</Text>
-                </View>
-              ))
-            ) : (
-              <Text style={styles.noDataText}>Nenhuma atividade recente encontrada.</Text>
-            )}
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Turmas</Text>
-            <View style={styles.card}>
-                <Text style={styles.value}>Matemática - 2A</Text>
-                <Text style={styles.label}>Ver Alunos</Text>
-            </View>
-             <View style={styles.card}>
-                <Text style={styles.value}>Física - 3B</Text>
-                <Text style={styles.label}>Ver Alunos</Text>
-            </View>
-          </View>
-        </>
-      )}
+      <Text style={styles.header}>Olá, {nomeUsuario}</Text>
+      {renderResumo()}
+      {renderAlternador()}
+      {modoGrafico === 'NOTAS' ? renderGraficoNotas() : renderGraficoFaltas()}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#f5f5f5',
-    padding: 20,
     flex: 1,
+    backgroundColor: '#e6f0f7',
+    padding: 20
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    alignItems: 'center'
   },
   loadingText: {
     marginTop: 10,
-    fontSize: 18,
-    color: '#007bff',
+    fontSize: 16
   },
   header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#003366',
+    marginBottom: 20
+  },
+  resumoContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-    paddingTop: 30,
+    marginBottom: 20
   },
-  logo: {
-    width: 100,
-    height: 40,
-    resizeMode: 'contain',
+  box: {
+    backgroundColor: '#cce6ff',
+    flex: 1,
+    marginHorizontal: 5,
+    paddingVertical: 25,
+    borderRadius: 14,
+    alignItems: 'center'
   },
-  welcomeText: {
+  boxTitulo: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#003366',
+    marginBottom: 6
+  },
+  boxValor: {
     fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#333',
-  },
-  roleText: {
-    fontSize: 18,
-    color: '#666',
-    marginBottom: 25,
-  },
-  section: {
-    alignItems: 'center',
-    marginBottom: 30,
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#003366',
-    marginBottom: 15,
-  },
-  image: {
-    width: '100%',
-    height: 150,
-    resizeMode: 'cover',
-    borderRadius: 10,
-    marginTop: 10,
-  },
-  cardContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 30,
-    flexWrap: 'wrap',
+    color: '#007acc'
   },
   card: {
-    backgroundColor: '#d0edf5',
-    padding: 20,
-    borderRadius: 20,
-    alignItems: 'center',
-    width: '46%',
-    marginVertical: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  value: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#003366',
-    marginBottom: 5,
-  },
-  label: {
-    fontSize: 15,
-    color: '#003366',
-    textAlign: 'center',
-  },
-  disciplineItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  disciplineName: {
-    fontSize: 18,
-    color: '#333',
-    fontWeight: '500',
-  },
-  disciplineFaltas: {
-    fontSize: 18,
-    color: '#ff6347',
-    fontWeight: 'bold',
-  },
-  activityItem: {
-    backgroundColor: '#e6ffe6',
+    backgroundColor: '#ffffff',
     padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    width: '100%',
+    borderRadius: 14,
+    marginBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.05,
     shadowRadius: 2,
-    elevation: 1,
+    elevation: 2
   },
-  activityDescription: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#006400',
-  },
-  activityDate: {
-    fontSize: 14,
-    color: '#3cb371',
-    marginTop: 5,
-  },
-  noDataText: {
-    fontSize: 16,
-    color: '#888',
-    marginTop: 10,
-    fontStyle: 'italic',
+  chartTitle: {
+    fontSize: 18,
+    fontWeight: '600',
     textAlign: 'center',
-    width: '100%',
+    marginBottom: 10,
+    color: '#003366'
   },
+  toggleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 20
+  },
+  toggleButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginHorizontal: 5,
+    borderRadius: 20,
+    backgroundColor: '#cce6ff'
+  },
+  toggleAtivo: {
+    backgroundColor: '#007acc'
+  },
+  toggleText: {
+    color: '#003366',
+    fontWeight: 'bold'
+  }
 });
