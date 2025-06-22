@@ -1,124 +1,249 @@
-import React, { useState, useEffect } from "react";
-import "../../styles/professor/HomeProfessor.css";
-import Calendar from "../../components/Calendario";
+// pages/Professor/HomeProfessor.js (Completo e Refatorado)
+
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { listarTurmasDoProfessor } from "../../services/ApiService";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+
+// Componentes e Hooks
+import Calendar from "../../components/Calendario";
+import { useToast } from "../../hooks/use-toast";
+import { Button } from "../../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../../components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../../components/ui/form";
+import { Input } from "../../components/ui/input";
+import { Textarea } from "../../components/ui/textarea";
+import { Skeleton } from "../../components/ui/skeleton";
+
+// Ícones
+import {
+  CalendarDays,
+  CalendarX,
+  Check,
+  ClipboardList,
+  Plus,
+  Users,
+} from "lucide-react";
+
+// Funções da API
+import {
+  listarTurmasDoProfessor,
+  listarEventos,
+  registarAusenciaProfessor,
+} from "../../services/ApiService";
+
+function DashboardSkeleton() {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="lg:col-span-2 space-y-4">
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-24 w-full" />
+      </div>
+      <div className="lg:col-span-1 space-y-4">
+        <Skeleton className="h-72 w-full" />
+        <Skeleton className="h-12 w-full" />
+      </div>
+    </div>
+  );
+}
 
 export default function HomeProfessor() {
   const navigate = useNavigate();
-
-  const [modalAberto, setModalAberto] = useState(false);
-  const [descricao, setDescricao] = useState("");
-  const [data, setData] = useState("");
-  const [turmas, setTurmas] = useState([]);
-
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const idProfessor = localStorage.getItem("idProfessor");
-  console.log("ID do prof:", idProfessor);
-  const abrirModal = () => {
-    setDescricao("");
-    setData("");
-    setModalAberto(true);
-  };
 
-  const enviarAusencia = () => {
-    if (!descricao || !data) return alert("Preencha todos os campos!");
-    console.log("Ausência planejada:", { descricao, data });
-    setModalAberto(false);
-  };
+  // -- QUERIES: Busca das turmas do professor e dos eventos do calendário --
+  const { data: turmas = [], isLoading: isTurmasLoading } = useQuery({
+    queryKey: ["turmasDoProfessor", idProfessor],
+    queryFn: () => listarTurmasDoProfessor(idProfessor),
+    enabled: !!idProfessor, // A query só roda se o idProfessor existir
+  });
 
-  useEffect(() => {
-    const carregarTurmas = async () => {
-      try {
-        const resposta = await listarTurmasDoProfessor(idProfessor);
-        setTurmas(resposta);
-        console.log(turmas)
-      } catch (error) {
-        console.error("Erro ao buscar turmas do professor:", error);
-        alert("Erro ao carregar turmas.");
-      }
-    };
+  const { data: eventos = [], isLoading: isEventosLoading } = useQuery({
+    queryKey: ["eventos"],
+    queryFn: listarEventos,
+    select: (data) =>
+      data.map((ev) => ({ title: ev.titulo, date: ev.data, ...ev })),
+  });
 
-    if (idProfessor) {
-      carregarTurmas();
-    }
-  }, [idProfessor]);
+  // -- FORMULÁRIO E MUTAÇÃO PARA REGISTRAR AUSÊNCIA --
+  const form = useForm();
+  const ausenciaMutation = useMutation({
+    mutationFn: registarAusenciaProfessor,
+    onSuccess: () => {
+      toast({ title: "Sucesso!", description: "Sua ausência foi registrada." });
+      queryClient.invalidateQueries({ queryKey: ["ausencias"] }); // Invalida outras queries se necessário
+      form.reset();
+      // Fecha o modal (se o Dialog não for controlado)
+    },
+    onError: (err) =>
+      toast({
+        title: "Erro",
+        description:
+          err.response?.data?.message ||
+          "Não foi possível registrar a ausência.",
+        variant: "destructive",
+      }),
+  });
+
+  function onAusenciaSubmit(data) {
+    ausenciaMutation.mutate({
+      ...data,
+      idProfessor: parseInt(idProfessor, 10),
+      // A data já vem no formato AAAA-MM-DD do input type="date"
+    });
+  }
+
+  const isLoading = isTurmasLoading || isEventosLoading;
+
   return (
-    <>
-      
-      <div className="home-secretaria-container">
-        <main className="main-content-turmas">
-      
-          <div
-            className="ausencia-card"
-            onClick={abrirModal}
-            style={{ cursor: "pointer" }}
-          >
-            <h2>Ausência Planejada</h2>
-          </div>
-          <div className="turmas-lista">
-            {turmas.map((turma) => (
-              <div
-                key={turma.id}
-                className="turma-lista-item"
-                onClick={() => navigate(`/turmaDetalhe/${turma.id}`)}
-              >
-                <strong>{turma.nome}</strong>
-                <span>Turno: {turma.turno}</span>
-                <span className="turmas-serie">Série: {turma.serieAno}</span>
-              </div>
-            ))}
-          </div>
-        </main>
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+      <div className="max-w-7xl mx-auto">
 
-        <section className="event-panel">
-          <div className="event-card branco">
-            <div className="calendar-container">
-              <Calendar />
+        {isLoading ? (
+          <DashboardSkeleton />
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Coluna Principal: Minhas Turmas */}
+            <div className="lg:col-span-2 space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ClipboardList /> Minhas Turmas
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {turmas.length > 0 ? (
+                    turmas.map((turma) => (
+                      <div
+                        key={turma.id}
+                        className="p-4 border rounded-lg flex justify-between items-center hover:bg-gray-100 cursor-pointer transition-colors"
+                        onClick={() => navigate(`/turmaDetalhe/${turma.id}`)}
+                      >
+                        <div>
+                          <p className="font-bold text-lg text-teal-700">
+                            {turma.nome}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {turma.serieAno} - Turno {turma.turno}
+                          </p>
+                        </div>
+                        <Users className="text-gray-400" />
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-center text-gray-500 py-4">
+                      Nenhuma turma associada a você.
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
             </div>
-          </div>
 
-          <div className="event-group">
-            <div className="event-card verde">
-              <span>Próximo Feriado</span>
-              <span className="hora">xx/xx</span>
-            </div>
-            <button
-              className="event-card laranja"
-              onClick={() =>
-                navigate("/secretaria/calendario/eventos/cadastrar")
-              }
-            >
-              <h2>Cadastrar Eventos</h2>
-            </button>
-          </div>
-        </section>
+            {/* Coluna Lateral: Calendário e Ações */}
+            <div className="lg:col-span-1 space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CalendarDays /> Calendário
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Calendar eventos={eventos} />
+                </CardContent>
+              </Card>
 
-        {modalAberto && (
-          <div className="modal-backdrop">
-            <div className="modal">
-              <label>
-                <strong>Descrição</strong>
-              </label>
-              <textarea
-                rows={4}
-                value={descricao}
-                onChange={(e) => setDescricao(e.target.value)}
-              />
-
-              <label>
-                <strong>Data</strong>
-              </label>
-              <input
-                type="date"
-                value={data}
-                onChange={(e) => setData(e.target.value)}
-              />
-
-              <button onClick={enviarAusencia}>ENVIAR</button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full h-auto p-4 flex flex-col items-start"
+                  >
+                    <div className="flex items-center gap-2 font-semibold text-lg">
+                      <CalendarX className="text-red-500" /> Registrar Ausência
+                    </div>
+                    <p className="font-normal text-sm text-gray-500 text-left">
+                      Informe a secretaria sobre uma ausência planejada.
+                    </p>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Registrar Ausência Planejada</DialogTitle>
+                  </DialogHeader>
+                  <Form {...form}>
+                    <form
+                      onSubmit={form.handleSubmit(onAusenciaSubmit)}
+                      className="space-y-4"
+                    >
+                      <FormField
+                        control={form.control}
+                        name="dataAusencia"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Data da Ausência</FormLabel>
+                            <FormControl>
+                              <Input type="date" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="motivo"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Motivo (Ex: Consulta Médica)</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder="Descreva brevemente o motivo..."
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div className="flex justify-end pt-2">
+                        <Button
+                          type="submit"
+                          disabled={ausenciaMutation.isPending}
+                        >
+                          {ausenciaMutation.isPending
+                            ? "Enviando..."
+                            : "Enviar Registro"}
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
