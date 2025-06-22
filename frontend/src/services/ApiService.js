@@ -289,6 +289,65 @@ export const listarNotasDoAlunoPorDisciplina = async (alunoId, disciplinaId) => 
     const response = await api.get(`/notas/aluno/${alunoId}/disciplina/${disciplinaId}`);
     return response.data; //usar
 };
+// --- NOVAS FUNÇÕES: AULAS ---
+// Endpoint: POST /aulas
+// Cria uma nova aula ou retorna uma existente.
+export const criarOuObterAula = async (aulaDTO) => {
+    try {
+        const response = await axios.post(`/aulas`, aulaDTO);
+        return response.data; // Retorna o AulaResponseDTO
+    } catch (error) {
+        console.error("Erro ao criar ou obter aula:", error);
+        throw error;
+    }
+};
+
+// Endpoint: GET /aulas/{id}
+export const getAulaById = async (aulaId) => {
+    try {
+        const response = await axios.get(`/aulas/${aulaId}`);
+        return response.data;
+    } catch (error) {
+        console.error(`Erro ao buscar aula com ID ${aulaId}:`, error);
+        throw error;
+    }
+};
+
+// Endpoint: GET /aulas/professor/{professorId}/disciplina/{disciplinaId}/turma/{turmaId}
+export const listarAulasPorProfessorEDisciplinaETurma = async (professorId, disciplinaId, turmaId) => {
+    try {
+        const response = await axios.get(`/aulas/professor/${professorId}/disciplina/${disciplinaId}/turma/${turmaId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Erro ao listar aulas por professor, disciplina e turma:", error);
+        throw error;
+    }
+};
+
+// --- NOVAS FUNÇÕES: FALTAS ---
+// Endpoint: POST /faltas/sincronizar
+// Sincroniza faltas para uma aula específica.
+export const sincronizarFaltasPorAula = async (aulaId, faltasParaManter, professorQueEstaRegistrandoId) => {
+    try {
+        const response = await axios.post(`/faltas/sincronizar/${aulaId}/${professorQueEstaRegistrandoId}`, faltasParaManter);
+        return response.data; // Deve retornar uma lista de FaltaResponseDTO
+    } catch (error) {
+        console.error("Erro ao sincronizar faltas por aula:", error);
+        throw error;
+    }
+};
+
+// Endpoint: GET /faltas/aula/{aulaId}
+export const listarFaltasDeUmaAula = async (aulaId) => {
+    try {
+        const response = await axios.get(`/faltas/aula/${aulaId}`);
+        return response.data; // Deve retornar uma lista de FaltaResponseDTO
+    } catch (error) {
+        console.error("Erro ao listar faltas de uma aula:", error);
+        throw error;
+    }
+};
+
 
 // --- Faltas ---
 export const registrarFalta = async (faltaData) => {

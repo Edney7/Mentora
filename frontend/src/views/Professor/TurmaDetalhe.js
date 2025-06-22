@@ -4,36 +4,47 @@ import {
   listarAlunosDaTurma,
   listarNotasDoAlunoPorDisciplina,
   listarDisciplinasDoProfessor,
-  // lancarNota, // Não usaremos aqui, já que estamos usando axios diretamente
-  // registrarFalta, // Mantido comentado como estava
+  criarOuObterAula, 
+  listarAulasPorProfessorEDisciplinaETurma, 
+  sincronizarFaltasPorAula, 
+  listarFaltasDeUmaAula, 
 } from "../../services/ApiService";
-import axios from "axios"; // Importe o axios, é essencial para suas chamadas diretas
+import axios from "axios"; 
 import "../../styles/professor/TurmaDetalhe.css";
 
 export default function TurmaDetalhe() {
-  const { id } = useParams(); // ID da turma
+  const { id: turmaId } = useParams(); 
   const [alunos, setAlunos] = useState([]);
   const [disciplinas, setDisciplinas] = useState([]);
   const [alunoSelecionado, setAlunoSelecionado] = useState(null);
-  // **Ajustado para objeto vazio**, facilitando acesso aninhado
   const [notas, setNotas] = useState({});
-  const [faltas, setFaltas] = useState([]); // Não usado ativamente no código fornecido
-  const [professorId, setProfessorId] = useState(null); // Adicionado para armazenar o ID do professor
+  const [professorId, setProfessorId] = useState(null); 
+  // --- NOVOS ESTADOS PARA AULAS E FALTAS ---
+  const [dataAula, setDataAula] = useState(""); 
+  const [topicoAula, setTopicoAula] = useState(""); 
+  const [disciplinaAulaSelecionada, setDisciplinaAulaSelecionada] = useState(""); 
+  const [aulasExistentes, setAulasExistentes] = useState([]); 
+  const [aulaAtualSelecionada, setAulaAtualSelecionada] = useState(null); 
+  const [disciplinaDaAula, setDisciplinaDaAula] = useState(null);
 
-  // ---
-  // Efeito para carregar alunos e disciplinas do professor
-  // ---
+ 
+  const [presencaAlunos, setPresencaAlunos] = useState({});
+ 
   useEffect(() => {
     async function carregarDadosIniciais() {
       try {
-        const respostaAlunos = await listarAlunosDaTurma(id);
+        const respostaAlunos = await listarAlunosDaTurma(turmaId);
         setAlunos(respostaAlunos);
 
         const idProfessorLogado = localStorage.getItem("idProfessor");
         if (idProfessorLogado) {
-          setProfessorId(parseInt(idProfessorLogado, 10)); // Armazena o ID do professor como número
+          setProfessorId(parseInt(idProfessorLogado, 10)); 
           const disciplinaResposta = await listarDisciplinasDoProfessor(idProfessorLogado);
           setDisciplinas(disciplinaResposta);
+          if (disciplinaResposta.length > 0) {
+  setDisciplinaDaAula(disciplinaResposta[0]); // salva o objeto completo
+  setDisciplinaAulaSelecionada(disciplinaResposta[0].id); // salva apenas o ID
+}
         } else {
           console.warn("ID do professor não encontrado no localStorage.");
           alert("Erro: ID do professor não disponível. Faça login novamente.");
@@ -44,37 +55,26 @@ export default function TurmaDetalhe() {
       }
     }
     carregarDadosIniciais();
-  }, [id]); // Depende apenas do ID da turma e do estado professorId
+  }, [turmaId]); 
 
-  // ---
-  // Efeito para carregar notas do aluno selecionado
-  // ---
   useEffect(() => {
     async function carregarNotasDoAlunoSelecionado() {
-      // Só continua se o aluno estiver selecionado, houver disciplinas e professorId carregado
       if (!alunoSelecionado || disciplinas.length === 0 || professorId === null) return;
 
-      // Vamos iterar sobre todas as disciplinas que o professor ministra
-      // e buscar as notas para o aluno selecionado em cada uma delas.
-      // Isso é mais robusto do que pegar apenas a primeira disciplina.
+
       const notasFormatadasDoAluno = {};
 
       try {
         for (const disc of disciplinas) {
           console.log("Buscando notas para aluno:", alunoSelecionado.id, "disciplina:", disc.id);
-          // A função listarNotasDoAlunoPorDisciplina deve retornar um array de notas
-          // para o aluno e disciplina específicos.
+        
           const notasRecebidasPorDisciplina = await listarNotasDoAlunoPorDisciplina(
             alunoSelecionado.id,
             disc.id
           );
 
           notasRecebidasPorDisciplina.forEach((nota) => {
-            // Supondo que a 'nota' retornada tenha `id`, `bimestre`, `prova1`, `prova2`
-            // e os IDs do aluno e disciplina estejam diretamente nela (não aninhados)
             const { id: notaId, alunoId: returnedAlunoId, disciplinaId: returnedDisciplinaId, bimestre, prova1, prova2 } = nota;
-
-            // Usa os IDs que vêm da nota, ou os IDs atuais se não vierem
             const currentAlunoId = returnedAlunoId || alunoSelecionado.id;
             const currentDisciplinaId = returnedDisciplinaId || disc.id;
 
@@ -85,12 +85,11 @@ export default function TurmaDetalhe() {
               prova1,
               prova2,
               id: notaId,
-              cadastrada: true, // Indica que a nota já existe no DB
+              cadastrada: true, 
             };
           });
         }
 
-        // Atualiza o estado 'notas' de forma imutável, mesclando com o que já existe
         setNotas((prev) => {
           const atualizadas = { ...prev };
           Object.entries(notasFormatadasDoAluno).forEach(([alunoIdKey, disciplinasObj]) => {
@@ -111,26 +110,75 @@ export default function TurmaDetalhe() {
       }
     }
     carregarNotasDoAlunoSelecionado();
-  }, [alunoSelecionado, disciplinas, professorId]); // Depende do aluno, disciplinas e professorId
+  }, [alunoSelecionado, disciplinas, professorId]); 
+  useEffect(() => {
+    async function carregarAulasEFaltas() {
+      if (!professorId || !disciplinaAulaSelecionada || !dataAula || dataAula.length < 10) {
+        setAulasExistentes([]);
+        setAulaAtualSelecionada(null);
+        setPresencaAlunos({}); // Limpa as presenças quando os filtros mudam
+        return;
+      }
 
-  // ---
-  // Lida com a mudança nos inputs de nota
-  // ---
+      try {
+        const aulas = await listarAulasPorProfessorEDisciplinaETurma(
+          professorId,
+          disciplinaAulaSelecionada,
+          turmaId
+        );
+        setAulasExistentes(aulas);
+
+       
+        const aulaEncontradaNaData = aulas.find(
+          (aula) => aula.dataAula === dataAula
+        );
+
+        if (aulaEncontradaNaData) {
+          setAulaAtualSelecionada(aulaEncontradaNaData);
+          setTopicoAula(aulaEncontradaNaData.topico || "");
+        
+          const faltasDaAula = await listarFaltasDeUmaAula(aulaEncontradaNaData.id);
+          const presencaInicial = {};
+          alunos.forEach(aluno => {
+        
+            presencaInicial[aluno.id] = !faltasDaAula.some(falta => falta.alunoId === aluno.id);
+          });
+          setPresencaAlunos(presencaInicial);
+        } else {
+        
+          setAulaAtualSelecionada(null);
+          setTopicoAula(""); 
+          const presencaInicial = {};
+          alunos.forEach(aluno => {
+            presencaInicial[aluno.id] = true; 
+          });
+          setPresencaAlunos(presencaInicial);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar aulas e faltas:", error.response?.data || error.message || error);
+        alert("Erro ao carregar aulas para esta disciplina/data/turma.");
+        setAulasExistentes([]);
+        setAulaAtualSelecionada(null);
+        setPresencaAlunos({});
+      }
+    }
+    carregarAulasEFaltas();
+  }, [professorId, disciplinaAulaSelecionada, dataAula, turmaId, alunos]); 
+
   const handleNotaChange = (alunoId, disciplinaId, bimestre, campo, valor) => {
     setNotas((prev) => ({
       ...prev,
       [alunoId]: {
-        ...(prev[alunoId] || {}), // Garante que o objeto para alunoId exista
-        [disciplinaId]: {
-          ...((prev[alunoId] && prev[alunoId][disciplinaId]) || {}), // Garante que o objeto para disciplinaId exista
+        ...(prev[alunoId] || {}), 
+          ...((prev[alunoId] && prev[alunoId][disciplinaId]) || {}), 
           [bimestre]: {
-            ...((prev[alunoId]?.[disciplinaId]?.[bimestre]) || {}), // Garante que o objeto para bimestre exista
+            ...((prev[alunoId]?.[disciplinaId]?.[bimestre]) || {}), 
             [campo]: valor,
           },
         },
-      },
-    }));
-  };
+      }
+  ))};
+  
 
   // ---
   // Salva ou edita as notas
@@ -157,11 +205,10 @@ export default function TurmaDetalhe() {
       return;
     }
 
-    // Objeto DTO para enviar ao backend
     const notaDTO = {
       alunoId,
       disciplinaId,
-      professorId, // Usa o professorId do estado
+      professorId, 
       bimestre,
       prova1,
       prova2,
@@ -182,11 +229,9 @@ export default function TurmaDetalhe() {
         alert("Nota cadastrada com sucesso!");
       }
 
-      const notaSalvaDoBackend = response.data; // Dados da nota como retornados pelo backend
+      const notaSalvaDoBackend = response.data; 
 
-      // **CORREÇÃO CRÍTICA AQUI:**
-      // Atualizamos o estado `notas` usando os IDs que já conhecemos (alunoId, disciplinaId, bimestre)
-      // e preenchemos os dados da nota com o que veio do backend, incluindo o ID retornado.
+    
       setNotas((prev) => ({
         ...prev,
         [alunoId]: {
@@ -194,9 +239,9 @@ export default function TurmaDetalhe() {
           [disciplinaId]: {
             ...(prev[alunoId]?.[disciplinaId] || {}),
             [bimestre]: {
-              ...notaSalvaDoBackend, // Copia todos os campos da resposta do backend (incluindo id)
-              id: notaSalvaDoBackend.id, // Garante que o ID correto esteja no campo 'id'
-              cadastrada: true, // Marca como cadastrada
+              ...notaSalvaDoBackend, 
+              id: notaSalvaDoBackend.id, 
+              cadastrada: true, 
             },
           },
         },
@@ -207,13 +252,73 @@ export default function TurmaDetalhe() {
       alert("Erro ao salvar nota. Verifique o console para mais detalhes.");
     }
   };
+  const handleSalvarAulaEFaltas = async () => {
+    if (!professorId || !disciplinaAulaSelecionada || !dataAula || !topicoAula) {
+      alert("Por favor, preencha a disciplina, data e tópico da aula.");
+      return;
+    }
 
+    const aulaDTO = {
+      disciplinaId: disciplinaAulaSelecionada,
+      professorId: professorId,
+      turmaId: parseInt(turmaId, 10), // Garante que é um número
+      dataAula: dataAula, // Formato yyyy-MM-dd
+      topico: topicoAula,
+    };
+
+    try {
+      // 1. Cria ou obtém a aula
+      const aulaResponse = await criarOuObterAula(aulaDTO);
+      setAulaAtualSelecionada(aulaResponse); // Armazena a aula criada/obtida
+      alert(`Aula "${aulaResponse.topico}" (${aulaResponse.dataAula}) ${aulaAtualSelecionada ? "atualizada" : "criada"} com sucesso!`);
+
+      // 2. Prepara a lista de faltas a serem sincronizadas
+      const faltasParaBackend = [];
+      alunos.forEach(aluno => {
+        if (!presencaAlunos[aluno.id]) { // Se o aluno NÃO está presente, ele tem falta
+          faltasParaBackend.push({
+            alunoId: aluno.id,
+            // Adicione campos de justificativa se necessário na UI
+            justificada: false, // Default para false, UI pode mudar
+            descricaoJustificativa: null
+          });
+        }
+      });
+
+      // 3. Sincroniza as faltas para esta aula
+      // O endpoint do backend espera: /faltas/sincronizar/{aulaId}/{professorId}
+      const faltasSincronizadas = await sincronizarFaltasPorAula(
+        aulaResponse.id,
+        faltasParaBackend,
+        professorId
+      );
+      console.log("Faltas sincronizadas:", faltasSincronizadas);
+      alert(`Faltas da aula sincronizadas. Total de faltas registradas: ${faltasSincronizadas.length}`);
+
+      // Opcional: Atualizar UI com faltas justificadas ou outros detalhes retornados.
+      // Neste exemplo, setPresencaAlunos já reflete o estado atual.
+
+    } catch (error) {
+      console.error("Erro ao salvar aula e/ou sincronizar faltas:", error.response?.data || error.message || error);
+      alert("Erro ao salvar aula e/ou sincronizar faltas. Verifique o console.");
+    }
+  };
+
+  // ---
+  // Lida com a mudança no checkbox de presença/falta
+  // ---
+  const handlePresencaChange = (alunoId, isPresente) => {
+    setPresencaAlunos((prev) => ({
+      ...prev,
+      [alunoId]: isPresente,
+    }));
+  };
   // ---
   // Componente de renderização (JSX)
   // ---
   return (
     <>
-      <h1 className="titulo-turma">Notas e faltas - TURMA {id}</h1>
+      <h1 className="titulo-turma">Notas e faltas - TURMA {turmaId}</h1>
       <div className="painel-geral">
         <div className="painel-alunos">
           <h3 className="titulo">ALUNOS</h3>
@@ -224,17 +329,13 @@ export default function TurmaDetalhe() {
               onClick={() => setAlunoSelecionado(aluno)}
             >
               {aluno.nomeUsuario}
-              <div>
-                {/* Esses checkboxes parecem ser para faltas, mas não estão conectados a um estado */}
-                <input type="checkbox" readOnly />
-                <input type="checkbox" readOnly />
-              </div>
+              <div></div>
             </div>
           ))}
         </div>
 
         <div className="painel-notas">
-          {alunoSelecionado && (
+          {alunoSelecionado ? (
             <>
               <h3 className="titulo">NOTAS - {alunoSelecionado.nomeUsuario}</h3>
               <div className="tabela-notas">
@@ -252,7 +353,7 @@ export default function TurmaDetalhe() {
                     {disciplinas.map((disciplina) =>
                       [1, 2, 3, 4].map((bimestre) => (
                         <tr key={`${alunoSelecionado.id}-${disciplina.id}-${bimestre}`}>
-                          <td>{disciplina.nome}</td>
+                          <td>{disciplina.nome}</td> 
                           <td>{bimestre}º</td>
                           <td>
                             <input
@@ -294,7 +395,6 @@ export default function TurmaDetalhe() {
                                 salvarNotas(alunoSelecionado.id, disciplina.id, bimestre)
                               }
                             >
-                              {/* Verifica se a nota tem um ID para exibir "Editar" ou "Salvar" */}
                               {notas?.[alunoSelecionado.id]?.[disciplina.id]?.[bimestre]?.id
                                 ? "Editar"
                                 : "Salvar"}
@@ -307,9 +407,85 @@ export default function TurmaDetalhe() {
                 </table>
               </div>
             </>
+          ) : (
+            <p>Selecione um aluno para visualizar e editar suas notas.</p>
+          )}
+        </div>
+
+        <div className="painel-faltas">
+          <h3 className="titulo">REGISTRO DE AULAS E FALTAS</h3>
+          <div className="form-aula">
+            <label>
+              Disciplina:
+              <span className="disciplina-display">
+                {disciplinaDaAula ? disciplinaDaAula.nome : "Carregando Disciplina..."}
+              </span>
+              {disciplinaDaAula === null && professorId !== null && (
+                <p style={{ color: 'red', fontSize: '0.8em' }}>Nenhuma disciplina encontrada para este professor. O registro de aula não será possível.</p>
+              )}
+            </label>
+            <label>
+              Data da Aula:
+              <input
+                type="date"
+                value={dataAula}
+                onChange={(e) => setDataAula(e.target.value)}
+              />
+            </label>
+            <label>
+              Tópico da Aula:
+              <input
+                type="text"
+                value={topicoAula}
+                onChange={(e) => setTopicoAula(e.target.value)}
+                placeholder="Ex: Introdução à Álgebra"
+              />
+            </label>
+            {aulaAtualSelecionada && (
+              <p>Aula existente: ID {aulaAtualSelecionada.id} - Tópico: {aulaAtualSelecionada.topico}</p>
+            )}
+            {!aulaAtualSelecionada && disciplinaAulaSelecionada && dataAula && topicoAula && (
+              <p>Esta será uma **nova aula** para {disciplinaDaAula?.nome || 'sua disciplina'} em {dataAula}.</p>
+            )}
+
+            {professorId && disciplinaAulaSelecionada && dataAula && topicoAula && (
+              <button onClick={handleSalvarAulaEFaltas} className="btn-salvar-aula">
+                {aulaAtualSelecionada ? "Atualizar Tópico e Sincronizar Faltas" : "Criar Aula e Sincronizar Faltas"}
+              </button>
+            )}
+          </div>
+
+          {(professorId && disciplinaAulaSelecionada && dataAula) && (
+            <div className="tabela-faltas">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Aluno</th>
+                    <th>Presença</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {alunos.map((aluno) => (
+                    <tr key={`falta-${aluno.id}`}>
+                      <td>{aluno.nomeUsuario}</td>
+                      <td>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={presencaAlunos[aluno.id] ?? true}
+                            onChange={(e) => handlePresencaChange(aluno.id, e.target.checked)}
+                          />
+                          <span className="slider round"></span>
+                        </label>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </div>
     </>
   );
-}
+};
