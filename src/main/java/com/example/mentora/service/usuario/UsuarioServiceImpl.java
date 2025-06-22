@@ -137,14 +137,22 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
 
         Long professorId = null;
+        Long secretariaId = null;
         if (usuario.getTipoUsuario() == TipoUsuario.PROFESSOR) {
             Professor professor = professorRepository.findByUsuarioId(usuario.getId())
                     .orElse(null);
             if (professor != null) {
                 professorId = professor.getId();
             }
-        }
 
+        }
+        if (usuario.getTipoUsuario() == TipoUsuario.SECRETARIA) {
+            Secretaria secretaria = secretariaRepository.findByUsuarioId(usuario.getId())
+                    .orElse(null);
+            if (secretaria != null) {
+                secretariaId = secretaria.getId();
+            }
+        }
         return UsuarioResponseDTO.builder()
                 .id(usuario.getId())
                 .nome(usuario.getNome())
@@ -155,6 +163,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .tipoUsuario(usuario.getTipoUsuario())
                 .ativo(usuario.getAtivo())
                 .professorId(professorId)
+                .secretariaId(secretariaId)
                 .build();
     }
 

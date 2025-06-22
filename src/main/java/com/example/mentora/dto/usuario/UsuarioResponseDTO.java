@@ -18,4 +18,5 @@ public class UsuarioResponseDTO {
     private TipoUsuario tipoUsuario;
     private Boolean ativo;
     private Long professorId;
+    private Long secretariaId;
 }
