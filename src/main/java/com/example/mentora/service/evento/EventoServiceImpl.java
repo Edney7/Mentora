@@ -52,18 +52,20 @@ public class EventoServiceImpl implements EventoService {
                 .tipo(salvo.getTipo())
                 .build();
     }
+    private EventoResponseDTO toResponseDTO(Evento evento) {
+        return EventoResponseDTO.builder()
+                .idEvento(evento.getIdEvento())
+                .titulo(evento.getTitulo())
+                .descricao(evento.getDescricao())
+                .data(evento.getData())
+                .tipo(evento.getTipo())
+                .build();
+    }
 
-    @Override
-    public List<EventoResponseDTO> listarEventos() {
-        return eventoRepository.findAll()
-                .stream()
-                .map(ev -> EventoResponseDTO.builder()
-                        .idEvento(ev.getIdEvento())
-                        .titulo(ev.getTitulo())
-                        .descricao(ev.getDescricao())
-                        .data(ev.getData())
-                        .tipo(ev.getTipo())
-                        .build())
+    public List<EventoResponseDTO> buscarEventosPorCalendario(Long idCalendario) {
+        List<Evento> eventos = eventoRepository.findByCalendario_Id(idCalendario);
+        return eventos.stream()
+                .map(this::toResponseDTO)
                 .collect(Collectors.toList());
     }
 }

@@ -23,8 +23,8 @@ public class EventoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(evento);
     }
 
-    @GetMapping
-    public ResponseEntity<List<EventoResponseDTO>> listarEventos() {
-        return ResponseEntity.ok(eventoService.listarEventos());
+    @GetMapping("/calendario/{idCalendario}")
+    public List<EventoResponseDTO> listarEventosPorCalendario(@PathVariable Long idCalendario) {
+        return eventoService.buscarEventosPorCalendario(idCalendario);
     }
 }

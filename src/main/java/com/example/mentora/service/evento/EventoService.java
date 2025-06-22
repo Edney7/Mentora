@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface EventoService {
     EventoResponseDTO criarEvento(EventoCreateDTO dto);
-    List<EventoResponseDTO> listarEventos();
+    List<EventoResponseDTO> buscarEventosPorCalendario(Long idCalendario);
 }
