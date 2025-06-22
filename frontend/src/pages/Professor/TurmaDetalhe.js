@@ -295,12 +295,16 @@ const FaltasPanel = ({ alunos, disciplinas, professorId, turmaId }) => {
       });
       return;
     }
-
+const formatarDataParaBackend = (dataYYYYMMDD) => {
+  if (!dataYYYYMMDD) return null;
+  const [ano, mes, dia] = dataYYYYMMDD.split("-");
+  return `${dia}-${mes}-${ano}`;
+};
     const aulaDTO = {
       disciplinaId: parseInt(data.disciplinaId),
       professorId: parseInt(professorId),
       turmaId: parseInt(turmaId),
-      dataAula: data.dataAula,
+      dataAula: formatarDataParaBackend(data.dataAula),
       topico: data.topico,
     };
     aulaMutation.mutate(aulaDTO);
@@ -510,7 +514,7 @@ export default function TurmaDetalhe() {
                     <ClipboardEdit className="mr-2 h-4 w-4" /> Lançar Notas
                   </TabsTrigger>
                   <TabsTrigger value="faltas">
-                    <CalendarCheck className="mr-2 h-4 w-4" /> Registrar Faltas
+                    <CalendarCheck className="mr-2 h-4 w-4" /> Registrar Aulas e Faltas
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value="notas">

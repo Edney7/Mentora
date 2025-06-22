@@ -153,7 +153,7 @@ export const sincronizarFaltasPorAula = (
 ) =>
   api
     .post(
-      `/faltas/sincronizar/${aulaId}/${professorQueEstaRegistrandoId}`,
+      `/faltas/aula/${aulaId}/sincronizar?professorQueEstaRegistrandoId=${professorQueEstaRegistrandoId}`,
       faltasParaManter
     )
     .then((res) => res.data);
