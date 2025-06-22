@@ -1,11 +1,12 @@
 import axios from "axios";
 
+// Instância única do Axios com configurações base
 const api = axios.create({
   baseURL: "http://localhost:8080",
-  withCredentials: true, // Mantém a configuração para sessões/cookies
+  withCredentials: true, // Garante que cookies de sessão sejam enviados
 });
 
-export default api;
+export default api; // Exporta a instância para uso direto se necessário
 
 // --- AUTENTICAÇÃO E USUÁRIOS ---
 export const cadastrarUsuario = (data) =>

@@ -1,5 +1,3 @@
-// pages/Professor/HomeProfessor.js (Completo e Refatorado)
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -21,6 +19,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
+  DialogFooter, // IMPORT ADICIONADO AQUI
 } from "../../components/ui/dialog";
 import {
   Form,
@@ -67,13 +67,19 @@ function DashboardSkeleton() {
   );
 }
 
+// Função para formatar a data para o formato que o backend espera (dd-MM-yyyy)
+const formatarDataParaBackend = (dataYYYYMMDD) => {
+  if (!dataYYYYMMDD) return null;
+  const [ano, mes, dia] = dataYYYYMMDD.split("-");
+  return `${dia}-${mes}-${ano}`;
+};
+
 export default function HomeProfessor() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const idProfessor = localStorage.getItem("idProfessor");
 
-  // -- QUERIES: Busca das turmas do professor e dos eventos do calendário --
   const { data: turmas = [], isLoading: isTurmasLoading } = useQuery({
     queryKey: ["turmasDoProfessor", idProfessor],
     queryFn: () => listarTurmasDoProfessor(idProfessor),
@@ -87,15 +93,20 @@ export default function HomeProfessor() {
       data.map((ev) => ({ title: ev.titulo, date: ev.data, ...ev })),
   });
 
-  // -- FORMULÁRIO E MUTAÇÃO PARA REGISTRAR AUSÊNCIA --
-  const form = useForm();
+  const form = useForm({
+    defaultValues: {
+      dataAusencia: "",
+      motivo: "",
+    },
+  });
+
   const ausenciaMutation = useMutation({
     mutationFn: registarAusenciaProfessor,
     onSuccess: () => {
       toast({ title: "Sucesso!", description: "Sua ausência foi registrada." });
-      queryClient.invalidateQueries({ queryKey: ["ausencias"] }); // Invalida outras queries se necessário
+      queryClient.invalidateQueries({ queryKey: ["ausenciasProfessor"] }); // Invalida outras queries se necessário
       form.reset();
-      // Fecha o modal (se o Dialog não for controlado)
+      // Idealmente, fecharíamos o modal programaticamente aqui, mas o DialogTrigger cuida disso.
     },
     onError: (err) =>
       toast({
@@ -108,11 +119,22 @@ export default function HomeProfessor() {
   });
 
   function onAusenciaSubmit(data) {
-    ausenciaMutation.mutate({
-      ...data,
-      idProfessor: parseInt(idProfessor, 10),
-      // A data já vem no formato AAAA-MM-DD do input type="date"
-    });
+    if (!data.motivo || !data.dataAusencia) {
+      toast({
+        title: "Erro",
+        description: "Preencha todos os campos!",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const ausenciaData = {
+      motivo: data.motivo,
+      dataAusencia: formatarDataParaBackend(data.dataAusencia), // Formato correto
+      professorId: parseInt(idProfessor),
+    };
+
+    ausenciaMutation.mutate(ausenciaData);
   }
 
   const isLoading = isTurmasLoading || isEventosLoading;
@@ -120,12 +142,19 @@ export default function HomeProfessor() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Dashboard do Professor
+          </h1>
+          <p className="text-gray-600">
+            Acesse suas turmas e registre suas ausências.
+          </p>
+        </div>
 
         {isLoading ? (
           <DashboardSkeleton />
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Coluna Principal: Minhas Turmas */}
             <div className="lg:col-span-2 space-y-4">
               <Card>
                 <CardHeader>
@@ -161,7 +190,6 @@ export default function HomeProfessor() {
               </Card>
             </div>
 
-            {/* Coluna Lateral: Calendário e Ações */}
             <div className="lg:col-span-1 space-y-6">
               <Card>
                 <CardHeader>
@@ -195,11 +223,12 @@ export default function HomeProfessor() {
                   <Form {...form}>
                     <form
                       onSubmit={form.handleSubmit(onAusenciaSubmit)}
-                      className="space-y-4"
+                      className="space-y-4 pt-4"
                     >
                       <FormField
                         control={form.control}
                         name="dataAusencia"
+                        rules={{ required: "A data é obrigatória." }}
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Data da Ausência</FormLabel>
@@ -213,6 +242,7 @@ export default function HomeProfessor() {
                       <FormField
                         control={form.control}
                         name="motivo"
+                        rules={{ required: "O motivo é obrigatório." }}
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Motivo (Ex: Consulta Médica)</FormLabel>
@@ -226,7 +256,12 @@ export default function HomeProfessor() {
                           </FormItem>
                         )}
                       />
-                      <div className="flex justify-end pt-2">
+                      <DialogFooter className="pt-2">
+                        <DialogClose asChild>
+                          <Button type="button" variant="ghost">
+                            Cancelar
+                          </Button>
+                        </DialogClose>
                         <Button
                           type="submit"
                           disabled={ausenciaMutation.isPending}
@@ -235,7 +270,7 @@ export default function HomeProfessor() {
                             ? "Enviando..."
                             : "Enviar Registro"}
                         </Button>
-                      </div>
+                      </DialogFooter>
                     </form>
                   </Form>
                 </DialogContent>
