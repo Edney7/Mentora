@@ -1,292 +1,557 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm, useFieldArray } from "react-hook-form";
+
+// Componentes e Hooks
+import { Button } from "../../components/ui/button";
 import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../components/ui/table";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../components/ui/tabs";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../../components/ui/form";
+import { Input } from "../../components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
+import { Switch } from "../../components/ui/switch";
+import { Skeleton } from "../../components/ui/skeleton";
+import { useToast } from "../../hooks/use-toast";
+
+// Ícones
+import {
+  ArrowLeft,
+  BookOpen,
+  Users,
+  CalendarCheck,
+  ClipboardEdit,
+} from "lucide-react";
+
+// Funções da API (e import do 'api' default)
+import api, {
   listarAlunosDaTurma,
-  listarNotasDoAlunoPorDisciplina,
   listarDisciplinasDoProfessor,
-  lancarNota,
-  registrarFalta,
+  listarNotasDoAlunoPorDisciplina,
+  criarOuObterAula,
+  sincronizarFaltasPorAula,
 } from "../../services/ApiService";
-import axios from "axios";
-import "../../styles/professor/TurmaDetalhe.css";
 
-export default function TurmaDetalhe() {
-  const { id } = useParams(); // ID da turma
-  const [alunos, setAlunos] = useState([]);
-  const [disciplinas, setDisciplinas] = useState([]);
-  const [alunoSelecionado, setAlunoSelecionado] = useState(null);
-  const [notas, setNotas] = useState([]);
-  const [faltas, setFaltas] = useState([]);
+// Sub-componente para o Painel de Notas
+const NotasPanel = ({ aluno, disciplinas, professorId, turmaId }) => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-
-  useEffect(() => {
-    async function carregarAlunos() {
-      try {
-        const resposta = await listarAlunosDaTurma(id);
-        setAlunos(resposta);
-        const idProfessor = localStorage.getItem("idProfessor");
-
-        const disciplinaResposta = await listarDisciplinasDoProfessor(idProfessor);
-        setDisciplinas(disciplinaResposta);
-
-      } catch (error) {
-        console.error("Erro ao carregar alunos:", error);
-        alert("Erro ao buscar alunos da turma.");
-      }
-    }
-    carregarAlunos();
-  }, [id]);
-
-  useEffect(() => {
-    async function carregarNotasDoAlunoSelecionado() {
-      // Só continua se o aluno estiver selecionado e houver pelo menos 1 disciplina carregada
-      if (!alunoSelecionado || disciplinas.length === 0) return;
-
-      const disciplinaId = disciplinas[0]?.id;
-      if (!disciplinaId) {
-        console.warn("Disciplina não definida");
-        return;
-      }
-
-      try {
-        console.log("Buscando notas do aluno", alunoSelecionado.id, "disciplina", disciplinaId);
-
-        const notasRecebidas = await listarNotasDoAlunoPorDisciplina(alunoSelecionado.id, disciplinaId);
-
-        const notasFormatadas = {};
-        notasRecebidas.forEach((nota) => {
-          const { alunoId, disciplinaId, bimestre, prova1, prova2, id } = nota;
-
-          if (!notasFormatadas[alunoId]) notasFormatadas[alunoId] = {};
-          if (!notasFormatadas[alunoId][disciplinaId]) notasFormatadas[alunoId][disciplinaId] = {};
-          notasFormatadas[alunoId][disciplinaId][bimestre] = {
-            prova1,
-            prova2,
-            id,
-            cadastrada: true,
-          };
-        });
-
-        setNotas((prev) => {
-          const atualizadas = { ...prev };
-          Object.entries(notasFormatadas).forEach(([alunoId, disciplinasObj]) => {
-            if (!atualizadas[alunoId]) atualizadas[alunoId] = {};
-            Object.entries(disciplinasObj).forEach(([disciplinaId, bimestresObj]) => {
-              if (!atualizadas[alunoId][disciplinaId]) atualizadas[alunoId][disciplinaId] = {};
-              Object.entries(bimestresObj).forEach(([bimestre, nota]) => {
-                atualizadas[alunoId][disciplinaId][bimestre] = nota;
-              });
-            });
+  const notasQuery = useQuery({
+    queryKey: ["notas", aluno.id],
+    queryFn: async () => {
+      const todasAsNotas = {};
+      if (disciplinas && disciplinas.length > 0) {
+        for (const disc of disciplinas) {
+          const notasDaDisciplina = await listarNotasDoAlunoPorDisciplina(
+            aluno.id,
+            disc.id
+          );
+          notasDaDisciplina.forEach((nota) => {
+            if (!todasAsNotas[disc.id]) todasAsNotas[disc.id] = {};
+            todasAsNotas[disc.id][nota.bimestre] = nota;
           });
-          return atualizadas;
-        });
-      } catch (error) {
-        console.error("Erro ao buscar notas do aluno:", error);
-        alert("Erro ao carregar notas lançadas.");
+        }
       }
+      return todasAsNotas;
+    },
+    enabled: !!aluno && !!disciplinas?.length,
+  });
+
+  const form = useForm();
+  const { reset, watch, register } = form;
+
+  useEffect(() => {
+    if (notasQuery.data) {
+      reset(notasQuery.data);
+    }
+  }, [notasQuery.data, reset]);
+
+  const notaMutation = useMutation({
+    mutationFn: async (data) => {
+      const url = data.id ? `/notas/${data.id}` : "/notas";
+      const method = data.id ? "put" : "post";
+      return api[method](url, data).then((res) => res.data);
+    },
+    onSuccess: () => {
+      toast({ title: "Sucesso!", description: "Nota salva com sucesso." });
+      queryClient.invalidateQueries({ queryKey: ["notas", aluno.id] });
+    },
+    onError: (err) =>
+      toast({
+        title: "Erro",
+        description:
+          err.response?.data?.message || "Não foi possível salvar a nota.",
+        variant: "destructive",
+      }),
+  });
+
+  const handleSalvarNota = (disciplinaId, bimestre) => {
+    const notasDoForm = form.getValues(`${disciplinaId}.${bimestre}`);
+    const prova1 = parseFloat(notasDoForm.prova1);
+    const prova2 = parseFloat(notasDoForm.prova2);
+
+    if (isNaN(prova1) || isNaN(prova2)) {
+      toast({
+        title: "Erro de Validação",
+        description: "As notas devem ser números.",
+        variant: "destructive",
+      });
+      return;
     }
 
-    carregarNotasDoAlunoSelecionado();
-  }, [alunoSelecionado, disciplinas]); // <-- depende dos dois!
-
-
-  /*useEffect(() => {
-    async function carregarNotasEFaltas() {
-      if (!alunoSelecionado) return;
-      const notas = await listarNotasDoAlunoPorDisciplina(alunoSelecionado.id, disciplinaId);
-      const faltas = await listarFaltasDoAlunoPorDisciplina(alunoSelecionado.id, disciplinaId);
-      setNotas(notas);
-      setFaltas(faltas);
-    }
-    carregarNotasEFaltas();
-  }, [alunoSelecionado, disciplinaId]);*/
-
-  const handleNotaChange = (alunoId, disciplinaId, bimestre, campo, valor) => {
-    setNotas((prev) => ({
-      ...prev,
-      [alunoId]: {
-        ...prev[alunoId],
-        [disciplinaId]: {
-          ...((prev[alunoId] && prev[alunoId][disciplinaId]) || {}),
-          [bimestre]: {
-            ...((prev[alunoId]?.[disciplinaId]?.[bimestre]) || {}),
-            [campo]: valor,
-          },
-        },
-      },
-    }));
-  };
-
-  const salvarNotas = async (alunoId, disciplinaId, bimestre) => {
-    const nota = notas[alunoId]?.[disciplinaId]?.[bimestre];
-    if (!nota || nota.prova1 === undefined || nota.prova2 === undefined) {
-      return alert("Preencha as duas notas antes de salvar.");
-    }
-
-    try {
-      const professorId = localStorage.getItem("idProfessor");
-      const media = (parseFloat(nota.prova1) + parseFloat(nota.prova2)) / 2;
-
-      const notaDTO = {
-        alunoId,
-        disciplinaId,
-        professorId: parseInt(professorId),
-        bimestre,
-        prova1: parseFloat(nota.prova1),
-        prova2: parseFloat(nota.prova2),
-        media: media,
-      };
-
-      if (nota.id) {
-        // Atualizar nota existente (PUT)
-        await axios.put(`http://localhost:8080/notas/${nota.id}`, notaDTO);
-        alert("Nota atualizada com sucesso!");
-      } else {
-        // Cadastrar nova nota (POST)
-        const response = await axios.post("http://localhost:8080/notas", notaDTO);
-        const novaNotaId = response.data.id;
-
-        // Atualiza o estado local com ID retornado
-        setNotas((prev) => ({
-          ...prev,
-          [alunoId]: {
-            ...prev[alunoId],
-            [disciplinaId]: {
-              ...prev[alunoId][disciplinaId],
-              [bimestre]: {
-                ...nota,
-                id: novaNotaId,
-                prova1: parseFloat(nota.prova1),
-                prova2: parseFloat(nota.prova2),
-                media: media,
-                cadastrada: true,
-              },
-            },
-          },
-        }));
-        alert("Nota cadastrada com sucesso!");
-      }
-
-    } catch (error) {
-      console.error("Erro ao salvar nota:", error);
-      alert("Erro ao salvar nota.");
-    }
-  };
-
-
-  /*const handleFalta = async (bimestre) => {
-    const confirmar = window.confirm(`Registrar falta no ${bimestre}º Bimestre?`);
-    if (!confirmar) return;
-    await registrarFalta({
-      alunoId: alunoSelecionado.id,
+    const notaDTO = {
+      id: notasDoForm.id || null,
+      alunoId: aluno.id,
+      disciplinaId,
+      professorId: parseInt(professorId),
       bimestre,
-      justificada: false,
-    });
-    setAlunoSelecionado({ ...alunoSelecionado });
-  };*/
+      prova1,
+      prova2,
+      media: (prova1 + prova2) / 2,
+    };
+    notaMutation.mutate(notaDTO);
+  };
 
   return (
-    <>
+    <CardContent className="pt-6">
+      {notasQuery.isLoading ? (
+        <p>Carregando notas...</p>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Disciplina</TableHead>
+              <TableHead>Bimestre</TableHead>
+              <TableHead>Prova 1</TableHead>
+              <TableHead>Prova 2</TableHead>
+              <TableHead>Média</TableHead>
+              <TableHead>Ação</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {disciplinas.map((disciplina) =>
+              [1, 2, 3, 4].map((bimestre) => (
+                <TableRow key={`${disciplina.id}-${bimestre}`}>
+                  <TableCell>{disciplina.nome}</TableCell>
+                  <TableCell>{bimestre}º</TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      {...register(`${disciplina.id}.${bimestre}.prova1`)}
+                      className="w-20"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      {...register(`${disciplina.id}.${bimestre}.prova2`)}
+                      className="w-20"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    {((parseFloat(
+                      watch(`${disciplina.id}.${bimestre}.prova1`)
+                    ) || 0) +
+                      (parseFloat(
+                        watch(`${disciplina.id}.${bimestre}.prova2`)
+                      ) || 0)) /
+                      2 || 0}
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      size="sm"
+                      onClick={() => handleSalvarNota(disciplina.id, bimestre)}
+                      disabled={notaMutation.isPending}
+                    >
+                      Salvar
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      )}
+    </CardContent>
+  );
+};
 
-      <h1 className="titulo-turma">Notas e faltas - TURMA {id}</h1>
-      <div className="painel-geral">
-        <div className="painel-alunos">
-          <h3 className="titulo">ALUNOS</h3>
-          {alunos.map((aluno) => (
-            <div
-              key={aluno.id}
-              className={`aluno-box ${alunoSelecionado?.id === aluno.id ? "selecionado" : ""}`}
-              onClick={() => setAlunoSelecionado(aluno)}
+// Sub-componente para o Painel de Faltas
+const FaltasPanel = ({ alunos, disciplinas, professorId, turmaId }) => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const form = useForm({
+    defaultValues: {
+      disciplinaId: "",
+      dataAula: "",
+      topico: "",
+      alunos: [],
+    },
+  });
+
+  const { fields, replace } = useFieldArray({
+    control: form.control,
+    name: "alunos",
+  });
+
+  useEffect(() => {
+    if (alunos && alunos.length > 0) {
+      replace(
+        alunos.map((aluno) => ({
+          alunoId: aluno.id,
+          nome: aluno.nomeUsuario,
+          presente: true,
+          justificativa: "",
+        }))
+      );
+    }
+  }, [alunos, replace]);
+
+  const aulaMutation = useMutation({
+    mutationFn: criarOuObterAula,
+    onSuccess: (aulaResponse) => {
+      const faltas = form
+        .getValues("alunos")
+        .filter((a) => !a.presente)
+        .map((a) => ({
+          alunoId: a.alunoId,
+          justificada: false,
+          descricaoJustificativa: null,
+        }));
+      sincronizarFaltasMutation.mutate({
+        aulaId: aulaResponse.id,
+        faltas,
+        professorId: parseInt(professorId),
+      });
+    },
+    onError: (err) =>
+      toast({
+        title: "Erro na Aula",
+        description:
+          err.response?.data?.message || "Não foi possível criar a aula.",
+        variant: "destructive",
+      }),
+  });
+
+  const sincronizarFaltasMutation = useMutation({
+    mutationFn: (data) =>
+      sincronizarFaltasPorAula(data.aulaId, data.faltas, data.professorId),
+    onSuccess: () =>
+      toast({
+        title: "Sucesso!",
+        description: "Aula e faltas registradas com sucesso.",
+      }),
+    onError: (err) =>
+      toast({
+        title: "Erro nas Faltas",
+        description:
+          err.response?.data?.message ||
+          "Não foi possível registrar as faltas.",
+        variant: "destructive",
+      }),
+  });
+
+  function onSubmit(data) {
+    if (!data.disciplinaId || !data.dataAula || !data.topico) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Por favor, preencha disciplina, data e tópico da aula.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const aulaDTO = {
+      disciplinaId: parseInt(data.disciplinaId),
+      professorId: parseInt(professorId),
+      turmaId: parseInt(turmaId),
+      dataAula: data.dataAula,
+      topico: data.topico,
+    };
+    aulaMutation.mutate(aulaDTO);
+  }
+
+  return (
+    <CardContent className="pt-6">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Informações da Aula</CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6">
+              <FormField
+                control={form.control}
+                name="disciplinaId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Disciplina</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {disciplinas.map((d) => (
+                          <SelectItem key={d.id} value={d.id.toString()}>
+                            {d.nome}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="dataAula"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Data</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="topico"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tópico da Aula</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: Verbos" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Lista de Presença</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Aluno</TableHead>
+                    <TableHead className="text-right">Presente</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {fields.map((field, index) => (
+                    <TableRow key={field.id}>
+                      <TableCell>{field.nome}</TableCell>
+                      <TableCell className="text-right">
+                        <FormField
+                          control={form.control}
+                          name={`alunos.${index}.presente`}
+                          render={({ field: switchField }) => (
+                            <FormControl>
+                              <Switch
+                                checked={switchField.value}
+                                onCheckedChange={switchField.onChange}
+                              />
+                            </FormControl>
+                          )}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          <div className="flex justify-end">
+            <Button
+              type="submit"
+              disabled={
+                aulaMutation.isPending || sincronizarFaltasMutation.isPending
+              }
             >
-              {aluno.nomeUsuario}
-              <div>
-                <input type="checkbox" readOnly />
-                <input type="checkbox" readOnly />
-              </div>
-            </div>
-          ))}
+              {aulaMutation.isPending
+                ? "Criando aula..."
+                : sincronizarFaltasMutation.isPending
+                ? "Registrando faltas..."
+                : "Salvar Aula e Faltas"}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </CardContent>
+  );
+};
+
+// Componente Principal da Página
+export default function TurmaDetalhe() {
+  const { id: turmaId } = useParams();
+  const navigate = useNavigate();
+  const professorId = localStorage.getItem("idProfessor");
+  const [alunoSelecionado, setAlunoSelecionado] = useState(null);
+
+  const alunosQuery = useQuery({
+    queryKey: ["alunosDaTurma", turmaId],
+    queryFn: () => listarAlunosDaTurma(turmaId),
+    enabled: !!turmaId,
+  });
+
+  const disciplinasQuery = useQuery({
+    queryKey: ["disciplinasDoProfessor", professorId],
+    queryFn: () => listarDisciplinasDoProfessor(professorId),
+    enabled: !!professorId,
+  });
+
+  const isLoading = alunosQuery.isLoading || disciplinasQuery.isLoading;
+
+  // Quando os dados dos alunos carregarem, selecione o primeiro aluno automaticamente
+  useEffect(() => {
+    if (alunosQuery.data && alunosQuery.data.length > 0 && !alunoSelecionado) {
+      setAlunoSelecionado(alunosQuery.data[0]);
+    }
+  }, [alunosQuery.data, alunoSelecionado]);
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-6 flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">
+              Detalhes da Turma
+            </h1>
+          </div>
         </div>
 
-        <div className="painel-notas">
-          {alunoSelecionado && (
-            <>
-              <h3 className="titulo">
-                NOTAS - {alunoSelecionado.nomeUsuario}
-              </h3>
-              <div className="tabela-notas">
-                <table>
-                  <thead>
-                    <tr>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <Card className="lg:col-span-1">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="text-teal-600" /> Alunos
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {isLoading
+                ? Array(5)
+                    .fill(0)
+                    .map((_, i) => <Skeleton key={i} className="h-10 w-full" />)
+                : alunosQuery.data?.map((aluno) => (
+                    // AQUI ESTÁ A MUDANÇA: trocamos 'secondary' por 'default' para um destaque maior
+                    <Button
+                      key={aluno.id}
+                      variant={
+                        alunoSelecionado?.id === aluno.id ? "default" : "ghost"
+                      }
+                      className="w-full justify-start"
+                      onClick={() => setAlunoSelecionado(aluno)}
+                    >
+                      {aluno.nomeUsuario}
+                    </Button>
+                  ))}
+            </CardContent>
+          </Card>
 
-                      <th>Disciplina</th>
-                      <th>Bimestre</th>
-                      <th>Prova 1</th>
-                      <th>Prova 2</th>
-                      <th>Ação</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {disciplinas.map((disciplina) =>
-                      [1, 2, 3, 4].map((bimestre) => (
-                        <tr key={`${alunoSelecionado.id}-${disciplina.id}-${bimestre}`}>
-                          <td>{disciplina.nome}</td>
-                          <td>{bimestre}º</td>
-                          <td>
-                            <input
-                              type="number"
-                              min="0"
-                              max="10"
-                              value={notas[alunoSelecionado.id]?.[disciplina.id]?.[bimestre]?.prova1 || ""}
-                              onChange={(e) =>
-                                handleNotaChange(
-                                  alunoSelecionado.id,
-                                  disciplina.id,
-
-                                  bimestre,
-                                  "prova1",
-                                  e.target.value
-                                )
-                              }
-                            />
-                          </td>
-                          <td>
-                            <input
-                              type="number"
-                              min="0"
-                              max="10"
-                              value={notas[alunoSelecionado.id]?.[disciplina.id]?.[bimestre]?.prova2 || ""}
-                              onChange={(e) =>
-                                handleNotaChange(
-                                  alunoSelecionado.id,
-                                  disciplina.id,
-                                  bimestre,
-                                  "prova2",
-                                  e.target.value
-                                )
-                              }
-                            />
-                          </td>
-                          <td>
-                            <button
-                              onClick={() =>
-                                salvarNotas(alunoSelecionado.id, disciplina.id, bimestre)
-                              }
-                            >{notas[alunoSelecionado.id]?.[disciplina.id]?.[bimestre]?.id
-                              ? "Editar" : "Salvar"}
-
-                            </button>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-
-                  </tbody>
-                </table>
-              </div>
-            </>
-          )}
+          <div className="lg:col-span-3">
+            {isLoading ? (
+              <Card className="flex items-center justify-center h-full min-h-[400px]">
+                <p>Carregando dados...</p>
+              </Card>
+            ) : alunoSelecionado && disciplinasQuery.data ? (
+              <Tabs defaultValue="notas" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="notas">
+                    <ClipboardEdit className="mr-2 h-4 w-4" /> Lançar Notas
+                  </TabsTrigger>
+                  <TabsTrigger value="faltas">
+                    <CalendarCheck className="mr-2 h-4 w-4" /> Registrar Faltas
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="notas">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>
+                        Notas de {alunoSelecionado.nomeUsuario}
+                      </CardTitle>
+                    </CardHeader>
+                    <NotasPanel
+                      aluno={alunoSelecionado}
+                      disciplinas={disciplinasQuery.data || []}
+                      professorId={professorId}
+                      turmaId={turmaId}
+                    />
+                  </Card>
+                </TabsContent>
+                <TabsContent value="faltas">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Registro de Presença</CardTitle>
+                    </CardHeader>
+                    <FaltasPanel
+                      alunos={alunosQuery.data || []}
+                      disciplinas={disciplinasQuery.data || []}
+                      professorId={professorId}
+                      turmaId={turmaId}
+                    />
+                  </Card>
+                </TabsContent>
+              </Tabs>
+            ) : (
+              <Card className="flex items-center justify-center h-full min-h-[400px]">
+                <p className="text-gray-500">
+                  Selecione um aluno para ver os detalhes.
+                </p>
+              </Card>
+            )}
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
