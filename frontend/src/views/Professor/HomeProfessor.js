@@ -2,29 +2,50 @@ import React, { useState, useEffect } from "react";
 import "../../styles/professor/HomeProfessor.css";
 import Calendar from "../../components/Calendario";
 import { useNavigate } from "react-router-dom";
-import { listarTurmasDoProfessor } from "../../services/ApiService";
+import { listarTurmasDoProfessor, registarAusenciaProfessor } from "../../services/ApiService";
 
 export default function HomeProfessor() {
   const navigate = useNavigate();
 
   const [modalAberto, setModalAberto] = useState(false);
-  const [descricao, setDescricao] = useState("");
+  const [motivo, setMotivo] = useState("");
   const [data, setData] = useState("");
   const [turmas, setTurmas] = useState([]);
 
   const idProfessor = localStorage.getItem("idProfessor");
   console.log("ID do prof:", idProfessor);
   const abrirModal = () => {
-    setDescricao("");
+    setMotivo("");
     setData("");
     setModalAberto(true);
   };
 
-  const enviarAusencia = () => {
-    if (!descricao || !data) return alert("Preencha todos os campos!");
-    console.log("Ausência planejada:", { descricao, data });
-    setModalAberto(false);
+const enviarAusencia = async () => {
+  if (!motivo || !data) return alert("Preencha todos os campos!");
+
+  // Formata a data de "yyyy-MM-dd" para "dd-MM-yyyy"
+  const formatarDataParaBackend = (data) => {
+    const [ano, mes, dia] = data.split("-");
+    return `${dia}-${mes}-${ano}`;
   };
+
+  try {
+    const ausenciaData = {
+      motivo,
+      dataAusencia: formatarDataParaBackend(data), // nome do campo + formato correto
+      professorId: idProfessor
+    };
+
+    console.log("Enviando ausência:", ausenciaData);
+
+    await registarAusenciaProfessor(ausenciaData);
+    alert("Ausência registrada com sucesso!");
+    setModalAberto(false);
+  } catch (error) {
+    console.error("Erro ao registrar ausência:", error);
+    alert("Erro ao registrar ausência.");
+  }
+};
 
   useEffect(() => {
     const carregarTurmas = async () => {
@@ -101,8 +122,8 @@ export default function HomeProfessor() {
               </label>
               <textarea
                 rows={4}
-                value={descricao}
-                onChange={(e) => setDescricao(e.target.value)}
+                value={motivo}
+                onChange={(e) => setMotivo(e.target.value)}
               />
 
               <label>
