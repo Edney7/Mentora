@@ -4,32 +4,33 @@ import {
   listarAlunosDaTurma,
   listarNotasDoAlunoPorDisciplina,
   listarDisciplinasDoProfessor,
-  criarOuObterAula, 
-  listarAulasPorProfessorEDisciplinaETurma, 
-  sincronizarFaltasPorAula, 
-  listarFaltasDeUmaAula, 
+  criarOuObterAula,
+
+  sincronizarFaltasPorAula,
+
 } from "../../services/ApiService";
-import axios from "axios"; 
+import axios from "axios";
 import "../../styles/professor/TurmaDetalhe.css";
 
 export default function TurmaDetalhe() {
-  const { id: turmaId } = useParams(); 
+  const { id: turmaId } = useParams();
   const [alunos, setAlunos] = useState([]);
   const [disciplinas, setDisciplinas] = useState([]);
   const [alunoSelecionado, setAlunoSelecionado] = useState(null);
   const [notas, setNotas] = useState({});
-  const [professorId, setProfessorId] = useState(null); 
+  const [professorId, setProfessorId] = useState(null);
   // --- NOVOS ESTADOS PARA AULAS E FALTAS ---
-  const [dataAula, setDataAula] = useState(""); 
-  const [topicoAula, setTopicoAula] = useState(""); 
-  const [disciplinaAulaSelecionada, setDisciplinaAulaSelecionada] = useState(""); 
-  const [aulasExistentes, setAulasExistentes] = useState([]); 
-  const [aulaAtualSelecionada, setAulaAtualSelecionada] = useState(null); 
+  const [dataAula, setDataAula] = useState("");
+  const [topicoAula, setTopicoAula] = useState("");
+  const [disciplinaAulaSelecionada, setDisciplinaAulaSelecionada] = useState("");
+  const [aulasExistentes, setAulasExistentes] = useState([]);
+  const [aulaAtualSelecionada, setAulaAtualSelecionada] = useState(null);
   const [disciplinaDaAula, setDisciplinaDaAula] = useState(null);
+  const [justificativas, setJustificativas] = useState({});
 
- 
+
   const [presencaAlunos, setPresencaAlunos] = useState({});
- 
+
   useEffect(() => {
     async function carregarDadosIniciais() {
       try {
@@ -38,13 +39,13 @@ export default function TurmaDetalhe() {
 
         const idProfessorLogado = localStorage.getItem("idProfessor");
         if (idProfessorLogado) {
-          setProfessorId(parseInt(idProfessorLogado, 10)); 
+          setProfessorId(parseInt(idProfessorLogado, 10));
           const disciplinaResposta = await listarDisciplinasDoProfessor(idProfessorLogado);
           setDisciplinas(disciplinaResposta);
           if (disciplinaResposta.length > 0) {
-  setDisciplinaDaAula(disciplinaResposta[0]); // salva o objeto completo
-  setDisciplinaAulaSelecionada(disciplinaResposta[0].id); // salva apenas o ID
-}
+            setDisciplinaDaAula(disciplinaResposta[0]); // salva o objeto completo
+            setDisciplinaAulaSelecionada(disciplinaResposta[0].id); // salva apenas o ID
+          }
         } else {
           console.warn("ID do professor não encontrado no localStorage.");
           alert("Erro: ID do professor não disponível. Faça login novamente.");
@@ -55,7 +56,7 @@ export default function TurmaDetalhe() {
       }
     }
     carregarDadosIniciais();
-  }, [turmaId]); 
+  }, [turmaId]);
 
   useEffect(() => {
     async function carregarNotasDoAlunoSelecionado() {
@@ -67,7 +68,7 @@ export default function TurmaDetalhe() {
       try {
         for (const disc of disciplinas) {
           console.log("Buscando notas para aluno:", alunoSelecionado.id, "disciplina:", disc.id);
-        
+
           const notasRecebidasPorDisciplina = await listarNotasDoAlunoPorDisciplina(
             alunoSelecionado.id,
             disc.id
@@ -85,7 +86,7 @@ export default function TurmaDetalhe() {
               prova1,
               prova2,
               id: notaId,
-              cadastrada: true, 
+              cadastrada: true,
             };
           });
         }
@@ -110,75 +111,24 @@ export default function TurmaDetalhe() {
       }
     }
     carregarNotasDoAlunoSelecionado();
-  }, [alunoSelecionado, disciplinas, professorId]); 
-  useEffect(() => {
-    async function carregarAulasEFaltas() {
-      if (!professorId || !disciplinaAulaSelecionada || !dataAula || dataAula.length < 10) {
-        setAulasExistentes([]);
-        setAulaAtualSelecionada(null);
-        setPresencaAlunos({}); // Limpa as presenças quando os filtros mudam
-        return;
-      }
+  }, [alunoSelecionado, disciplinas, professorId]);
 
-      try {
-        const aulas = await listarAulasPorProfessorEDisciplinaETurma(
-          professorId,
-          disciplinaAulaSelecionada,
-          turmaId
-        );
-        setAulasExistentes(aulas);
-
-       
-        const aulaEncontradaNaData = aulas.find(
-          (aula) => aula.dataAula === dataAula
-        );
-
-        if (aulaEncontradaNaData) {
-          setAulaAtualSelecionada(aulaEncontradaNaData);
-          setTopicoAula(aulaEncontradaNaData.topico || "");
-        
-          const faltasDaAula = await listarFaltasDeUmaAula(aulaEncontradaNaData.id);
-          const presencaInicial = {};
-          alunos.forEach(aluno => {
-        
-            presencaInicial[aluno.id] = !faltasDaAula.some(falta => falta.alunoId === aluno.id);
-          });
-          setPresencaAlunos(presencaInicial);
-        } else {
-        
-          setAulaAtualSelecionada(null);
-          setTopicoAula(""); 
-          const presencaInicial = {};
-          alunos.forEach(aluno => {
-            presencaInicial[aluno.id] = true; 
-          });
-          setPresencaAlunos(presencaInicial);
-        }
-      } catch (error) {
-        console.error("Erro ao carregar aulas e faltas:", error.response?.data || error.message || error);
-        alert("Erro ao carregar aulas para esta disciplina/data/turma.");
-        setAulasExistentes([]);
-        setAulaAtualSelecionada(null);
-        setPresencaAlunos({});
-      }
-    }
-    carregarAulasEFaltas();
-  }, [professorId, disciplinaAulaSelecionada, dataAula, turmaId, alunos]); 
 
   const handleNotaChange = (alunoId, disciplinaId, bimestre, campo, valor) => {
     setNotas((prev) => ({
       ...prev,
       [alunoId]: {
-        ...(prev[alunoId] || {}), 
-          ...((prev[alunoId] && prev[alunoId][disciplinaId]) || {}), 
-          [bimestre]: {
-            ...((prev[alunoId]?.[disciplinaId]?.[bimestre]) || {}), 
-            [campo]: valor,
-          },
+        ...(prev[alunoId] || {}),
+        ...((prev[alunoId] && prev[alunoId][disciplinaId]) || {}),
+        [bimestre]: {
+          ...((prev[alunoId]?.[disciplinaId]?.[bimestre]) || {}),
+          [campo]: valor,
         },
-      }
-  ))};
-  
+      },
+    }
+    ))
+  };
+
 
   // ---
   // Salva ou edita as notas
@@ -208,7 +158,7 @@ export default function TurmaDetalhe() {
     const notaDTO = {
       alunoId,
       disciplinaId,
-      professorId, 
+      professorId,
       bimestre,
       prova1,
       prova2,
@@ -229,9 +179,9 @@ export default function TurmaDetalhe() {
         alert("Nota cadastrada com sucesso!");
       }
 
-      const notaSalvaDoBackend = response.data; 
+      const notaSalvaDoBackend = response.data;
 
-    
+
       setNotas((prev) => ({
         ...prev,
         [alunoId]: {
@@ -239,9 +189,9 @@ export default function TurmaDetalhe() {
           [disciplinaId]: {
             ...(prev[alunoId]?.[disciplinaId] || {}),
             [bimestre]: {
-              ...notaSalvaDoBackend, 
-              id: notaSalvaDoBackend.id, 
-              cadastrada: true, 
+              ...notaSalvaDoBackend,
+              id: notaSalvaDoBackend.id,
+              cadastrada: true,
             },
           },
         },
@@ -256,13 +206,22 @@ export default function TurmaDetalhe() {
     if (!professorId || !disciplinaAulaSelecionada || !dataAula || !topicoAula) {
       alert("Por favor, preencha a disciplina, data e tópico da aula.");
       return;
-    }
-
+    } const faltasParaBackend = alunos
+      .filter(aluno => !presencaAlunos[aluno.id]) // só quem FALTOU
+      .map(aluno => ({
+        alunoId: aluno.id,
+        justificada: justificativas[aluno.id]?.justificada || false,
+        descricaoJustificativa: justificativas[aluno.id]?.descricao || null
+      }));
+    const formatarDataParaBackend = (data) => {
+      const [ano, mes, dia] = data.split("-");
+      return `${dia}-${mes}-${ano}`;
+    };
     const aulaDTO = {
       disciplinaId: disciplinaAulaSelecionada,
       professorId: professorId,
       turmaId: parseInt(turmaId, 10), // Garante que é um número
-      dataAula: dataAula, // Formato yyyy-MM-dd
+      dataAula: formatarDataParaBackend(dataAula), // Formato yyyy-MM-dd
       topico: topicoAula,
     };
 
@@ -273,20 +232,8 @@ export default function TurmaDetalhe() {
       alert(`Aula "${aulaResponse.topico}" (${aulaResponse.dataAula}) ${aulaAtualSelecionada ? "atualizada" : "criada"} com sucesso!`);
 
       // 2. Prepara a lista de faltas a serem sincronizadas
-      const faltasParaBackend = [];
-      alunos.forEach(aluno => {
-        if (!presencaAlunos[aluno.id]) { // Se o aluno NÃO está presente, ele tem falta
-          faltasParaBackend.push({
-            alunoId: aluno.id,
-            // Adicione campos de justificativa se necessário na UI
-            justificada: false, // Default para false, UI pode mudar
-            descricaoJustificativa: null
-          });
-        }
-      });
+      
 
-      // 3. Sincroniza as faltas para esta aula
-      // O endpoint do backend espera: /faltas/sincronizar/{aulaId}/{professorId}
       const faltasSincronizadas = await sincronizarFaltasPorAula(
         aulaResponse.id,
         faltasParaBackend,
@@ -353,7 +300,7 @@ export default function TurmaDetalhe() {
                     {disciplinas.map((disciplina) =>
                       [1, 2, 3, 4].map((bimestre) => (
                         <tr key={`${alunoSelecionado.id}-${disciplina.id}-${bimestre}`}>
-                          <td>{disciplina.nome}</td> 
+                          <td>{disciplina.nome}</td>
                           <td>{bimestre}º</td>
                           <td>
                             <input
@@ -477,6 +424,45 @@ export default function TurmaDetalhe() {
                           />
                           <span className="slider round"></span>
                         </label>
+
+                        {/* CAMPOS DE JUSTIFICATIVA */}
+                        {!presencaAlunos[aluno.id] && (
+                          <div className="campo-justificativa">
+                            <label>
+                              Justificada?
+                              <input
+                                type="checkbox"
+                                checked={justificativas[aluno.id]?.justificada || false}
+                                onChange={(e) =>
+                                  setJustificativas((prev) => ({
+                                    ...prev,
+                                    [aluno.id]: {
+                                      ...prev[aluno.id],
+                                      justificada: e.target.checked,
+                                    },
+                                  }))
+                                }
+                              />
+                            </label>
+
+                            {justificativas[aluno.id]?.justificada && (
+                              <input
+                                type="text"
+                                placeholder="Descrição da justificativa"
+                                value={justificativas[aluno.id]?.descricao || ""}
+                                onChange={(e) =>
+                                  setJustificativas((prev) => ({
+                                    ...prev,
+                                    [aluno.id]: {
+                                      ...prev[aluno.id],
+                                      descricao: e.target.value,
+                                    },
+                                  }))
+                                }
+                              />
+                            )}
+                          </div>
+                        )}
                       </td>
                     </tr>
                   ))}
