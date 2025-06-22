@@ -21,7 +21,8 @@ public interface FaltaRepository extends JpaRepository<Falta, Long> {
     Optional<Falta> findByAlunoIdAndAula_Disciplina_IdAndAula_DataAula(Long alunoId, Long disciplinaId, LocalDate dataAula);
     boolean existsByAlunoIdAndAula_Disciplina_IdAndAula_DataAula(Long alunoId, Long disciplinaId, LocalDate dataAula);
     List<Falta> findByAula_Disciplina_Id(Long disciplinaId);
-
+    // <<<<<<< ADICIONE ESTE MÉTODO AQUI NA INTERFACE >>>>>>>>>
+    List<Falta> findByAula_Id(Long aulaId);
 
     List<Falta> findByAula_DataAula(LocalDate dataAula);
     List<Falta> findByProfessorQueRegistrouId(Long professorId);

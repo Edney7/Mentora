@@ -21,4 +21,6 @@ public class FaltaResponseDTO {
 
     private Long professorId;
     private String nomeProfessor;
+    private Long aulaId; // O ID da Aula em que a falta ocorreu
+    private LocalDate dataAula; // A data da Aula em que a falta ocorreu
 }

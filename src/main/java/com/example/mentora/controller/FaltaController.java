@@ -7,6 +7,7 @@ import com.example.mentora.service.falta.FaltaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -52,7 +53,39 @@ public class FaltaController {
         FaltaResponseDTO falta = faltaService.buscarFaltaPorId(id);
         return ResponseEntity.ok(falta);
     }
+    // ESTE É O ENDPOINT CHAVE PARA O MODAL DE FREQUÊNCIA
+    @PostMapping("/aula/{aulaId}/sincronizar")
+    public ResponseEntity<List<FaltaResponseDTO>> sincronizarFaltasPorAula(
+            @PathVariable Long aulaId,
+            @RequestParam Long professorQueEstaRegistrandoId, // ID do professor logado que está fazendo a ação
+            @RequestBody List<FaltaCreateDTO> faltasParaManter) { // Lista de DTOs dos alunos que FALTARAM
+        try {
+            List<FaltaResponseDTO> faltasAtualizadas = faltaService.sincronizarFaltasPorAula(aulaId, faltasParaManter, professorQueEstaRegistrandoId);
+            return new ResponseEntity<>(faltasAtualizadas, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
+    // ESTE É O ENDPOINT CHAVE PARA PRÉ-POPULAR O MODAL
+    @GetMapping("/aula/{aulaId}")
+    public ResponseEntity<List<FaltaResponseDTO>> getFaltasDeUmaAula(@PathVariable Long aulaId) {
+        try {
+            List<FaltaResponseDTO> faltas = faltaService.listarFaltasDeUmaAula(aulaId);
+            if (faltas.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT); // Retorna 204 se não houver faltas
+            }
+            return new ResponseEntity<>(faltas, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     @GetMapping
     public List<FaltaResponseDTO> listarTodasFaltas() {
         return faltaService.listarTodasFaltas();

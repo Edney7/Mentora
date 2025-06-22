@@ -18,7 +18,11 @@ public interface FaltaService {
     List<FaltaResponseDTO> listarFaltasPorAluno(Long alunoId);
 
     List<FaltaResponseDTO> listarFaltasPorAlunoEDisciplina(Long alunoId, Long disciplinaId);
+    // <<<<<<<< ADICIONE ESTE MÉTODO AQUI NA INTERFACE >>>>>>>>
+    List<FaltaResponseDTO> sincronizarFaltasPorAula(Long aulaId, List<FaltaCreateDTO> faltasParaManter, Long professorQueEstaRegistrandoId);
 
+    // <<<<<<<< E este também, se ainda não estiver >>>>>>>>
+    List<FaltaResponseDTO> listarFaltasDeUmaAula(Long aulaId);
     List<FaltaResponseDTO> listarFaltasPorProfessor(Long professorId);
 
     List<FaltaResponseDTO> listarFaltasPorData(LocalDate dataFalta);

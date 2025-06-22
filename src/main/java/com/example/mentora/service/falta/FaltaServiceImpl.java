@@ -14,9 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -135,7 +133,59 @@ public class FaltaServiceImpl implements FaltaService {
     }
 
 
+    @Override // This annotation is crucial for confirming you're overriding an interface method
+    @Transactional
+    public List<FaltaResponseDTO> sincronizarFaltasPorAula(Long aulaId, List<FaltaCreateDTO> faltasParaManter, Long professorQueEstaRegistrandoId) {
+        log.info("Sincronizando faltas para a aula ID: {} por professor ID: {}", aulaId, professorQueEstaRegistrandoId);
 
+        Aula aula = aulaRepository.findById(aulaId)
+                .orElseThrow(() -> {
+                    log.error("Aula com ID {} não encontrada durante a sincronização de faltas.", aulaId);
+                    return new RuntimeException("Aula com ID " + aulaId + " não encontrada.");
+                });
+
+        Professor professor = professorRepository.findById(professorQueEstaRegistrandoId)
+                .orElseThrow(() -> {
+                    log.error("Professor com ID {} não encontrado para registrar faltas.", professorQueEstaRegistrandoId);
+                    return new RuntimeException("Professor com ID " + professorQueEstaRegistrandoId + " não encontrado.");
+                });
+
+        // 1. Apaga todas as faltas existentes para esta aula
+        log.debug("Deletando faltas existentes para a aula ID: {}", aulaId);
+
+
+        // 2. Cria e salva as novas faltas baseadas na lista recebida
+        List<FaltaResponseDTO> faltasSalvas = new ArrayList<>();
+        if (faltasParaManter != null && !faltasParaManter.isEmpty()) {
+            for (FaltaCreateDTO dto : faltasParaManter) {
+                // Validação para descrição de justificativa
+                if (Boolean.TRUE.equals(dto.getJustificada()) && (dto.getDescricaoJustificativa() == null || dto.getDescricaoJustificativa().trim().isEmpty())) {
+                    log.warn("Falta para aluno ID {} marcada como justificada, mas sem descrição.", dto.getAlunoId());
+                    throw new IllegalArgumentException("A descrição da justificativa é obrigatória quando a falta é justificada para o aluno ID: " + dto.getAlunoId());
+                }
+
+                Aluno aluno = alunoRepository.findById(dto.getAlunoId())
+                        .orElseThrow(() -> {
+                            log.error("Aluno com ID {} não encontrado para registrar falta durante a sincronização.", dto.getAlunoId());
+                            return new RuntimeException("Aluno com ID " + dto.getAlunoId() + " não encontrado.");
+                        });
+
+                Falta novaFalta = new Falta();
+                novaFalta.setAluno(aluno);
+                novaFalta.setAula(aula);
+                novaFalta.setProfessorQueRegistrou(professor);
+                novaFalta.setDataRegistro(LocalDate.now()); // Data do registro da falta (hoje)
+                novaFalta.setJustificada(Optional.ofNullable(dto.getJustificada()).orElse(false)); // Garante que não seja null
+                novaFalta.setDescricaoJustificativa(dto.getDescricaoJustificativa());
+
+                Falta faltaSalva = faltaRepository.save(novaFalta);
+                faltasSalvas.add(toFaltaResponseDTO(faltaSalva));
+                log.debug("Falta registrada para aluno ID {} na aula ID {}.", dto.getAlunoId(), aulaId);
+            }
+        }
+        log.info("Sincronização de faltas para aula ID {} concluída. Total de faltas registradas: {}", aulaId, faltasSalvas.size());
+        return faltasSalvas;
+    }
     @Override
     @Transactional(readOnly = true)
     public FaltaResponseDTO buscarFaltaPorId(Long id) {
@@ -169,7 +219,14 @@ public class FaltaServiceImpl implements FaltaService {
         List<Falta> faltas = faltaRepository.findByAlunoId(alunoId);
         return toFaltaResponseDTOList(faltas);
     }
+    public List<FaltaResponseDTO> listarFaltasDeUmaAula(Long aulaId) {
+        log.debug("A listar faltas de uma aula para o ID: {}", aulaId);
+        Aula aula = aulaRepository.findById(aulaId)
+                .orElseThrow(() -> new RuntimeException("Aula com ID " + aulaId + " não encontrada."));
 
+        List<Falta> faltas = faltaRepository.findByAula_Id(aulaId); // Certifique-se que este método existe no FaltaRepository
+        return toFaltaResponseDTOList(faltas);
+    }
     @Override
     @Transactional(readOnly = true)
     public List<FaltaResponseDTO> listarFaltasPorAlunoEDisciplina(Long alunoId, Long disciplinaId) {

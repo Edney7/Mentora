@@ -21,8 +21,6 @@ public class FaltaCreateDTO {
     @NotNull(message = "O ID do Professor que está a registar a falta é obrigatório.")
     private Long professorId;
 
-
-
     private Boolean justificada;
     @NotBlank(message = "A descrição da justificativa é obrigatória.")
     @Size(min = 5, max = 500, message = "A descrição da justificativa deve ter entre 5 e 500 caracteres.")
