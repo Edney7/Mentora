@@ -13,7 +13,7 @@ const Navbar = ({ onLogout }) => {
     switch (tipoUsuario?.toUpperCase()) {
       case 'SECRETARIA':
         return [
-          { path: '/homeSecretaria', label: 'Dashboard', icon: Home },
+          { path: '/homeSecretaria', label: 'Home', icon: Home },
           { path: '/secretaria/usuarios', label: 'Usuários', icon: Users },
           { path: '/secretaria/turmas', label: 'Turmas', icon: Building },
           // USO DO ÍCONE CORRIGIDO AQUI
@@ -22,7 +22,7 @@ const Navbar = ({ onLogout }) => {
         ];
       case 'PROFESSOR':
         return [
-          { path: '/homeProfessor', label: 'Dashboard', icon: Home },
+          { path: '/homeProfessor', label: 'Home', icon: Home },
           { path: '/professor/perfil', label: 'Meu Perfil', icon: User },
         ];
       default:
@@ -38,7 +38,7 @@ const Navbar = ({ onLogout }) => {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <span className="text-white text-xl font-bold">Sistema Escolar</span>
+              <span className="text-white text-xl font-bold">MENTORA</span>
             </div>
           </div>
 

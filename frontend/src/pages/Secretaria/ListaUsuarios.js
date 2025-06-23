@@ -381,7 +381,8 @@ export default function ListaUsuarios() {
                                 )
                               }
                             >
-                              <Edit className="mr-2 h-4 w-4" /> Editar
+                              <Edit className="mr-2 h-4 w-4 text-yellow-600" /> 
+                              <p className="text-yellow-600">Editar</p>
                             </DropdownMenuItem>
                             <AlertDialogTrigger asChild>
                               <DropdownMenuItem

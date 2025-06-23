@@ -1,5 +1,3 @@
-// src/pages/Login.js
-
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
@@ -8,10 +6,11 @@ import { useMutation } from "@tanstack/react-query";
 import { loginUsuario } from "../services/ApiService";
 import { useToast } from "../hooks/use-toast";
 
-// Ícones
-import { GraduationCap, User, Lock } from "lucide-react";
+// Ícones e Logo
+import { User, Lock } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
+import logoMentora from "../assets/logo-mentora.png"; // 1. IMPORTAÇÃO DO LOGO
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -86,13 +85,12 @@ export default function Login() {
     <div className="min-h-screen bg-gradient-to-br from-teal-600 via-teal-700 to-cyan-800 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
         <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 bg-teal-600 rounded-full flex items-center justify-center mb-4">
-            <GraduationCap size={32} className="text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
-            Sistema Escolar
-          </h1>
-          <p className="text-gray-600">Faça login para continuar</p>
+          {/* 2. LOGO ADICIONADO AQUI */}
+          <img
+            src={logoMentora}
+            alt="Logo Mentora"
+            className="mx-auto h-12 w-auto mb-6"
+          />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -128,6 +126,7 @@ export default function Login() {
             </div>
           </div>
 
+<<<<<<< HEAD
           {/*<div className="text-right">
             <Link
               to="/esqueci-senha"
@@ -136,6 +135,9 @@ export default function Login() {
               Esqueci minha senha
             </Link>
           </div>*/}
+=======
+
+>>>>>>> 2c9aa9fb5a1376472e4fb753a9cb751e491aa89c
 
           <Button
             type="submit"
