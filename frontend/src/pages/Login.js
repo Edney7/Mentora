@@ -128,14 +128,14 @@ export default function Login() {
             </div>
           </div>
 
-          <div className="text-right">
+          {/*<div className="text-right">
             <Link
               to="/esqueci-senha"
               className="text-sm text-teal-600 hover:text-teal-700 transition-colors"
             >
               Esqueci minha senha
             </Link>
-          </div>
+          </div>*/}
 
           <Button
             type="submit"
