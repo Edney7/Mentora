@@ -6,13 +6,14 @@ import {
   ScrollView,
   ActivityIndicator,
   Dimensions,
-  TouchableOpacity
+  TouchableOpacity,
+  Alert
 } from 'react-native';
-import { LineChart, BarChart } from 'react-native-chart-kit';
+import { BarChart, LineChart } from 'react-native-chart-kit'; // Importação correta
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 
-const API_BASE_URL = 'http://192.168.248.47:8080';
+const API_BASE_URL = 'http://192.168.248.47:8080';  // Substitua com o seu URL da API
 const screenWidth = Dimensions.get("window").width;
 
 const chartConfig = {
@@ -32,19 +33,23 @@ const chartConfig = {
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [nomeUsuario, setNomeUsuario] = useState('');
-  const [mediaGeral, setMediaGeral] = useState(null);
-  const [totalFaltas, setTotalFaltas] = useState(null);
   const [notasDetalhadas, setNotasDetalhadas] = useState([]);
   const [faltasPorDisciplina, setFaltasPorDisciplina] = useState([]);
+  const [totalFaltas, setTotalFaltas] = useState(null);
+  const [mediaGeral, setMediaGeral] = useState(null);
   const [modoGrafico, setModoGrafico] = useState('NOTAS');
 
   const fetchAlunoNotasData = async (alunoId) => {
     try {
       const response = await fetch(`${API_BASE_URL}/notas/aluno/${alunoId}/resumo`);
-      if (!response.ok) throw new Error();
+      if (!response.ok) {
+        const errorBody = await response.text();
+        console.error(`Erro HTTP ${response.status}: ${errorBody}`);
+        throw new Error(`Erro ao buscar notas: ${response.status}`);
+      }
       const resumo = await response.json();
       setNotasDetalhadas(resumo.mediasPorDisciplina || []);
-      setMediaGeral(resumo.mediaGeral);
+      setMediaGeral(resumo.mediaGeral); 
     } catch (error) {
       console.error("Erro ao buscar notas:", error);
       Alert.alert("Erro", "Erro ao buscar notas.");
@@ -54,10 +59,14 @@ export default function Dashboard() {
   const fetchAlunoFaltasData = async (alunoId) => {
     try {
       const response = await fetch(`${API_BASE_URL}/faltas/resumo-aluno/${alunoId}`);
-      if (!response.ok) throw new Error();
+      if (!response.ok) {
+        const errorBody = await response.text();
+        console.error(`Erro HTTP ${response.status}: ${errorBody}`);
+        throw new Error(`Erro ao buscar faltas: ${response.status}`);
+      }
       const data = await response.json();
       setFaltasPorDisciplina(data.faltasPorDisciplina || []);
-      setTotalFaltas(data.totalFaltas);
+      setTotalFaltas(data.totalFaltas); 
     } catch (error) {
       console.error("Erro ao buscar faltas:", error);
       Alert.alert("Erro", "Erro ao buscar faltas.");
@@ -74,6 +83,8 @@ export default function Dashboard() {
         if (alunoId) {
           await fetchAlunoNotasData(alunoId);
           await fetchAlunoFaltasData(alunoId);
+        } else {
+          Alert.alert("Erro", "ID do aluno não encontrado. Faça o login novamente.");
         }
         setLoading(false);
       };
@@ -95,20 +106,33 @@ export default function Dashboard() {
   );
 
   const renderGraficoNotas = () => {
-    if (!notasDetalhadas.length) return null;
+    if (!notasDetalhadas.length) return (
+      <View style={styles.card}>
+        <Text style={styles.chartTitle}>Nenhuma nota disponível.</Text>
+      </View>
+    );
+
     return notasDetalhadas.map((disciplina, index) => {
-      const labels = ['1º', '2º', '3º', '4º'];
-      const valores = Array(4).fill(disciplina.media);
+      const dados = [
+        disciplina.prova1 ?? 0, 
+        disciplina.prova2 ?? 0, 
+        disciplina.media ?? 0 
+      ];
+      const bimestres = ['P1', 'P2', 'Média'];
+
       return (
         <View key={index} style={styles.card}>
           <Text style={styles.chartTitle}>{disciplina.nomeDisciplina}</Text>
           <LineChart
-            data={{ labels, datasets: [{ data: valores }] }}
+            data={{
+              labels: bimestres,
+              datasets: [{ data: dados }]
+            }}
             width={screenWidth - 40}
-            height={180}
+            height={220}
             chartConfig={chartConfig}
             bezier
-            style={{ borderRadius: 10 }}
+            style={{ borderRadius: 12 }}
           />
         </View>
       );
@@ -116,9 +140,15 @@ export default function Dashboard() {
   };
 
   const renderGraficoFaltas = () => {
-    if (!faltasPorDisciplina.length) return null;
+    if (!faltasPorDisciplina.length) return (
+      <View style={styles.card}>
+        <Text style={styles.chartTitle}>Nenhuma falta registrada.</Text>
+      </View>
+    );
+
     const labels = faltasPorDisciplina.map(f => f.nomeDisciplina);
     const dados = faltasPorDisciplina.map(f => f.faltas);
+
     return (
       <View style={styles.card}>
         <Text style={styles.chartTitle}>Faltas por Disciplina</Text>
