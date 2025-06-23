@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm, useFieldArray } from "react-hook-form";
+import { cn } from "../../lib/utils";
 
 // Componentes e Hooks
 import { Button } from "../../components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "../../components/ui/card";
@@ -46,15 +48,9 @@ import { Skeleton } from "../../components/ui/skeleton";
 import { useToast } from "../../hooks/use-toast";
 
 // Ícones
-import {
-  ArrowLeft,
-  BookOpen,
-  Users,
-  CalendarCheck,
-  ClipboardEdit,
-} from "lucide-react";
+import { ArrowLeft, Users, CalendarCheck, ClipboardEdit } from "lucide-react";
 
-// Funções da API (e import do 'api' default)
+// Funções da API
 import api, {
   listarAlunosDaTurma,
   listarDisciplinasDoProfessor,
@@ -63,8 +59,32 @@ import api, {
   sincronizarFaltasPorAula,
 } from "../../services/ApiService";
 
-// Sub-componente para o Painel de Notas
-const NotasPanel = ({ aluno, disciplinas, professorId, turmaId }) => {
+// --- O COMPONENTE QUE VOCÊ GOSTOU ---
+const AlunoCard = ({ aluno, isSelected, onClick }) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      "p-3 border rounded-lg flex items-center gap-4 transition-all duration-200 w-full text-left",
+      isSelected
+        ? "bg-teal-600 text-white shadow-lg ring-2 ring-teal-700 ring-offset-2"
+        : "bg-white hover:bg-gray-100 hover:shadow-md"
+    )}
+  >
+    <div
+      className={cn(
+        "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
+        isSelected ? "bg-white/20" : "bg-gray-100"
+      )}
+    >
+      <Users
+        className={cn("h-5 w-5", isSelected ? "text-white" : "text-gray-500")}
+      />
+    </div>
+    <span className="font-medium text-sm break-words">{aluno.nomeUsuario}</span>
+  </button>
+);
+
+const PainelNotas = ({ aluno, disciplinas, professorId, turmaId }) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -90,7 +110,7 @@ const NotasPanel = ({ aluno, disciplinas, professorId, turmaId }) => {
   });
 
   const form = useForm();
-  const { reset, watch, register } = form;
+  const { reset, watch, register, getValues } = form;
 
   useEffect(() => {
     if (notasQuery.data) {
@@ -118,7 +138,7 @@ const NotasPanel = ({ aluno, disciplinas, professorId, turmaId }) => {
   });
 
   const handleSalvarNota = (disciplinaId, bimestre) => {
-    const notasDoForm = form.getValues(`${disciplinaId}.${bimestre}`);
+    const notasDoForm = getValues(`${disciplinaId}.${bimestre}`);
     const prova1 = parseFloat(notasDoForm.prova1);
     const prova2 = parseFloat(notasDoForm.prova2);
 
@@ -144,77 +164,74 @@ const NotasPanel = ({ aluno, disciplinas, professorId, turmaId }) => {
     notaMutation.mutate(notaDTO);
   };
 
+  if (notasQuery.isLoading)
+    return (
+      <CardContent className="pt-6">
+        <p>Carregando notas...</p>
+      </CardContent>
+    );
   return (
     <CardContent className="pt-6">
-      {notasQuery.isLoading ? (
-        <p>Carregando notas...</p>
-      ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Disciplina</TableHead>
-              <TableHead>Bimestre</TableHead>
-              <TableHead>Prova 1</TableHead>
-              <TableHead>Prova 2</TableHead>
-              <TableHead>Média</TableHead>
-              <TableHead>Ação</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {disciplinas.map((disciplina) =>
-              [1, 2, 3, 4].map((bimestre) => (
-                <TableRow key={`${disciplina.id}-${bimestre}`}>
-                  <TableCell>{disciplina.nome}</TableCell>
-                  <TableCell>{bimestre}º</TableCell>
-                  <TableCell>
-                    <Input
-                      type="number"
-                      step="0.1"
-                      {...register(`${disciplina.id}.${bimestre}.prova1`)}
-                      className="w-20"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input
-                      type="number"
-                      step="0.1"
-                      {...register(`${disciplina.id}.${bimestre}.prova2`)}
-                      className="w-20"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    {((parseFloat(
-                      watch(`${disciplina.id}.${bimestre}.prova1`)
-                    ) || 0) +
-                      (parseFloat(
-                        watch(`${disciplina.id}.${bimestre}.prova2`)
-                      ) || 0)) /
-                      2 || 0}
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      size="sm"
-                      onClick={() => handleSalvarNota(disciplina.id, bimestre)}
-                      disabled={notaMutation.isPending}
-                    >
-                      Salvar
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      )}
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Disciplina</TableHead>
+            <TableHead>Bimestre</TableHead>
+            <TableHead>Prova 1</TableHead>
+            <TableHead>Prova 2</TableHead>
+            <TableHead>Média</TableHead>
+            <TableHead>Ação</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {disciplinas.map((disciplina) =>
+            [1, 2, 3, 4].map((bimestre) => (
+              <TableRow key={`${disciplina.id}-${bimestre}`}>
+                <TableCell>{disciplina.nome}</TableCell>
+                <TableCell>{bimestre}º</TableCell>
+                <TableCell>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    {...register(`${disciplina.id}.${bimestre}.prova1`)}
+                    className="w-20"
+                  />
+                </TableCell>
+                <TableCell>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    {...register(`${disciplina.id}.${bimestre}.prova2`)}
+                    className="w-20"
+                  />
+                </TableCell>
+                <TableCell>
+                  {((parseFloat(watch(`${disciplina.id}.${bimestre}.prova1`)) ||
+                    0) +
+                    (parseFloat(watch(`${disciplina.id}.${bimestre}.prova2`)) ||
+                      0)) /
+                    2 || 0}
+                </TableCell>
+                <TableCell>
+                  <Button
+                    size="sm"
+                    onClick={() => handleSalvarNota(disciplina.id, bimestre)}
+                    disabled={notaMutation.isPending}
+                  >
+                    Salvar
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
     </CardContent>
   );
 };
 
-// Sub-componente para o Painel de Faltas
-const FaltasPanel = ({ alunos, disciplinas, professorId, turmaId }) => {
+const PainelFaltas = ({ alunos, disciplinas, professorId, turmaId }) => {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-
   const form = useForm({
     defaultValues: {
       disciplinaId: "",
@@ -295,11 +312,11 @@ const FaltasPanel = ({ alunos, disciplinas, professorId, turmaId }) => {
       });
       return;
     }
-const formatarDataParaBackend = (dataYYYYMMDD) => {
-  if (!dataYYYYMMDD) return null;
-  const [ano, mes, dia] = dataYYYYMMDD.split("-");
-  return `${dia}-${mes}-${ano}`;
-};
+    const formatarDataParaBackend = (dataYYYYMMDD) => {
+      if (!dataYYYYMMDD) return null;
+      const [ano, mes, dia] = dataYYYYMMDD.split("-");
+      return `${dia}-${mes}-${ano}`;
+    };
     const aulaDTO = {
       disciplinaId: parseInt(data.disciplinaId),
       professorId: parseInt(professorId),
@@ -400,6 +417,7 @@ const formatarDataParaBackend = (dataYYYYMMDD) => {
                               <Switch
                                 checked={switchField.value}
                                 onCheckedChange={switchField.onChange}
+                                className="data-[state=checked]:bg-green-600"
                               />
                             </FormControl>
                           )}
@@ -485,19 +503,14 @@ export default function TurmaDetalhe() {
               {isLoading
                 ? Array(5)
                     .fill(0)
-                    .map((_, i) => <Skeleton key={i} className="h-10 w-full" />)
+                    .map((_, i) => <Skeleton key={i} className="h-16 w-full" />)
                 : alunosQuery.data?.map((aluno) => (
-                    // AQUI ESTÁ A MUDANÇA: trocamos 'secondary' por 'default' para um destaque maior
-                    <Button
+                    <AlunoCard
                       key={aluno.id}
-                      variant={
-                        alunoSelecionado?.id === aluno.id ? "default" : "ghost"
-                      }
-                      className="w-full justify-start"
+                      aluno={aluno}
+                      isSelected={alunoSelecionado?.id === aluno.id}
                       onClick={() => setAlunoSelecionado(aluno)}
-                    >
-                      {aluno.nomeUsuario}
-                    </Button>
+                    />
                   ))}
             </CardContent>
           </Card>
@@ -514,7 +527,7 @@ export default function TurmaDetalhe() {
                     <ClipboardEdit className="mr-2 h-4 w-4" /> Lançar Notas
                   </TabsTrigger>
                   <TabsTrigger value="faltas">
-                    <CalendarCheck className="mr-2 h-4 w-4" /> Registrar Aulas e Faltas
+                    <CalendarCheck className="mr-2 h-4 w-4" /> Registrar Faltas
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value="notas">
@@ -523,8 +536,11 @@ export default function TurmaDetalhe() {
                       <CardTitle>
                         Notas de {alunoSelecionado.nomeUsuario}
                       </CardTitle>
+                      <CardDescription>
+                        Insira as notas de P1 e P2 para cada bimestre e salve.
+                      </CardDescription>
                     </CardHeader>
-                    <NotasPanel
+                    <PainelNotas
                       aluno={alunoSelecionado}
                       disciplinas={disciplinasQuery.data || []}
                       professorId={professorId}
@@ -536,8 +552,12 @@ export default function TurmaDetalhe() {
                   <Card>
                     <CardHeader>
                       <CardTitle>Registro de Presença</CardTitle>
+                      <CardDescription>
+                        Selecione a disciplina, data e tópico da aula. Marque os
+                        alunos presentes.
+                      </CardDescription>
                     </CardHeader>
-                    <FaltasPanel
+                    <PainelFaltas
                       alunos={alunosQuery.data || []}
                       disciplinas={disciplinasQuery.data || []}
                       professorId={professorId}
