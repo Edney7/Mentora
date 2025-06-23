@@ -170,7 +170,7 @@ export default function HomeSecretaria() {
                  <Button variant="outline" className="h-auto p-6 text-left justify-start bg-white border border-gray-200 shadow-lg" onClick={() => navigate("/secretaria/ausenciaProfessor")}>
                     <div className="flex flex-col">
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Ausência do Professor</h3>
-                        <p className="text-gray-600 text-sm">Gerenciar ausências e substituições</p>
+                        <p className="text-gray-600 text-sm">Gerenciar ausências dos professores</p>
                     </div>
                  </Button>
                  <Button variant="outline" className="h-auto p-6 text-left justify-start bg-white border border-gray-200 shadow-lg" onClick={() => navigate("/secretaria/turmas")}>
@@ -182,7 +182,7 @@ export default function HomeSecretaria() {
                  <Button variant="outline" className="h-auto p-6 text-left justify-start bg-white border border-gray-200 shadow-lg" onClick={() => navigate("/secretaria/disciplina")}>
                     <div className="flex flex-col">
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Gerenciar Disciplinas</h3>
-                        <p className="text-gray-600 text-sm">Configurar matérias e currículos</p>
+                        <p className="text-gray-600 text-sm">Configurar as disciplinas</p>
                     </div>
                 </Button>
             </div>

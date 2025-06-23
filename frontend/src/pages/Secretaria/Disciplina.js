@@ -130,21 +130,8 @@ export default function Disciplina() {
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <Button variant="ghost" size="icon" onClick={() => setModalAberto({ type: 'details', data: disciplina })}><Eye className="h-4 w-4" /></Button>
-                                        <Button variant="ghost" size="icon" onClick={() => setModalAberto({ type: 'edit', data: disciplina })}><Edit className="h-4 w-4" /></Button>
-                                        <AlertDialog>
-                                            <AlertDialogTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="text-red-600 hover:text-red-700"><Trash2 className="h-4 w-4" /></Button>
-                                            </AlertDialogTrigger>
-                                            <AlertDialogContent>
-                                                <AlertDialogHeader><AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle></AlertDialogHeader>
-                                                <AlertDialogDescription>Tem certeza que deseja excluir a disciplina "{disciplina.nome}"? Esta ação não pode ser desfeita.</AlertDialogDescription>
-                                                <AlertDialogFooter>
-                                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                                    <AlertDialogAction onClick={() => deleteMutation.mutate(disciplina.id)}>Excluir</AlertDialogAction>
-                                                </AlertDialogFooter>
-                                            </AlertDialogContent>
-                                        </AlertDialog>
+                                        <Button variant="ghost" size="icon" onClick={() => setModalAberto({ type: 'details', data: disciplina })}><Eye className="h-4 w-4 text-blue-600" /></Button>
+                                        <Button variant="ghost" size="icon" onClick={() => setModalAberto({ type: 'edit', data: disciplina })}><Edit className="h-4 w-4 text-yellow-600" /></Button>
                                     </div>
                                 </Card>
                             ))

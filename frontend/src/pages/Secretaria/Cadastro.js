@@ -148,7 +148,11 @@ export default function Cadastro() {
                     <FormItem>
                       <FormLabel>Nome Completo</FormLabel>
                       <FormControl>
-                        <Input placeholder="Nome do usuário" {...field} />
+                        <Input
+                          placeholder="Nome do usuário"
+                          {...field}
+                          required
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -167,6 +171,7 @@ export default function Cadastro() {
                           onChange={(e) =>
                             field.onChange(formatarCPF(e.target.value))
                           }
+                          required
                         />
                       </FormControl>
                       <FormMessage />
@@ -184,6 +189,7 @@ export default function Cadastro() {
                           type="email"
                           placeholder="email@exemplo.com"
                           {...field}
+                          required
                         />
                       </FormControl>
                       <FormMessage />
@@ -197,7 +203,7 @@ export default function Cadastro() {
                     <FormItem>
                       <FormLabel>Data de Nascimento</FormLabel>
                       <FormControl>
-                        <Input type="date" {...field} />
+                        <Input type="date" {...field} required />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -214,6 +220,7 @@ export default function Cadastro() {
                           type="password"
                           placeholder="Mínimo 6 caracteres"
                           {...field}
+                          required
                         />
                       </FormControl>
                       <FormMessage />
@@ -231,6 +238,7 @@ export default function Cadastro() {
                           type="password"
                           placeholder="Repita a senha"
                           {...field}
+                          required
                         />
                       </FormControl>
                       <FormMessage />
@@ -249,7 +257,9 @@ export default function Cadastro() {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecione o sexo" />
+                            <SelectValue
+                              placeholder="Selecione o sexo"
+                            required/>
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -273,7 +283,7 @@ export default function Cadastro() {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecione um tipo" />
+                            <SelectValue placeholder="Selecione um tipo"/>
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
