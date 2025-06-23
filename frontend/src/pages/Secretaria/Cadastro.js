@@ -140,7 +140,7 @@ export default function Cadastro() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
                 <FormField
                   control={form.control}
                   name="nome"
@@ -389,7 +389,7 @@ export default function Cadastro() {
                 <Button
                   type="submit"
                   disabled={cadastroMutation.isPending}
-                  className="w-full md:w-auto"
+                  className="w-full md:w-auto text-white bg-blue-600 hover:bg-blue-700"
                 >
                   {cadastroMutation.isPending
                     ? "Cadastrando..."

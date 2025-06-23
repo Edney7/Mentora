@@ -94,8 +94,8 @@ export default function TurmaForm({ onSubmit, initialData, isSaving }) {
             )}
           />
         </div>
-        <div className="flex justify-end pt-4">
-          <Button type="submit" disabled={isSaving}>
+        <div className="flex justify-end pt-4 ">
+          <Button className="text-white bg-blue-600 hover:bg-blue-700" type="submit" disabled={isSaving}>
             {isSaving ? "Salvando..." : "Salvar Turma"}
           </Button>
         </div>

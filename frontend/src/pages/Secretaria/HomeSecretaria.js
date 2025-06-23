@@ -161,25 +161,25 @@ export default function HomeSecretaria() {
           <div className="lg:col-span-2 space-y-6">
              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                  {/* Botões de Ação Rápida */}
-                 <Button variant="outline" className="h-auto p-6 text-left justify-start" onClick={() => navigate("/secretaria/usuarios")}>
+                 <Button variant="outline" className="h-auto p-6 text-left justify-start bg-white border border-gray-200 shadow-lg" onClick={() => navigate("/secretaria/usuarios")}>
                     <div className="flex flex-col">
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Gerenciar Usuários</h3>
                         <p className="text-gray-600 text-sm">Cadastre, edite e gerencie usuários</p>
                     </div>
                 </Button>
-                 <Button variant="outline" className="h-auto p-6 text-left justify-start" onClick={() => navigate("/secretaria/ausenciaProfessor")}>
+                 <Button variant="outline" className="h-auto p-6 text-left justify-start bg-white border border-gray-200 shadow-lg" onClick={() => navigate("/secretaria/ausenciaProfessor")}>
                     <div className="flex flex-col">
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Ausência do Professor</h3>
                         <p className="text-gray-600 text-sm">Gerenciar ausências e substituições</p>
                     </div>
                  </Button>
-                 <Button variant="outline" className="h-auto p-6 text-left justify-start" onClick={() => navigate("/secretaria/turmas")}>
+                 <Button variant="outline" className="h-auto p-6 text-left justify-start bg-white border border-gray-200 shadow-lg" onClick={() => navigate("/secretaria/turmas")}>
                     <div className="flex flex-col">
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Gerenciar Turmas</h3>
                         <p className="text-gray-600 text-sm">Criar e organizar turmas</p>
                     </div>
                  </Button>
-                 <Button variant="outline" className="h-auto p-6 text-left justify-start" onClick={() => navigate("/secretaria/disciplina")}>
+                 <Button variant="outline" className="h-auto p-6 text-left justify-start bg-white border border-gray-200 shadow-lg" onClick={() => navigate("/secretaria/disciplina")}>
                     <div className="flex flex-col">
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Gerenciar Disciplinas</h3>
                         <p className="text-gray-600 text-sm">Configurar matérias e currículos</p>
@@ -197,12 +197,12 @@ export default function HomeSecretaria() {
               </h3>
               <Calendar eventos={eventosQuery.data || []} />
             </div>
-            <Button className="w-full h-auto" onClick={abrirModal}>
+            {/*<Button className="w-full h-auto" onClick={abrirModal}>
                 <div className="flex items-center justify-center space-x-2 p-2">
                     <Plus size={20} />
                     <span className="font-semibold">Cadastrar Evento</span>
                 </div>
-            </Button>
+            </Button>*/}
           </div>
         </div>
 

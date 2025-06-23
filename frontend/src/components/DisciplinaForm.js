@@ -43,7 +43,7 @@ export default function DisciplinaForm({ onSubmit, initialData, isSaving }) {
         />
       </div>
       <div className="flex justify-end gap-2 pt-2">
-        <Button type="submit" disabled={isSaving}>
+        <Button className="text-white bg-blue-600 hover:bg-blue-700" type="submit" disabled={isSaving}>
           {isSaving ? "Salvando..." : "Salvar"}
         </Button>
       </div>

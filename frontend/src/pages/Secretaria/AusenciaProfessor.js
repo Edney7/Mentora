@@ -105,7 +105,7 @@ export default function AusenciaProfessor() {
           <h1 className="text-3xl font-bold text-gray-800">Ausências de Professores</h1>
         </div>
 
-        <Card className="mb-6">
+        <Card className="mb-6 bg-white">
           <CardHeader><CardTitle>Filtros</CardTitle></CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -133,10 +133,10 @@ export default function AusenciaProfessor() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <CalendarDays className="h-6 w-6 text-teal-600" />
+              <CalendarDays className="h-6 w-6 " />
               Lista de Ausências Registradas
             </CardTitle>
           </CardHeader>

@@ -96,7 +96,7 @@ export default function Disciplina() {
                     {/* Botão de Criar agora usa DialogTrigger */}
                     <Dialog onOpenChange={(open) => !open && setModalAberto({type: null, data: null})}>
                         <DialogTrigger asChild>
-                            <Button onClick={() => setModalAberto({ type: 'create', data: null })}>
+                            <Button className="text-white bg-blue-600 hover:bg-blue-700" onClick={() => setModalAberto({ type: 'create', data: null })}>
                                 <Plus className="mr-2 h-4 w-4" /> Nova Disciplina
                             </Button>
                         </DialogTrigger>
@@ -121,7 +121,7 @@ export default function Disciplina() {
                     {isLoading ? <DisciplinaSkeleton /> : 
                         disciplinasFiltradas.length > 0 ? (
                             disciplinasFiltradas.map((disciplina) => (
-                                <Card key={disciplina.id} className="flex items-center justify-between p-4">
+                                <Card key={disciplina.id} className="flex items-center justify-between p-4 bg-white">
                                     <div className="flex items-center gap-4">
                                         <div className="bg-teal-100 p-3 rounded-full"><BookMarked className="h-6 w-6 text-teal-600" /></div>
                                         <div>

@@ -255,7 +255,7 @@ export default function ListaTurmas() {
           </div>
           <Dialog open={modalState.type === "create"} onOpenChange={(open) => !open && setModalState({ type: null, data: null })}>
             <DialogTrigger asChild>
-              <Button onClick={() => setModalState({ type: "create", data: null })}>
+              <Button className="text-white bg-blue-600 hover:bg-blue-700" onClick={() => setModalState({ type: "create", data: null })}>
                 <Plus className="mr-2 h-4 w-4" /> Nova Turma
               </Button>
             </DialogTrigger>
